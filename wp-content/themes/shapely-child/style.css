@@ -15,4 +15,27 @@
     border-radius: 5px; 
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); 
     margin-top: 50px; 
+    border-width: 0;
+}
+
+.homepage .phone a:hover {
+    background-color: #e6e6e6;
+}
+
+.homepage .phone .phone-image {
+    width: 185px; 
+    height: 224px; 
+    margin-top: 27px; 
+    padding-top: 10px;
+}
+
+.homepage .phone .title {
+    font-family: 'HP Simplified'; 
+    padding-top: 50px; 
+    font-size: 25px; 
+    width: 249px; 
+    height: 70px; 
+    color: #000; 
+    margin-right: 50px;
+    text-transform: initial;
 }

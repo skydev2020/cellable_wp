@@ -23,8 +23,8 @@ get_header();
 				<?php foreach ($phones as $phone): ?>
 				<div class="col-sm-4 text-center phone">
 					<a class="btn btn-default" href="/Phones/Carriers/1">
-						<img src="<?= get_stylesheet_directory_uri()?>/assets/images/<?= $phone['image_file'] ?>" style="width: 185px; height: 224px; margin-top: 27px; padding-top: 10px;">
-						<p class="text-center" style="font-family: 'HP Simplified'; padding-top: 50px; font-size: 25px; width: 249px; height: 70px; color: #000; margin-right: 50px;"><?= $phone['brand'] ?></p>
+						<img class="phone-image" src="<?= get_stylesheet_directory_uri()?>/assets/images/<?= $phone['image_file'] ?>">
+						<p class="text-center title"><?= $phone['brand'] ?></p>
 					</a>
 				</div>
 				<?php endforeach; ?>
