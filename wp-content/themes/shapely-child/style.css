@@ -39,3 +39,17 @@
     margin-right: 50px;
     text-transform: initial;
 }
+
+.phone-page .carrier a {
+    width: 200px;
+    height: 100px;
+    padding: .375rem .75rem;
+    border-width: 0px;
+    box-shadow: 0 14px 18px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    color: black;
+}
+
+.phone-page .carrier a:hover {
+    background-color: initial;
+    color: initial;
+}
