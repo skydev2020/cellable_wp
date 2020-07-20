@@ -19,7 +19,7 @@ get_header();
 			<div class="text-center">
 				<?php foreach ($phones as $phone): ?>
 				<div class="col-sm-4 text-center phone">
-					<a class="btn btn-default" href="<?=get_home_url() ?>/phones/<?=$phone['id']?>">
+					<a class="btn btn-default" href="<?=get_home_url() ?>/carriers/?phone_id=<?=$phone['id']?>">
 						<img class="phone-image" src="<?= get_stylesheet_directory_uri()?>/assets/images/<?= $phone['image_file'] ?>">
 						<p class="text-center title"><?= $phone['brand'] ?></p>
 					</a>
