@@ -127,11 +127,12 @@ get_header();
 											
 											<?php foreach ($possible_defects as $ele): ?>
 											<label>
-												<input id="<?= $ele['defect_group_id'] ?>" type="radio" name="defect_ids[]" 
-													value="<?= $ele['id'] ?>" autocomplete="off"/> 
+												<input name="defect_group_<?= $ele['defect_group_id'] ?>" id="<?= $ele['defect_group_id'] ?>" type="radio"	value="<?= $ele['id'] ?>" 
+													autocomplete="off" onclick="setDefectId('<?=$ele['defect_group_id'] ?>','<?= $ele['id'] ?>')"/> 
 													&nbsp; <?= $ele['name'] ?>
 											</label>&nbsp;&nbsp;&nbsp;
 											<?php endforeach; ?>
+											<input type="hidden" name="defect_ids[]" id="defect_group_id_<?= $ele['defect_group_id'] ?>"/>
 										</div>
 									</td>
 								</tr>
@@ -150,5 +151,10 @@ get_header();
 			</form>
 		</div><!-- #primary -->
 	</div>
+	<script>
+		function setDefectId(defect_group_id, defect_id) {
+			document.getElementById("defect_group_id_"+defect_group_id).value=defect_id;
+		}
+	</script>
 <?php
 get_footer();

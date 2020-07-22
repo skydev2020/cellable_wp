@@ -34,10 +34,12 @@ get_header();
 			}
 
 			$price = $phone_version_capacity['value'];
-			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM wp_cellable_possible_defects WHERE id in %s",
-				"(".implode(', ', $defect_ids).")"), ARRAY_A );
+			$defect_ids_str = implode(', ', $defect_ids);
+			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM wp_cellable_possible_defects WHERE id in ($defect_ids_str)") );
 			
 			$price = $price-$total_defect_value;
+
+			
 			
 			$possible_defect_groups = $wpdb->get_results($wpdb->prepare("SELECT distinct(defect_group_id) id FROM wp_cellable_possible_defects 
 				where phone_version_id = %d order by defect_group_id asc", 
