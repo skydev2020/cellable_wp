@@ -34,6 +34,7 @@ get_header();
 			}
 
 			$price = $phone_version_capacity['value'];
+			$original_price = $price;
 			$defect_ids_str = implode(', ', $defect_ids);
 			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM wp_cellable_possible_defects WHERE id in ($defect_ids_str)") );
 			
@@ -75,7 +76,7 @@ get_header();
 						</td>
 						<td class="text-center" style="width:40%;">
 							<div style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: green; font-size: 55px;">
-								<?= number_format((float)$price, 2, '.', '')  ?>	
+								$<?= number_format((float)$price, 2, '.', '')  ?>
 							</div>
 							<p>&nbsp;</p>
 
@@ -109,79 +110,56 @@ get_header();
 								<div class='text-danger'>Unfortunately, we cannot purchase your phone.</div>
 							<?php endif;?>
 						</td>
-						
 						<td style="width: 30%;">
-							<table style="width:80%; margin-left:auto; margin-right:auto;">
+							<table style="width:100%; margin-left:auto; margin-right:auto;">
 								<tr>
-									<td>
-										<div style=" margin-right: 50px; height: 125px; border: medium solid #ccc; width: 600px; border-radius: 15px; margin-left: 24px;">
-											<div style="text-align:left; background-color:lightgray;">
-												&nbsp;&nbsp;&nbsp;
-												<p style="text-align:left; font-size:large; background-color:lightgray; margin-top: -10px; width: 573px; margin-left: 17px; border-bottom: thin solid #ccc; ">
-													Storage Capacity
-												</p>
-											</div>
-											<div style="display:inline-block; width:30px;"></div>
-											<?php foreach ($capacities as $capacity): ?>
-												<?php foreach ($phone_version_capacities as $phone_version_capacity): ?>
-													<?php if ($capacity['id'] == $phone_version_capacity['storage_capacity_id']): ?>
-												
-												<label>
-													<input  type="radio" name="capacity" value="<?= $phone_version_capacity['value'] ?>" onchange="SetField('capacity', <?= $capacity['value'] ?>, '<?= $phone_version_capacity['description'] ?>')" autocomplete="off" />&nbsp;
-													<?= $capacity['description'] ?>
-												</label>&nbsp;&nbsp;
-												
-													<?php endif; ?>
-												<?php endforeach; ?>
-											<?php endforeach; ?>
-											
-											
-											<br />
-											<div style="display:inline-block; width:30px;"></div><div id="CapacityValidationMessage" name="CapacityValidationMessage" style="display:inline-block" class="text-danger"></div>
-											<input type="hidden" name="hdnCapacity" id="hdnCapacity" />
-											<input type="hidden" name="hdnCapacityDesc" id="hdnCapacityDesc" />
-										</div>
+									<td class="text-center" style="background-color:lightgrey" colspan="3">
+										<b>Your Phone Details</b><br />
 									</td>
 								</tr>
-								
-								<?php 
-
-								foreach ($possible_defect_groups as $possible_defect_group):
-									
-									$defect_group = $wpdb->get_row("SELECT * FROM wp_cellable_defect_groups WHERE id=" . $possible_defect_group['id'], ARRAY_A);
-									$possible_defects = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_possible_defects 
-										where phone_version_id = %d and defect_group_id = %d", 
-										$wpdb->esc_like($phone_version_id), $wpdb->esc_like($possible_defect_group['id'])), ARRAY_A);
-								?>
 								<tr>
-									<td>
-										<div style="margin-right: 50px; height: 125px; border: medium solid #ccc; width: 600px; border-radius: 15px; margin-left: 24px;">
-											&nbsp;&nbsp;&nbsp;
-											<p style="text-align:left; margin-top: -10px; font-size:large; width: 573px; margin-left: 17px; border-bottom: thin solid #ccc; ">
-												<?= $defect_group['name'] ?>
-												<?php if ($defect_group['info']!=null): ?>
-													<abbr title="<?= $defect_group['info'] ?>"><i class="fa fa-info-circle" style="cursor:pointer;"></i></abbr>	
-												<?php endif; ?>
-											</p>
-											<div style="width:30px; display:inline-block"></div>
-											
-											<?php foreach ($possible_defects as $ele): ?>
-											<label>
-												<input id="<?= $ele['defect_group_id'] ?>" type="radio" name="<?= $ele['defect_group_id'] ?>" 
-													value="<?= $defect_group['id'] ?>_<?= $ele['id'] ?>_<?= $ele['cost'] ?>" 
-													onchange="SetField('<?= $defect_group['id'] ?>', null, null)" autocomplete="off"/> 
-													&nbsp; <?= $ele['name'] ?>
-											</label>&nbsp;&nbsp;&nbsp;
-											<?php endforeach; ?>
-											
-											<div id="<?= $defect_group['id'] ?>" name="<?= $defect_group['id'] ?>" class="text-danger" style="margin-left:40px; display:none;">* Required</div>
-											<input type="hidden" id="hdn_<?= $defect_group['id'] ?>" name="hdn_<?= $defect_group['id'] ?>" />
-										</div>
+									<td class = "text-right" style="padding:3px;">
+										<strong>Phone's Base Value:</strong>
+									</td>
+									<td class="text-right" style="width:25px; color:forestgreen;">
+										<strong>$</strong>
+									</td>
+									<td class="text-right" style="padding:3px; text-align:right; color:forestgreen;">
+										<strong><?= number_format((float)$original_price, 2, '.', '')?></strong>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2" style="padding:3px;">Storage Capacity</td>
+									<td class="text-right">
+										<?= $capacity['description'] ?>
+									</td>
+								</tr>
+								<tr>
+									
+								</tr>
+								<?php 
+								foreach ($defect_ids as $defect_id): 
+									$defect = $wpdb->get_row("SELECT * FROM wp_cellable_possible_defects WHERE id=" . $defect_id, ARRAY_A);
+									if (!$defect) {
+										continue;
+									}	
+									$defect_group = $wpdb->get_row("SELECT * FROM wp_cellable_defect_groups WHERE id=" . $defect['defect_group_id'], ARRAY_A);
+									if (!$defect_group) {
+										continue;
+									}
+								?>
+								
+								<tr>
+									<td colspan='2' style='padding:3px;'>
+										<?= $defect_group['name'] ?>
+									</td>
+									<td class='text-right'>
+										<?= $defect['name'] ?>
 									</td>
 								</tr>
 								<?php endforeach; ?>
-								
 									
+							
 								
 							</table>
 						</td>
