@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: Cellable Defect Question
+Template Name: Cellable Price Phone
 Template Post Type: page
 */
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
@@ -33,46 +33,28 @@ get_header();
 			$possible_defect_groups = $wpdb->get_results($wpdb->prepare("SELECT distinct(defect_group_id) id FROM wp_cellable_possible_defects 
 				where phone_version_id = %d order by defect_group_id asc", 
 				$wpdb->esc_like($phone_version_id)), ARRAY_A);
-
-			
-			// Update Phone Version View Count to DB		
-			if ($phone_version['views'] !=null) {
-				$phone_version['views'] +=1;
-			}
-			else {
-				$phone_version['views'] =0;
-			}
-
-			$wpdb->update('wp_cellable_phone_versions', array(            
-				'views' => $phone_version['views']
-			), array(
-				'id' => $phone_version_id,
-			));
 			
 			$phone_brand = $wpdb->get_row("SELECT * FROM wp_cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
+			$capacity = $wpdb->get_row("SELECT * FROM wp_cellable_storage_capacities WHERE id=" . $_REQUEST['capacity_id'], ARRAY_A);
+
+			$capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_storage_capacities"), ARRAY_A);
 			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_version_capacities 
 				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
 
 			?>
-			<form action="<?=get_home_url() ?>/price-phone/?phone_version_id=<?= $phone_version_id ?>" method="post">
+			<form action="<?=get_home_url() ?>/pricephone" method="post">
 			    <input id="id" name="id" type="hidden" value="<?= $phone_version_id?>" />
-				<table style="width:70%; margin-left:auto; margin-right:auto; font-family:'HP Simplified'">
+				<table style="width:80%; margin-left:auto; margin-right:auto; font-family:'HP Simplified'">
 					<tr>
-						<td style="text-align:center; vertical-align:top; width:30%;">
-							<div style="height:50px;"></div>
-							<div style=" width:300px">
-								<?= $phone_brand['name'] ?>
-								<br />
-								<?= $phone_version['name'] ?>
-								<br />
-								<img src="<?= $PHONE_IMAGE_LOCATION ?>/<?= $phone_version['image_file'] ?>" style="height:250px; width:130px;" />
-								<br />
-								Please Note: We do not pay for devices that have been reported lost or stolen.
-								<p>
-									<input type="submit" class="button" value="Price Phone" onclick="return ValidateForm()" />
-									<input type="reset" class="button" value="Reset Form" />
-								</p>
-							</div>
+						<td class="text-center" style="vertical-align:top; width:30%;">
+							<div style="height:100px;"></div>
+							<?= $phone_brand['name'] ?>
+							<br/> 
+							<?= $phone_version['name'] ?> (<?= $capacity['description'] ?>)
+                        	<br/>
+							<img src="<?= $PHONE_IMAGE_LOCATION ?>/<?= $phone_version['image_file'] ?>" style="height:250px; width:130px;" />
+							<br/>
+							Please Note: We do not pay for devices that have been reported lost or stolen.
 						</td>
 						<td style="text-align:left;">
 							<table style="width:80%; margin-left:auto; margin-right:auto;">
@@ -86,15 +68,19 @@ get_header();
 												</p>
 											</div>
 											<div style="display:inline-block; width:30px;"></div>
-											<?php 
-											foreach ($phone_version_capacities as $phone_version_capacity): 
-												$capacity = $wpdb->get_row("SELECT * FROM wp_cellable_storage_capacities WHERE id=" . $phone_version_capacity['storage_capacity_id'], ARRAY_A);
-											?>
+											<?php foreach ($capacities as $capacity): ?>
+												<?php foreach ($phone_version_capacities as $phone_version_capacity): ?>
+													<?php if ($capacity['id'] == $phone_version_capacity['storage_capacity_id']): ?>
+												
 												<label>
-													<input type="radio" name="capacity_id" value="<?= $capacity['id'] ?>" autocomplete="off" />&nbsp;
+													<input  type="radio" name="capacity" value="<?= $phone_version_capacity['value'] ?>" onchange="SetField('capacity', <?= $capacity['value'] ?>, '<?= $phone_version_capacity['description'] ?>')" autocomplete="off" />&nbsp;
 													<?= $capacity['description'] ?>
 												</label>&nbsp;&nbsp;
+												
+													<?php endif; ?>
+												<?php endforeach; ?>
 											<?php endforeach; ?>
+											
 											
 											<br />
 											<div style="display:inline-block; width:30px;"></div><div id="CapacityValidationMessage" name="CapacityValidationMessage" style="display:inline-block" class="text-danger"></div>
