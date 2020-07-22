@@ -10,7 +10,7 @@ get_header();
 
 <?php $layout_class = shapely_get_layout_class(); ?>
 	<div class="row">
-		<div id="primary" class="col-md-12 mb-xs-24 phone-page">
+		<div id="primary" class="col-md-12 mb-xs-24">
 			<?php
 			while ( have_posts() ) : the_post();				
 				the_content();
@@ -32,7 +32,7 @@ get_header();
 			<div class="text-center">
 				<?php foreach ($phone_versions as $ele): ?>
 				<div class="col-sm-3 text-center phone-version">
-					<a class="btn btn-default" href="<?=get_home_url() ?>/phone_versions/?id=<?=$ele['id']?>">
+					<a class="btn btn-default" href="<?=get_home_url() ?>/defect-questions/?phone_version_id=<?=$ele['id']?>">
 						<img src="<?= $PHONE_IMAGE_LOCATION ?>/<?= $ele['image_file'] ?>" alt="<?= $ele['name'] ?>">
 					</a>
 					<br />

@@ -53,3 +53,19 @@
     background-color: initial;
     color: initial;
 }
+
+.phone-version a {
+    border-width: 0px;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    background-color: transparent;
+    padding-top: 10px;
+}
+
+.phone-version a:hover {
+    background-color: initial;
+}
+
+.phone-version a img {
+    height: 250px;
+    width: 130px;
+}
