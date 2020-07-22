@@ -38,8 +38,13 @@ get_header();
 			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM wp_cellable_possible_defects WHERE id in ($defect_ids_str)") );
 			
 			$price = $price-$total_defect_value;
+			// Promotion Code
+			$promo_code = $_REQUEST['promo_code'];
+			$promo = null;
 
-			
+			if (isset($promo_code)) {
+				$promo = $wpdb->get_row("SELECT * FROM wp_cellable_promoes WHERE code=" . $promo_code, ARRAY_A);
+			}
 			
 			$possible_defect_groups = $wpdb->get_results($wpdb->prepare("SELECT distinct(defect_group_id) id FROM wp_cellable_possible_defects 
 				where phone_version_id = %d order by defect_group_id asc", 
@@ -70,61 +75,42 @@ get_header();
 						</td>
 						<td class="text-center" style="width:40%;">
 							<div style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: green; font-size: 55px;">
-								<?= number_format((float)$price, 2, '.', '')  ?>								
+								<?= number_format((float)$price, 2, '.', '')  ?>	
 							</div>
-							<p></p>
-							@if (decimal.Parse(Session["Phone Value"].ToString()) > 0)
-							{
-								if (Session["PromoCode"] == null)
-								{
-									using (Html.BeginForm("CalcPromo", "Phones", FormMethod.Post, new { enctype = "multipart/form-data" }))
-									{
-										Html.AntiForgeryToken();
+							<p>&nbsp;</p>
 
-										Html.Raw("Do you have a Promo Code?");
-										<br />
-										<input id="id" name="id" type="hidden" value="@Session["VersionId"]" />
+							<?php if ($price>0):?>
+								<?php if (isset($promo)):?>
+									Promo Code Applied<br/>
+									Promo Code: <?= $promo['code'] ?><br/>
+									<?php if ($promo['discount']>0):?>
+										+<?= $promo['discount'] ?>%
+									<?php else:?>
+										+$<?= $promo['dollar_value'] ?>
+									<?php endif;?>
+								<?php else:?>
+									<form action="<?=get_home_url() ?>/apply-promo/?phone_version_id=<?= $phone_version_id ?>" method="post">
+										Do you have a Promo Code?<br/>
+										<input id="id" name="id" type="hidden" value="<?=$phone_version['id']?>"/>
 										<input id="PromoCode" name="PromoCode" type="text" placeholder="Enter Promo Code" autofocus />
 										<button type="submit" name="submit" id="PromoCode" class="PromoCode" value="reset">
 											<i class="fa fa-plus-square"></i>
 										</button>
 										<p></p>
-									}
-								}
-								else
-								{
-									//string discount = Session["PromoDiscount"].ToString();
-									//discount.Split(char["."])[0];
-
-									Html.Raw("Promo Code Applied");
-									<br />
-									Html.Raw("Promo Code: " + Session["PromoCode"]);
-									<br />
-									if (Session["PromoType"].ToString() == "%")
-									{
-										Html.Raw("+" + Session["PromoValue"] + Session["PromoType"]);
-									}
-									else
-									{
-										Html.Raw("+" + Session["PromoType"] + decimal.Round(decimal.Parse(Session["PromoValue"].ToString()), 2).ToString());
-									}
-								}
-								using (Html.BeginForm("CompleteUserPhoneRegistration", "Users"))
-								{
-									@Html.AntiForgeryToken()
-									<p>
-										<input type="submit" value="Sell My Phone" class="button" onclick="return valid_form()" />
-										<input type="button" value="Cancel" class="button" onclick="location.href='@Url.Action("Cancel", "Users")';return false;" />
-									</p>
-								}
-							}
-							else
-							{
-								@Html.Raw("<div class='text-danger'>Unfortunately, we cannot purchase your phone.</div>")
-							}
+									</form>
+									<form action="<?=get_home_url() ?>/complete-user-phone-registration" method="post">
+										<p>
+											<input type="submit" value="Sell My Phone" class="button" onclick="return valid_form()" />
+											<input type="button" value="Cancel" class="button" onclick="location.href='<?=get_home_url() ?>/complete-user-phone-registration';return false;" />
+										</p>
+									</form>
+								<?php endif;?>
+							<?php else:?>
+								<div class='text-danger'>Unfortunately, we cannot purchase your phone.</div>
+							<?php endif;?>
 						</td>
 						
-						<td style="text-align:left;">
+						<td style="width: 30%;">
 							<table style="width:80%; margin-left:auto; margin-right:auto;">
 								<tr>
 									<td>
