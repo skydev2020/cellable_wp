@@ -17,29 +17,39 @@ get_header();
 			endwhile; // End of the loop.
 			
 			$phone_version_id = $_GET['phone_version_id'];
-			// Get filtered Phone Versions list
-			$phone_version = $wpdb->get_row("SELECT * FROM wp_cellable_phone_versions WHERE id=" . $phone_version_id, ARRAY_A);
+			$capacity_id = $_REQUEST['capacity_id'];
+			$defect_ids = $_REQUEST['defect_ids'];
 
-			if (!$phone_version) {
-			?>
-			<p>Proper Phone Version can't be found.</p>
-			<a href="<?=get_home_url() ?>">Go To Homepage</a>
+			$phone_version = $wpdb->get_row("SELECT * FROM wp_cellable_phone_versions WHERE id=" . $phone_version_id, ARRAY_A);
+			$capacity = $wpdb->get_row("SELECT * FROM wp_cellable_storage_capacities WHERE id=" . $capacity_id, ARRAY_A);
+			$phone_version_capacity = $wpdb->get_row("SELECT * FROM wp_cellable_version_capacities 
+				WHERE phone_version_id=" . $phone_version_id." and storage_capacity_id =" . $capacity_id, ARRAY_A);
 			
+			if (!$phone_version || !$capacity || !$phone_version_capacity || !$defect_ids || !is_array($defect_ids)) {
+			?>
+			<p>There are some incorrect variables.</p>
+			<a href="<?=get_home_url() ?>">Go To Homepage</a>
 			<?php
 				return;
 			}
-			
 
+			$price = $phone_version_capacity['value'];
+			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM wp_cellable_possible_defects WHERE id in %s",
+				"(".implode(', ', $defect_ids).")"), ARRAY_A );
+			
+			$price = $price-$total_defect_value;
+			
 			$possible_defect_groups = $wpdb->get_results($wpdb->prepare("SELECT distinct(defect_group_id) id FROM wp_cellable_possible_defects 
 				where phone_version_id = %d order by defect_group_id asc", 
 				$wpdb->esc_like($phone_version_id)), ARRAY_A);
 			
 			$phone_brand = $wpdb->get_row("SELECT * FROM wp_cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
-			$capacity = $wpdb->get_row("SELECT * FROM wp_cellable_storage_capacities WHERE id=" . $_REQUEST['capacity_id'], ARRAY_A);
+						
 
 			$capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_storage_capacities"), ARRAY_A);
 			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_version_capacities 
 				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
+
 
 			?>
 			<form action="<?=get_home_url() ?>/pricephone" method="post">
@@ -56,6 +66,62 @@ get_header();
 							<br/>
 							Please Note: We do not pay for devices that have been reported lost or stolen.
 						</td>
+						<td class="text-center" style="width:40%;">
+							<div style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: green; font-size: 55px;">
+								<?= number_format((float)$price, 2, '.', '')  ?>								
+							</div>
+							<p></p>
+							@if (decimal.Parse(Session["Phone Value"].ToString()) > 0)
+							{
+								if (Session["PromoCode"] == null)
+								{
+									using (Html.BeginForm("CalcPromo", "Phones", FormMethod.Post, new { enctype = "multipart/form-data" }))
+									{
+										Html.AntiForgeryToken();
+
+										Html.Raw("Do you have a Promo Code?");
+										<br />
+										<input id="id" name="id" type="hidden" value="@Session["VersionId"]" />
+										<input id="PromoCode" name="PromoCode" type="text" placeholder="Enter Promo Code" autofocus />
+										<button type="submit" name="submit" id="PromoCode" class="PromoCode" value="reset">
+											<i class="fa fa-plus-square"></i>
+										</button>
+										<p></p>
+									}
+								}
+								else
+								{
+									//string discount = Session["PromoDiscount"].ToString();
+									//discount.Split(char["."])[0];
+
+									Html.Raw("Promo Code Applied");
+									<br />
+									Html.Raw("Promo Code: " + Session["PromoCode"]);
+									<br />
+									if (Session["PromoType"].ToString() == "%")
+									{
+										Html.Raw("+" + Session["PromoValue"] + Session["PromoType"]);
+									}
+									else
+									{
+										Html.Raw("+" + Session["PromoType"] + decimal.Round(decimal.Parse(Session["PromoValue"].ToString()), 2).ToString());
+									}
+								}
+								using (Html.BeginForm("CompleteUserPhoneRegistration", "Users"))
+								{
+									@Html.AntiForgeryToken()
+									<p>
+										<input type="submit" value="Sell My Phone" class="button" onclick="return valid_form()" />
+										<input type="button" value="Cancel" class="button" onclick="location.href='@Url.Action("Cancel", "Users")';return false;" />
+									</p>
+								}
+							}
+							else
+							{
+								@Html.Raw("<div class='text-danger'>Unfortunately, we cannot purchase your phone.</div>")
+							}
+						</td>
+						
 						<td style="text-align:left;">
 							<table style="width:80%; margin-left:auto; margin-right:auto;">
 								<tr>

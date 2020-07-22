@@ -127,22 +127,15 @@ get_header();
 											
 											<?php foreach ($possible_defects as $ele): ?>
 											<label>
-												<input id="<?= $ele['defect_group_id'] ?>" type="radio" name="<?= $ele['defect_group_id'] ?>" 
-													value="<?= $defect_group['id'] ?>_<?= $ele['id'] ?>_<?= $ele['cost'] ?>" 
-													onchange="SetField('<?= $defect_group['id'] ?>', null, null)" autocomplete="off"/> 
+												<input id="<?= $ele['defect_group_id'] ?>" type="radio" name="defect_ids[]" 
+													value="<?= $ele['id'] ?>" autocomplete="off"/> 
 													&nbsp; <?= $ele['name'] ?>
 											</label>&nbsp;&nbsp;&nbsp;
 											<?php endforeach; ?>
-											
-											<div id="<?= $defect_group['id'] ?>" name="<?= $defect_group['id'] ?>" class="text-danger" style="margin-left:40px; display:none;">* Required</div>
-											<input type="hidden" id="hdn_<?= $defect_group['id'] ?>" name="hdn_<?= $defect_group['id'] ?>" />
 										</div>
 									</td>
 								</tr>
 								<?php endforeach; ?>
-								
-									
-								
 							</table>
 						</td>
 					</tr>
