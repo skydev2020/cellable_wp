@@ -18,17 +18,22 @@ get_header();
 			
 			$phone_version_id = $_GET['phone_version_id'];
 			// Get filtered Phone Versions list
-			$possible_defects = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_possible_defects where phone_version_id = %d", 
-			$wpdb->esc_like($phone_version_id)), ARRAY_A);
 			$phone_version = $wpdb->get_row("SELECT * FROM wp_cellable_phone_versions WHERE id=" . $phone_version_id, ARRAY_A);
 
 			if (!$phone_version) {
 			?>
 			<p>Proper Phone Version can't be found.</p>
 			<a href="<?=get_home_url() ?>">Go To Homepage</a>
+			
 			<?php
 				return;
 			}
+			
+
+			$possible_defect_groups = $wpdb->get_results($wpdb->prepare("SELECT distinct(defect_group_id) id FROM wp_cellable_possible_defects 
+				where phone_version_id = %d order by defect_group_id asc", 
+				$wpdb->esc_like($phone_version_id)), ARRAY_A);
+
 			
 			// Update Phone Version View Count to DB		
 			if ($phone_version['views'] !=null) {
@@ -48,6 +53,7 @@ get_header();
 			$capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_storage_capacities"), ARRAY_A);
 			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_version_capacities 
 				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
+
 			?>
 			<form action="<?=get_home_url() ?>/pricephone" method="post">
 			    <input id="id" name="id" type="hidden" value="<?= $phone_version_id?>" />
@@ -103,13 +109,14 @@ get_header();
 									</td>
 								</tr>
 								
-								<?php $last_group_id = 0; ?>
 								<?php 
-								foreach ($possible_defects as $defect):
-									// Don't Repeat an Already Created Group
-									$defect_group = $wpdb->get_row("SELECT * FROM wp_cellable_defect_groups WHERE id=" . $defect['defect_group_id'], ARRAY_A);
-									if ($last_group_id != $defect_group['id'] ):
-										$last_group_id = $defect_group['id'];
+
+								foreach ($possible_defect_groups as $possible_defect_group):
+									
+									$defect_group = $wpdb->get_row("SELECT * FROM wp_cellable_defect_groups WHERE id=" . $possible_defect_group['id'], ARRAY_A);
+									$possible_defects = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_possible_defects 
+										where phone_version_id = %d and defect_group_id = %d", 
+										$wpdb->esc_like($phone_version_id), $wpdb->esc_like($possible_defect_group['id'])), ARRAY_A);
 								?>
 								<tr>
 									<td>
@@ -122,15 +129,14 @@ get_header();
 												<?php endif; ?>
 											</p>
 											<div style="width:30px; display:inline-block"></div>
+											
 											<?php foreach ($possible_defects as $ele): ?>
-												<?php if ($defect_group['id'] == $ele['defect_group_id']): ?>
-													<label>
-														<input id="<?= $ele['defect_group_id'] ?>" type="radio" name="<?= $ele['defect_group_id'] ?>" 
-															value="<?= $defect_group['id'] ?>_<?= $ele['id'] ?>_<?= $ele['cost'] ?>" 
-															onchange="SetField('<?= $defect_group['id'] ?>', null, null)" autocomplete="off"/> 
-															&nbsp; <?= $ele['name'] ?>
-													</label>&nbsp;&nbsp;&nbsp;
-												<?php endif; ?>
+											<label>
+												<input id="<?= $ele['defect_group_id'] ?>" type="radio" name="<?= $ele['defect_group_id'] ?>" 
+													value="<?= $defect_group['id'] ?>_<?= $ele['id'] ?>_<?= $ele['cost'] ?>" 
+													onchange="SetField('<?= $defect_group['id'] ?>', null, null)" autocomplete="off"/> 
+													&nbsp; <?= $ele['name'] ?>
+											</label>&nbsp;&nbsp;&nbsp;
 											<?php endforeach; ?>
 											
 											<div id="<?= $defect_group['id'] ?>" name="<?= $defect_group['id'] ?>" class="text-danger" style="margin-left:40px; display:none;">* Required</div>
@@ -138,7 +144,6 @@ get_header();
 										</div>
 									</td>
 								</tr>
-									<?php endif; ?>
 								<?php endforeach; ?>
 								
 									
