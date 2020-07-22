@@ -124,7 +124,7 @@ get_header();
 									<td class="text-right" style="width:25px; color:forestgreen;">
 										<strong>$</strong>
 									</td>
-									<td class="text-right" style="padding:3px; text-align:right; color:forestgreen;">
+									<td class="text-right" style="padding:3px; color:forestgreen;">
 										<strong><?= number_format((float)$original_price, 2, '.', '')?></strong>
 									</td>
 								</tr>
@@ -158,9 +158,31 @@ get_header();
 									</td>
 								</tr>
 								<?php endforeach; ?>
-									
 							
-								
+								<?php if ($promo):?>
+								<tr>
+									<td class="text-right" style='padding:3px;'>Promo Code Applied:</td>
+									<td class="text-right" style='width:25px; color:forestgreen;'>+</td>
+									<td class="text-right" style='width:25px; color:forestgreen;'>
+									<?php if ($promo['discount']>0):?>
+										<?= $promo['discount'] ?>%
+									<?php else:?>
+										$<?= $promo['dollar_value'] ?>
+									<?php endif;?>
+									</td>									
+								</tr>
+								<?php endif; ?>                            
+								<tr>
+									<td class="text-right" style="padding:3px; border-top:solid; border-top-color:black; border-top-width:1px">
+										<strong>Phone Value:</strong>
+									</td>
+									<td class="text-right" style="width:25px; color:forestgreen; border-top:solid; border-top-color:black; border-top-width:1px">
+										<strong>$</strong>
+									</td>
+									<td class="text-right" style="padding:3px; color:forestgreen; border-top:solid; border-top-color:black; border-top-width:1px">
+										<strong><?= number_format((float)$price, 2, '.', '')?></strong>
+									</td>
+								</tr>
 							</table>
 						</td>
 					</tr>
