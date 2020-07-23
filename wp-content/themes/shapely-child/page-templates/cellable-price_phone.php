@@ -45,7 +45,7 @@ get_header();
 			$promo = null;
 
 			if (isset($promo_code)) {
-				$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM wp_cellable_promoes WHERE code= %s
+				$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM wp_cellable_promos WHERE code= %s
 					and start_date <= CURDATE() and end_date >= CURDATE()", $wpdb->esc_like($promo_code)), ARRAY_A);
 			}
 
@@ -54,21 +54,10 @@ get_header();
 			else:
 				$price += $promo['dollar_value'];
 			endif;
-
-			
-			$possible_defect_groups = $wpdb->get_results($wpdb->prepare("SELECT distinct(defect_group_id) id FROM wp_cellable_possible_defects 
-				where phone_version_id = %d order by defect_group_id asc", 
-				$wpdb->esc_like($phone_version_id)), ARRAY_A);
-			
-			$phone_brand = $wpdb->get_row("SELECT * FROM wp_cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
 						
-
-			$capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_storage_capacities"), ARRAY_A);
-			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_version_capacities 
-				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
-
-
-			?>			
+			$phone_brand = $wpdb->get_row("SELECT * FROM wp_cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
+			?>
+			
 			<table style="width:80%; margin-left:auto; margin-right:auto; font-family:'HP Simplified'">
 				<tr>
 					<td class="text-center" style="vertical-align:top; width:30%;">
@@ -110,13 +99,17 @@ get_header();
 									<p></p>
 								</form>
 							<?php endif;?>
-							<form action="<?=get_home_url() ?>/complete-user-phone-registration" method="post">
+							<form action="<?=get_home_url() ?>/checkout/?phone_version_id=<?= $phone_version_id ?>" method="post">
+								<input name="capacity_id" type="hidden" value="<?=$capacity_id?>"/>
+								<input name="promo_code" type="hidden" value="<?=$promo_code?>" />
+								<?php foreach ($defect_ids as $defect_id): ?>
+								<input name="defect_ids[]" type="hidden" value="<?=$defect_id?>"/>
+								<?php endforeach; ?>
 								<p>
 									<input type="submit" value="Sell My Phone" class="button" />
-									<input type="button" value="Cancel" class="button" onclick="location.href='<?=get_home_url() ?>/users-cancel';" />
+									<input type="button" value="Cancel" class="button" onclick="location.href='<?=get_home_url() ?>';" />
 								</p>
 							</form>
-						
 						<?php else:?>
 							<div class='text-danger'>Unfortunately, we cannot purchase your phone.</div>
 						<?php endif;?>
