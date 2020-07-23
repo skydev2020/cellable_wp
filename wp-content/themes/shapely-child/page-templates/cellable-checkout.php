@@ -185,50 +185,53 @@ get_header();
                                 <td style="width:30%; vertical-align:top;">
                                     <table style="width:100%; left:auto; right:auto;">
                                         <tr>
-                                            <td style="text-align:center" colspan="3">
-                                                <div style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: green; font-size: 55px;">
-                                                    $@decimal.Round(decimal.Parse(@Session["Phone Value"].ToString()), 2)
+                                            <td class="text-center" colspan="3">
+                                                <div style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: green; font-size: 55px;">                                                    
+													$<?= number_format((float)$price, 2, '.', '')  ?>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="text-align:center; background-color:lightgrey" colspan="3">
-                                                <b>Your Phone Details</b><br />
+                                            <td class="text-center" style="background-color:lightgrey" colspan="3">
+												<strong>Your Phone Details</strong><br />
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="padding:3px; text-align:right; font-weight:bold">
-                                                Phone's Base Value:
+                                            <td class="text-right" style="padding:3px; text-align:right; font-weight:bold">
+                                                <strong>Phone's Base Value:</strong>
                                             </td>
-                                            <td style="width:25px; text-align:right; color:forestgreen; font-weight:bold">$</td>
-                                            <td style="padding:3px; text-align:right; color:forestgreen; font-weight:bold">
-                                                @decimal.Truncate(decimal.Parse(Session["BaseValue"].ToString())).00
+                                            <td class="text-right" style="width:25px; color:forestgreen;"><strong>$</strong></td>
+                                            <td class="text-right" style="padding:3px; color:forestgreen;">
+												<strong><?= number_format((float)$original_price, 2, '.', '')?></strong>
                                             </td>
                                         </tr>
-                                        @if (Session["PromoCode"] != null)
-                                        {
-                                            @Html.Raw("<tr>")
-                                            @Html.Raw("<td  style='padding:3px; text-align:right;'>Promo Code Applied:</td>")
-                                            @Html.Raw("<td style='width:25px; text-align:right; color:forestgreen;'>+</td>")
-                                            @Html.Raw("<td style='width:25px; text-align:right; color:forestgreen;'>")
-                                            if (Session["PromoType"].ToString() == "%")
-                                            {
-                                                @Html.Raw(Session["PromoValue"].ToString() + Session["PromoType"].ToString());
-                                            }
-                                            else
-                                            {
-                                                @Html.Raw(Session["PromoType"] + decimal.Round(decimal.Parse(Session["PromoValue"].ToString()), 2).ToString());
-                                            }
-                                            @Html.Raw("</td>")
-                                            @Html.Raw("</tr>")
-                                        }
+										<?php if (isset($promo)):?>
+										<tr>
+											<td class="text-right" style="padding:3px;">
+												Promo Code Applied:
+											</td>
+											<td class="text-right" style="width:25px; color:forestgreen;">
+												+
+											</td>
+											<td class="text-right" style="width:25px; color:forestgreen;">
+												<?php if ($promo['discount']>0):?>
+													+<?= $promo['discount'] ?>%
+												<?php else: ?>
+													+$<?= $promo['dollar_value'] ?>
+												<?php endif;?>
+											</td>
+										</tr>
+										<?php endif; ?>
+
                                         <tr>
-                                            <td style="padding:3px; text-align:right; font-weight:bold; border-top:solid; border-top-color:black; border-top-width:1px">
-                                                Phone Value:
+                                            <td class="text-right" style="padding:3px; border-top:solid; border-top-color:black; border-top-width:1px">
+                                                <strong>Phone Value:</strong>
                                             </td>
-                                            <td style="width:25px; text-align:right; color:forestgreen; font-weight:bold; border-top:solid; border-top-color:black; border-top-width:1px">$</td>
-                                            <td style="padding:3px; text-align:right; color:forestgreen; font-weight:bold; border-top:solid; border-top-color:black; border-top-width:1px">
-                                                @decimal.Round(decimal.Parse(@Session["Phone Value"].ToString()), 2)
+                                            <td class="text-right" style="width:25px; color:forestgreen; border-top:solid; border-top-color:black; border-top-width:1px">
+												<strong>$</strong>
+											</td>
+                                            <td class="text-right" style="padding:3px; color:forestgreen; border-top:solid; border-top-color:black; border-top-width:1px">
+                                                <strong><?= number_format((float)$price, 2, '.', '')  ?></strong>
                                             </td>
                                         </tr>
                                     </table>
@@ -237,13 +240,6 @@ get_header();
                         </table>
                     </td>
                 </tr>
-			</table>
-			<table style="width:70%; margin-left:auto; margin-right:auto;">
-				<tr>
-					<td style="text-align:center; vertical-align:middle; height:150px;">							
-						Your phone will be professionally inspected at our facilities.      
-					</td>
-				</tr>
 			</table>
 		</div><!-- #primary -->
 	</div>
