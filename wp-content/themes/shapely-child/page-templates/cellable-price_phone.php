@@ -112,8 +112,8 @@ get_header();
 							<?php endif;?>
 							<form action="<?=get_home_url() ?>/complete-user-phone-registration" method="post">
 								<p>
-									<input type="submit" value="Sell My Phone" class="button" onclick="return valid_form()" />
-									<input type="button" value="Cancel" class="button" onclick="location.href='<?=get_home_url() ?>/complete-user-phone-registration';return false;" />
+									<input type="submit" value="Sell My Phone" class="button" />
+									<input type="button" value="Cancel" class="button" onclick="location.href='<?=get_home_url() ?>/users-cancel';" />
 								</p>
 							</form>
 						
