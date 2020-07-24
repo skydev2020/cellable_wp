@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: Cellable Checkout
+Template Name: Cellable User Register
 Template Post Type: page
 */
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
@@ -23,16 +23,21 @@ get_header();
 			
 			$phone_version_id = $_GET['phone_version_id'];
 			$capacity_id = $_REQUEST['capacity_id'];
+			$carrier_id = $_REQUEST['carrier_id'];
 			$defect_ids = $_REQUEST['defect_ids'];
 
-			$payment_types =  $wpdb->get_results("SELECT * FROM wp_cellable_payment_types", ARRAY_A);
+			$payment_username = $_REQUEST["payment_username"];
+			$payment_type_id = $_REQUEST["payment_type_id"];
 			
 			$phone_version = $wpdb->get_row("SELECT * FROM wp_cellable_phone_versions WHERE id=" . $phone_version_id, ARRAY_A);
+			$carrier = $wpdb->get_row("SELECT * FROM wp_cellable_carriers WHERE id=" . $carrier_id, ARRAY_A);
 			$capacity = $wpdb->get_row("SELECT * FROM wp_cellable_storage_capacities WHERE id=" . $capacity_id, ARRAY_A);
 			$phone_version_capacity = $wpdb->get_row("SELECT * FROM wp_cellable_version_capacities 
 				WHERE phone_version_id=" . $phone_version_id." and storage_capacity_id =" . $capacity_id, ARRAY_A);
+
 			
-			if (!$phone_version || !$capacity || !$phone_version_capacity || !$defect_ids || !is_array($defect_ids)) {
+			
+			if (!$phone_version || !$carrier || !$capacity || !$phone_version_capacity || !$payment_type_id || !$payment_username || !$defect_ids || !is_array($defect_ids)) {
 			?>
 			<p>There are some incorrect variables.</p>
 			<a href="<?=get_home_url() ?>">Go To Homepage</a>
@@ -40,6 +45,7 @@ get_header();
 				return;
 			}
 
+			
 			$price = $phone_version_capacity['value'];
 			$original_price = $price;
 			$defect_ids_str = implode(', ', $defect_ids);
@@ -49,11 +55,13 @@ get_header();
 			
 			// Promotion Code
 			$promo_code = $_REQUEST['promo_code'];
+			$promo_id = null;
 			$promo = null;
 
 			if (isset($promo_code)) {
 				$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM wp_cellable_promos WHERE code= %s
 					and start_date <= CURDATE() and end_date >= CURDATE()", $wpdb->esc_like($promo_code)), ARRAY_A);
+				$promo_id = $promo['id'];
 			}
 
 			if ($promo['discount']>0):
@@ -75,6 +83,56 @@ get_header();
 				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
 
 
+			// begin DB transaction
+			$wpdb->query('START TRANSACTION');
+						
+			// Save User Phone
+			$r1 = $wpdb->insert("wp_cellable_user_phones", array(
+				'user_id' => $user->ID,
+				'phone_id' => $phone_brand['id'],
+				'carrier_id' => $carrier['id'],
+				'phone_version_id' => $phone_version['id'],
+				'created_date' => date()
+			));
+
+			if ($r1>0) {
+				$user_phone_id = $wpdb->insert_id;
+				//Create Order
+				$r2 = $wpdb->insert("wp_cellable_orders", array(
+					'amount' => $price,
+					'user_id' => $user->ID,
+					'order_status_id' => 1,
+					'created_date' => date(),
+					'created_by' => 'System',
+					'payment_type_id' => $payment_type_id,
+					'promo_id' => $promo_id,
+					'user_phone_id' => $user_phone_id,
+					'payment_user_name' => $payment_username					
+				));
+				
+				$order_id = null;
+				if ($r2 > 0) {
+					$order_id = $wpdb->insert_id;
+				}
+				
+				$view_count = 0;
+				if ($phone_version['views'] == null ) {
+					$view_count = 1;
+				}
+				else {
+					$view_count = 1+ $phone_version['views'];
+				}
+				
+				$wpdb->update('wp_cellable_phone_versions', array(            
+					'views' => $phone_version['views']
+				), array(
+					'id' => $phone_version_id,
+				));
+				$wpdb->query('COMMIT');
+
+			}
+
+			
 			?>			
 
 			<table style="width:100%; margin-left:auto; margin-right:auto;">
@@ -148,7 +206,7 @@ get_header();
                                     <td class="text-left" style="width:100%; padding:10px;">
                                         <i class="text-danger">*</i>&nbsp;Payment Method:
                                         <br/>
-										<select class="form-control" name="payment_type_id" onchange="validate_form()">
+										<select class="form-control" name="payment_types" onchange="validate_form()">
 											<option value="">-- How You Get Paid --</option>
 											<?php foreach ($payment_types as $ele):  ?>
 											<option value="<?= $ele['id'] ?>"><?= $ele['type'] ?></option>
@@ -159,8 +217,8 @@ get_header();
                                 </tr>
                                 <tr>
                                     <td class="text-left"  style="width:100%; padding:10px;">
-                                        <div id="PayUserName"><i class="text-danger">*</i>&nbsp;User Name / Email for Payment Method:</div>
-                                        <input type="text" id="PaymentUserName" name="payment_username" class="form-control" onchange="validate_form()" />
+                                        <div id="PayUserName" name="PayUserName"><i class="text-danger">*</i>&nbsp;User Name / Email for Payment Method:</div>
+                                        <input type="text" id="PaymentUserName" name="PaymentUserName" class="form-control" onchange="validate_form()" />
                                         <div id="PaymentUserNameValidationMessage" class="text-danger"></div>
                                         <br />
                                         <input type="submit" name="submit" id="submit" value="Complete Order" class="PromoCode" onclick="return validate_form()" />
