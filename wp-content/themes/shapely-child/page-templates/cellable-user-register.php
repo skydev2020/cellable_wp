@@ -82,23 +82,27 @@ get_header();
 			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_version_capacities 
 				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
 
+			try {
+				// begin DB transaction
+				$wpdb->query('START TRANSACTION');
+							
+				// Save User Phone
+				$r = $wpdb->insert("wp_cellable_user_phones", array(
+					'user_id' => $user->ID,
+					'phone_id' => $phone_brand['id'],
+					'carrier_id' => $carrier['id'],
+					'phone_version_id' => $phone_version['id'],
+					'created_date' => date()
+				));
 
-			// begin DB transaction
-			$wpdb->query('START TRANSACTION');
-						
-			// Save User Phone
-			$r1 = $wpdb->insert("wp_cellable_user_phones", array(
-				'user_id' => $user->ID,
-				'phone_id' => $phone_brand['id'],
-				'carrier_id' => $carrier['id'],
-				'phone_version_id' => $phone_version['id'],
-				'created_date' => date()
-			));
+				if ($r == false) {
+					throw new Exception('User Phone Insert Failed');
+				}
 
-			if ($r1>0) {
 				$user_phone_id = $wpdb->insert_id;
 				//Create Order
-				$r2 = $wpdb->insert("wp_cellable_orders", array(
+				$order_id = null;
+				$r = $wpdb->insert("wp_cellable_orders", array(
 					'amount' => $price,
 					'user_id' => $user->ID,
 					'order_status_id' => 1,
@@ -110,10 +114,11 @@ get_header();
 					'payment_user_name' => $payment_username					
 				));
 				
-				$order_id = null;
-				if ($r2 > 0) {
-					$order_id = $wpdb->insert_id;
+				if ($r == false) {
+					throw new Exception('Order Insert Failed');
 				}
+				$order_id = $wpdb->insert_id;
+
 				
 				$view_count = 0;
 				if ($phone_version['views'] == null ) {
@@ -130,7 +135,17 @@ get_header();
 				));
 				$wpdb->query('COMMIT');
 
+				// Get/Save Shipping Label
+				MailController mail = new MailController();
+				mail.GetShippingLabel(userId, orderId);
+
+				// Send Confirmation Email(s)
+				EmailController email = new EmailController();
+				email.SendEmail(orderId, "Confirm", userEmail);
+			} catch (Exception $e) {
+				error_log($e->getMessage());
 			}
+
 
 			
 			?>			
