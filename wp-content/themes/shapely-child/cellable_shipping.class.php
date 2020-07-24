@@ -1,7 +1,7 @@
 <?php 
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
 require_once(ABSPATH . 'wp-content/themes/shapely-child/vendor/autoload.php');
-class CellableMail
+class CellableShipping
 { 
     // Constructor 
     public function __construct(){ 
@@ -130,96 +130,93 @@ class CellableMail
         //    return o;
         //}
 
-        public function GetShippingLabel($userId, $orderId) {
+        public function GetShippingLabel($user_id, $order_id) {
             // Generate Mailing Label
-            APIResource resource = new APIResource(ShippoLiveAPIToken);
+            Shippo:setApiKey($SHIPPO_API_LIVE_API_TOKEN);
 
             // To Address
             //Get Cellable Mail Info
-            SystemSetting address = db.SystemSettings.Find(9);
-            SystemSetting city = db.SystemSettings.Find(11);
-            SystemSetting state = db.SystemSettings.Find(12);
-            SystemSetting zip = db.SystemSettings.Find(13);
-            SystemSetting phone = db.SystemSettings.Find(14);
+            $address_setting = $wpdb->get_row("SELECT * FROM wp_cellable_system_settings WHERE name='LocationAddress'", ARRAY_A);
+            $city_setting = $wpdb->get_row("SELECT * FROM wp_cellable_system_settings WHERE name='LocationCity'", ARRAY_A);
+            $state_setting = $wpdb->get_row("SELECT * FROM wp_cellable_system_settings WHERE name='LocationState'", ARRAY_A);
+            $zip_setting = $wpdb->get_row("SELECT * FROM wp_cellable_system_settings WHERE name='LocationZip'", ARRAY_A);
+            $phone_setting = $wpdb->get_row("SELECT * FROM wp_cellable_system_settings WHERE name='Phone'", ARRAY_A);
+            
+            $user =get_userdata($user_id);
 
-            Hashtable toAddressTable = new Hashtable();
-            toAddressTable.Add("name", "Cellable Receiving");
-            toAddressTable.Add("company", "Cellable");
-            toAddressTable.Add("street1", address.Value);
-            toAddressTable.Add("city", city.Value);
-            toAddressTable.Add("state", state.Value);
-            toAddressTable.Add("zip", zip.Value);
-            toAddressTable.Add("country", "US");
-            toAddressTable.Add("phone", "+1 " + ContactUsPhone);
-            toAddressTable.Add("email", ContactEmail);
+            $to_address = array(
+                'name' => "Cellable Receiving",
+                'company' => "Cellable",
+                'street1' => $address_setting['value'],
+                'city' => $city_setting['value'],
+                'state' => $state_setting['value'],
+                'zip' => $zip_setting['value'],
+                'country' => 'US',
+                'phone' => '+1 '.$CONTACT_US_PHONE,
+                'email' => $CONTACT_EMAIL
+            );
 
             // from address
             // Get User Mail Info
-            User user = db.Users.Find(userId);
-            Hashtable fromAddressTable = new Hashtable();
-            fromAddressTable.Add("name", user.FirstName + " " + user.LastName);
-            fromAddressTable.Add("street1", user.Address);
-            fromAddressTable.Add("city", user.City);
-            fromAddressTable.Add("state", user.State);
-            fromAddressTable.Add("zip", user.Zip);
-            fromAddressTable.Add("country", "US");
-            fromAddressTable.Add("email", user.Email);
-            fromAddressTable.Add("phone", "+1 " + user.PhoneNumber);
-            fromAddressTable.Add("metadata", "Order ID " + orderId);
+            $from_address = array(
+                'name' => $user->first_name + " " + $user->last_name,
+                'street1' => 'User Address', //$user->address
+                'city' => 'User City', //$user->city
+                'state' => 'User State', //$user->state
+                'zip' => 'User Zip', //$user->zip
+                'country' => 'US',
+                'phone' => '+1 User Phone',
+                'email' => $user->user_email,
+                'metadata' => "Order ID " . $order_id,
+            );
 
             // parcel
-            Hashtable parcelTable = new Hashtable();
-            parcelTable.Add("length", "6");
-            parcelTable.Add("width", "4");
-            parcelTable.Add("height", "2");
-            parcelTable.Add("distance_unit", "in");
-            parcelTable.Add("weight", "7");
-            parcelTable.Add("mass_unit", "oz");
-            List<Hashtable> parcels = new List<Hashtable>();
-            parcels.Add(parcelTable);
-
+            $parcel = array(
+                'length'=> '6',
+                'width'=> '4',
+                'height'=> '2',
+                'distance_unit'=> 'in',
+                'weight'=> '2',
+                'mass_unit'=> 'oz',
+            );
 
             // shipment
-            Hashtable shipmentTable = new Hashtable();
-            shipmentTable.Add("address_to", toAddressTable);
-            shipmentTable.Add("address_from", fromAddressTable);
-            shipmentTable.Add("parcels", parcels);
-            shipmentTable.Add("object_purpose", "PURCHASE");
-            shipmentTable.Add("async", false);
-
-            // create Shipment object
-            Shipment shipment = resource.CreateShipment(shipmentTable);
+            $shipment = Shippo_Shipment::create(
+                array(
+                    'address_from'=> $from_address,
+                    'address_to'=> $to_address,
+                    'parcels'=> array($parcel),
+                    'object_purpose'=> 'PURCHASE',
+                    'async'=> false,
+                )
+            );
 
             // select desired shipping rate according to your business logic
             // we simply select the first rate in this example
-            Rate rate = shipment.Rates[3];
+            $rate = $shipment['rates'][0];
+            
+            $transaction = Shippo_Transaction::create(array(
+                'rate'=> $rate['object_id'],
+                'async'=> false,
+            ));
 
-            Hashtable transactionParameters = new Hashtable();
-            transactionParameters.Add("rate", rate.ObjectId);
-            transactionParameters.Add("async", false);
-            Transaction transaction = resource.CreateTransaction(transactionParameters);
-
-            if (((String)transaction.Status).Equals("SUCCESS", StringComparison.OrdinalIgnoreCase))
-            {
-                var order = new Order() 
-                { 
-                    OrderID = orderId,
-                    MailingLabel = transaction.LabelURL.ToString(),
-                    USPSTrackingId = transaction.TrackingNumber.ToString()
-                };
-                using (var db = new CellableEntities())
-                {
-                    db.Orders.Attach(order);
-                    db.Entry(order).Property(x => x.MailingLabel).IsModified = true;
-                    db.Entry(order).Property(x => x.USPSTrackingId).IsModified = true;
-                    db.Configuration.ValidateOnSaveEnabled = false;
-                    db.SaveChanges();
+            if ($transaction['status'] == 'SUCCESS'){
+                $order = $wpdb->get_row("SELECT * FROM wp_cellable_orders WHERE id=" . $orderId, ARRAY_A);
+                $wpdb->update('wp_cellable_orders', array(
+                    'mailing_label' => $transaction['label_url'],
+                    'usps_tracking_id' => $transaction['tracking_number']
+                ), array(
+                    'id' => $order_id,
+                ));
+                
+            } 
+            else {
+                error_log("Transaction failed with messages:");
+                foreach ($transaction['messages'] as $message) {
+                    error_log("--> " . $message);
                 }
             }
-            else
-            {
-                Console.WriteLine("An Error has occured while generating your label. Messages : " + transaction.Messages);
-            }
+
         }
       
 } 

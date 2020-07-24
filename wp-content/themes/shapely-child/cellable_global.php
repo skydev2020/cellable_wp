@@ -17,8 +17,7 @@ $SHIPPO_API_TEST_API_TOKEN = "shippo_test_f8958c51ac5aacf2ef429009e046baa1be8c61
 //$ShippoLiveAPIToken = "shippo_live_1a0974d75d58ff864278600ab85f456823a86661"; 
 $SHIPPO_API_LIVE_API_TOKEN = "shippo_test_f8958c51ac5aacf2ef429009e046baa1be8c61ef";
 
-<!-- Email Addresses -->
 // Email Address
-$ADMIN_EMAIL= "admin@cellable.tech"
-$CONTACT_EMAIL= "contactus@cellable.com"
-$CONFIRMATION_EMAIL= "CellableWebDev@gmail.com"
+$ADMIN_EMAIL= "admin@cellable.tech";
+$CONTACT_EMAIL= "contactus@cellable.com";
+$CONFIRMATION_EMAIL= "CellableWebDev@gmail.com";

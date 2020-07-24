@@ -3,7 +3,7 @@
 Template Name: Cellable User Register
 Template Post Type: page
 */
-require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
+require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_shipping.class.php');
 
 $user = wp_get_current_user(); // ID->0: if user is not logged in
 if ($user->ID==0):
@@ -118,7 +118,6 @@ get_header();
 					throw new Exception('Order Insert Failed');
 				}
 				$order_id = $wpdb->insert_id;
-
 				
 				$view_count = 0;
 				if ($phone_version['views'] == null ) {
@@ -136,8 +135,8 @@ get_header();
 				$wpdb->query('COMMIT');
 
 				// Get/Save Shipping Label
-				MailController mail = new MailController();
-				mail.GetShippingLabel(userId, orderId);
+				$shipping_mail = new CellableShipping;				
+				$shipping_mail->GetShippingLabel($user->ID, $order_id);
 
 				// Send Confirmation Email(s)
 				EmailController email = new EmailController();
