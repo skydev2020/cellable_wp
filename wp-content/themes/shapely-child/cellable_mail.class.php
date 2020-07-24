@@ -1,5 +1,6 @@
 <?php 
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
+require_once(ABSPATH . 'wp-content/themes/shapely-child/vendor/autoload.php');
 class CellableMail
 { 
     // Constructor 
