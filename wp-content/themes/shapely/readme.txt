@@ -2,24 +2,24 @@
 
 Theme Name: Shapely
 Theme URI: https://colorlib.com/wp/shapely/
-Version: 1.1.0
-Tested up to: WP 4.7
+Version: 1.2.4
+Tested up to: WP 4.9
 
 Author: Aigars Silkalns
 Author URI: https://colorlib.com/wp/
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl.html
 -------------------------------------------------------
-Shapely theme, Copyright 2017 colorlib.com
+Shapely theme, Copyright 2018 colorlib.com
 Shapely WordPress theme is distributed under the terms of the GNU GPL
-Shapely is based on Underscores http://underscores.me/, (C) 2012-2017 Automattic, Inc.
+Shapely is based on Underscores http://underscores.me/, (C) 2012-2018 Automattic, Inc.
 -------------------------------------------------------
 
 == Description ==
 
 Shapely is a powerful and versatile one page WordPress theme with pixel perfect design and outstanding functionality. It is by far the most advanced free WordPress theme available today with loads of unmatched customization options. This theme comes with several homepage widgets that can be used to add portfolio, testimonials, parallax sections, your product or service information, call for action and much more.
 
-Shapely supports most free and premium WordPress plugins such as WooCommerce, Jetpack, Gravity Forms, Contact Form 7, Yoast SEO, Google Analytics by Yoast and much more.
+Shapely supports most free and premium WordPress plugins such as WooCommerce, Jetpack, Kali Forms, Gravity Forms, Contact Form 7, Yoast SEO, Google Analytics by Yoast and much more.
 
 This theme is the best suited for business, landing page, portfolio, ecommerce, store, local business,  personal websites but can be tweaked to be used as blog, magazine or any other awesome website while highlighting its unique one page setup. This is going to be the last WordPress theme you will ever want to use because it is so much better than anything you have seen. We promise.
 
@@ -43,7 +43,7 @@ Shapely theme does not support long menus.
 
 = Front page template not displaying content =
 
-This page template is used to create the Parallax homepage from our demo : https://colorlib.com/shapely/ . it does not output any content added in the backend editor and we recommend using only the [Shapely] tagged widgets. 
+This page template is used to create the Parallax homepage from our demo : https://colorlib.com/shapely/ . it does not output any content added in the backend editor and we recommend using only the [Shapely] tagged widgets.
 
 == Credits ==
 
@@ -60,6 +60,27 @@ This page template is used to create the Parallax homepage from our demo : https
 
 
 == Changelog ==
+
+= 1.2.4 =
+* Implemented milestone: https://github.com/puikinsh/shapely/milestone/8?closed=1
+
+= 1.2.3 =
+* Implemented milestone: https://github.com/puikinsh/shapely/milestone/7?closed=1
+
+= 1.2.2 =
+* Implemented milestone: https://github.com/puikinsh/shapely/milestone/6?closed=1
+
+= 1.2.0 =
+
+* Implemented milestone https://github.com/puikinsh/shapely/milestone/4
+
+= 1.1.6 - June 15 2017 =
+
+* Implemented milestone https://github.com/puikinsh/shapely/milestone/2
+
+= 1.1.5 - June 9 2017 =
+
+* Added French translation thanks to Michaël Crofte
 
 = 1.1.0 - Jan 3 2017 =
 
