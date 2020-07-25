@@ -46,6 +46,7 @@ get_header();
 			$price = $phone_version_capacity['value'];
 			$original_price = $price;
 			$defect_ids_str = implode(', ', $defect_ids);
+			var_dump($defect_ids);
 			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM ". $wpdb->base_prefix ."cellable_possible_defects WHERE id in ($defect_ids_str)") );
 			
 			$price = $price-$total_defect_value;
@@ -60,7 +61,7 @@ get_header();
 					and start_date <= CURDATE() and end_date >= CURDATE()", $wpdb->esc_like($promo_code)), ARRAY_A);
 				$promo_id = $promo['id'];
 			}
-
+			var_dump($promo);
 			if ($promo['discount']>0):
 				$price += $price * $promo['discount'] / 100;	
 			else:
@@ -83,7 +84,7 @@ get_header();
 					'phone_id' => $phone_brand['id'],
 					'carrier_id' => $carrier['id'],
 					'phone_version_id' => $phone_version['id'],
-					'created_date' => date()
+					'created_date' => date_create()->format('Y-m-d H:i:s')
 				));
 
 				if ($r == false) {
@@ -97,7 +98,7 @@ get_header();
 					'amount' => $price,
 					'user_id' => $user->ID,
 					'order_status_id' => 1,
-					'created_date' => date(),
+					'created_date' => date_create()->format('Y-m-d H:i:s'),
 					'created_by' => 'System',
 					'payment_type_id' => $payment_type_id,
 					'promo_id' => $promo_id,

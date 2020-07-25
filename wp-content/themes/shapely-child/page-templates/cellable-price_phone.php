@@ -37,22 +37,23 @@ get_header();
 			$price = $phone_version_capacity['value'];
 			$original_price = $price;
 			$defect_ids_str = implode(', ', $defect_ids);
-			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM ".$wpdb->base_prefix."cellable_possible_defects WHERE id in ($defect_ids_str)") );
+			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM ".$wpdb->base_prefix
+				."cellable_possible_defects WHERE id in (%s)", $defect_ids_str) );
 			
 			$price = $price-$total_defect_value;
 			
 			// Promotion Code
-			$promo_code = $_REQUEST['promo_code'];
+			$promo_code = isset($_REQUEST['promo_code']) ? $_REQUEST['promo_code'] : null;
 			$promo = null;
 
-			if (isset($promo_code)) {
+			if (!$promo_code) {
 				$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_promos WHERE code= %s
 					and start_date <= CURDATE() and end_date >= CURDATE()", $wpdb->esc_like($promo_code)), ARRAY_A);
 			}
 
-			if ($promo['discount']>0):
+			if ($promo && $promo['discount']>0):
 				$price += $price * $promo['discount'] / 100;	
-			else:
+			elseif ($promo && $promo['dollar_value']>0):
 				$price += $promo['dollar_value'];
 			endif;
 						
