@@ -3,6 +3,7 @@
 Template Name: Cellable Carrier
 Template Post Type: page
 */
+require('wp-blog-header.php');
 get_header(); 
 ?>
 
@@ -13,7 +14,7 @@ get_header();
 			while ( have_posts() ) : the_post();				
 				the_content();
 			endwhile; // End of the loop.
-			$carriers = $wpdb->get_results("SELECT * FROM wp_cellable_carriers order by position", ARRAY_A);
+			$carriers = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix. "cellable_carriers order by position", ARRAY_A);
 			$search = $_GET['search'];
 			$brand_id = $_GET['phone_id'];
 			?>

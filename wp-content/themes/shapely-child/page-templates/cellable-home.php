@@ -3,6 +3,7 @@
 Template Name: Cellable Homepage
 Template Post Type: page
 */
+require('wp-blog-header.php');
 get_header(); 
 ?>
 
@@ -14,7 +15,7 @@ get_header();
 			while ( have_posts() ) : the_post();
 				the_content();
 			endwhile; // End of the loop.
-			$phones = $wpdb->get_results("SELECT * FROM wp_cellable_phones", ARRAY_A);
+			$phones = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix."cellable_phones", ARRAY_A);
 			?>
 			<div class="text-center">
 				<?php foreach ($phones as $phone): ?>

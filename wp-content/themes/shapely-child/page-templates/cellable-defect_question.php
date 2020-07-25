@@ -18,7 +18,7 @@ get_header();
 			
 			$phone_version_id = $_GET['phone_version_id'];
 			// Get filtered Phone Versions list
-			$phone_version = $wpdb->get_row("SELECT * FROM wp_cellable_phone_versions WHERE id=" . $phone_version_id, ARRAY_A);
+			$phone_version = $wpdb->get_row("SELECT * FROM " . $wpdb->base_prefix ."cellable_phone_versions WHERE id=" . $phone_version_id, ARRAY_A);
 
 			if (!$phone_version) {
 			?>
@@ -30,7 +30,7 @@ get_header();
 			}
 			
 
-			$possible_defect_groups = $wpdb->get_results($wpdb->prepare("SELECT distinct(defect_group_id) id FROM wp_cellable_possible_defects 
+			$possible_defect_groups = $wpdb->get_results($wpdb->prepare("SELECT distinct(defect_group_id) id FROM ". $wpdb->base_prefix. "cellable_possible_defects 
 				where phone_version_id = %d order by defect_group_id asc", 
 				$wpdb->esc_like($phone_version_id)), ARRAY_A);
 
@@ -43,14 +43,14 @@ get_header();
 				$phone_version['views'] =0;
 			}
 
-			$wpdb->update('wp_cellable_phone_versions', array(            
+			$wpdb->update($wpdb->base_prefix.'cellable_phone_versions', array(            
 				'views' => $phone_version['views']
 			), array(
 				'id' => $phone_version_id,
 			));
 			
-			$phone_brand = $wpdb->get_row("SELECT * FROM wp_cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
-			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_version_capacities 
+			$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
+			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix."cellable_version_capacities 
 				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
 
 			?>
@@ -58,7 +58,7 @@ get_header();
 			    <input id="id" name="id" type="hidden" value="<?= $phone_version_id?>" />
 				<table style="width:70%; margin-left:auto; margin-right:auto; font-family:'HP Simplified'">
 					<tr>
-						<td style="text-align:center; vertical-align:top; width:30%;">
+						<td class="text-center" style="vertical-align:top; width:30%;">
 							<div style="height:50px;"></div>
 							<div style=" width:300px">
 								<?= $phone_brand['name'] ?>
@@ -79,16 +79,16 @@ get_header();
 								<tr>
 									<td>
 										<div style=" margin-right: 50px; height: 125px; border: medium solid #ccc; width: 600px; border-radius: 15px; margin-left: 24px;">
-											<div style="text-align:left; background-color:lightgray;">
+											<div class="text-left" style="background-color:lightgray;">
 												&nbsp;&nbsp;&nbsp;
-												<p style="text-align:left; font-size:large; background-color:lightgray; margin-top: -10px; width: 573px; margin-left: 17px; border-bottom: thin solid #ccc; ">
+												<p class="text-left" style="font-size:large; background-color:lightgray; margin-top: -10px; width: 573px; margin-left: 17px; border-bottom: thin solid #ccc; ">
 													Storage Capacity
 												</p>
 											</div>
 											<div style="display:inline-block; width:30px;"></div>
 											<?php 
 											foreach ($phone_version_capacities as $phone_version_capacity): 
-												$capacity = $wpdb->get_row("SELECT * FROM wp_cellable_storage_capacities WHERE id=" . $phone_version_capacity['storage_capacity_id'], ARRAY_A);
+												$capacity = $wpdb->get_row("SELECT * FROM " .$wpdb->base_prefix ."cellable_storage_capacities WHERE id=" . $phone_version_capacity['storage_capacity_id'], ARRAY_A);
 											?>
 												<label>
 													<input type="radio" name="capacity_id" value="<?= $capacity['id'] ?>" autocomplete="off" />&nbsp;
@@ -108,8 +108,8 @@ get_header();
 
 								foreach ($possible_defect_groups as $possible_defect_group):
 									
-									$defect_group = $wpdb->get_row("SELECT * FROM wp_cellable_defect_groups WHERE id=" . $possible_defect_group['id'], ARRAY_A);
-									$possible_defects = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_possible_defects 
+									$defect_group = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix. "cellable_defect_groups WHERE id=" . $possible_defect_group['id'], ARRAY_A);
+									$possible_defects = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix . "cellable_possible_defects 
 										where phone_version_id = %d and defect_group_id = %d", 
 										$wpdb->esc_like($phone_version_id), $wpdb->esc_like($possible_defect_group['id'])), ARRAY_A);
 								?>
@@ -117,7 +117,7 @@ get_header();
 									<td>
 										<div style="margin-right: 50px; height: 125px; border: medium solid #ccc; width: 600px; border-radius: 15px; margin-left: 24px;">
 											&nbsp;&nbsp;&nbsp;
-											<p style="text-align:left; margin-top: -10px; font-size:large; width: 573px; margin-left: 17px; border-bottom: thin solid #ccc; ">
+											<p class="text-left" style="margin-top: -10px; font-size:large; width: 573px; margin-left: 17px; border-bottom: thin solid #ccc; ">
 												<?= $defect_group['name'] ?>
 												<?php if ($defect_group['info']!=null): ?>
 													<abbr title="<?= $defect_group['info'] ?>"><i class="fa fa-info-circle" style="cursor:pointer;"></i></abbr>	

@@ -20,9 +20,9 @@ get_header();
 			$capacity_id = $_REQUEST['capacity_id'];
 			$defect_ids = $_REQUEST['defect_ids'];
 
-			$phone_version = $wpdb->get_row("SELECT * FROM wp_cellable_phone_versions WHERE id=" . $phone_version_id, ARRAY_A);
-			$capacity = $wpdb->get_row("SELECT * FROM wp_cellable_storage_capacities WHERE id=" . $capacity_id, ARRAY_A);
-			$phone_version_capacity = $wpdb->get_row("SELECT * FROM wp_cellable_version_capacities 
+			$phone_version = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix. "cellable_phone_versions WHERE id=" . $phone_version_id, ARRAY_A);
+			$capacity = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix. "cellable_storage_capacities WHERE id=" . $capacity_id, ARRAY_A);
+			$phone_version_capacity = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix . "cellable_version_capacities 
 				WHERE phone_version_id=" . $phone_version_id." and storage_capacity_id =" . $capacity_id, ARRAY_A);
 			
 			if (!$phone_version || !$capacity || !$phone_version_capacity || !$defect_ids || !is_array($defect_ids)) {
@@ -36,7 +36,7 @@ get_header();
 			$price = $phone_version_capacity['value'];
 			$original_price = $price;
 			$defect_ids_str = implode(', ', $defect_ids);
-			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM wp_cellable_possible_defects WHERE id in ($defect_ids_str)") );
+			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM ".$wpdb->base_prefix."cellable_possible_defects WHERE id in ($defect_ids_str)") );
 			
 			$price = $price-$total_defect_value;
 			
@@ -45,7 +45,7 @@ get_header();
 			$promo = null;
 
 			if (isset($promo_code)) {
-				$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM wp_cellable_promos WHERE code= %s
+				$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_promos WHERE code= %s
 					and start_date <= CURDATE() and end_date >= CURDATE()", $wpdb->esc_like($promo_code)), ARRAY_A);
 			}
 
@@ -55,7 +55,7 @@ get_header();
 				$price += $promo['dollar_value'];
 			endif;
 						
-			$phone_brand = $wpdb->get_row("SELECT * FROM wp_cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
+			$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
 			?>
 			
 			<table style="width:80%; margin-left:auto; margin-right:auto; font-family:'HP Simplified'">
@@ -93,7 +93,7 @@ get_header();
 									<?php foreach ($defect_ids as $defect_id): ?>
 									<input name="defect_ids[]" type="hidden" value="<?=$defect_id?>"/>
 									<?php endforeach; ?>
-									<button type="submit" name="submit" id="PromoCode" class="PromoCode">
+									<button type="submit" name="submit" id="PromoCode" class="PromoCode" style="width: 30px;">
 										<i class="fa fa-plus-square"></i>
 									</button>
 									<p></p>
@@ -143,11 +143,11 @@ get_header();
 							</tr>
 							<?php 
 							foreach ($defect_ids as $defect_id): 
-								$defect = $wpdb->get_row("SELECT * FROM wp_cellable_possible_defects WHERE id=" . $defect_id, ARRAY_A);
+								$defect = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix. "cellable_possible_defects WHERE id=" . $defect_id, ARRAY_A);
 								if (!$defect) {
 									continue;
 								}	
-								$defect_group = $wpdb->get_row("SELECT * FROM wp_cellable_defect_groups WHERE id=" . $defect['defect_group_id'], ARRAY_A);
+								$defect_group = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix. "cellable_defect_groups WHERE id=" . $defect['defect_group_id'], ARRAY_A);
 								if (!$defect_group) {
 									continue;
 								}

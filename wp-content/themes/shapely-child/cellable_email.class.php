@@ -42,8 +42,7 @@ class CellableEmail
     {
         $first_name = "";
         $last_name = "";
-        $email = "";
-        $o_id = "";
+        $email = "";        
         $amount = "";
         $payment_type = "";
         $payment_username = "";
@@ -96,6 +95,17 @@ class CellableEmail
             mailLabel = item.mailLabel;
         }
 
+        $order = $wpdb->get_row("SELECT * FROM wp_cellable_orders WHERE id=".$order_id, ARRAY_A);
+        $payment_type = $wpdb->get_row("SELECT * FROM wp_cellable_payment_types WHERE id=".$order['payment_type_id'], ARRAY_A);
+        $order_detail = $wpdb->get_row("SELECT * FROM wp_cellable_order_details WHERE id=".$order['order_detail_id'], ARRAY_A);
+        $phone_version = $wpdb->get_row("SELECT * FROM wp_cellable_phone_versions WHERE id=".$order_detail['phone_version_id'], ARRAY_A);
+
+        $user =get_userdata($order['user_id']);
+
+        $first_name = $user->first_name;
+        $last_name = $user->last_name;
+        $email = $user->user_email;
+
         string HTML = "<table style='margin-top: 50px;'>" +
                 "<tr style='border: solid; border-width: thin; background-color: black;'>" +
                     "<th style='color: white;'>First Name" +
@@ -116,23 +126,23 @@ class CellableEmail
                 "</tr>" +
                 "<tr>" +
                     "<td>" +
-                    firstName +
+                    $user->first_name +
                     "</td>" +
                     "<td></td>" +
                     "<td>" +
-                    lastName +
+                    $user->last_name +
                     "</td>" +
                     "<td></td>" +
                     "<td>" +
-                    oId +
+                    $order_id +
                     "</td>" +
                     "<td></td>" +
                     "<td>" +
-                    phoneVersion +
+                    $phone_version['name'] +
                     "</td>" +
                     "<td></td>" +
                     "<td>$" +
-                    amount +
+                    number_format((float)$order['amount'], 2, '.', '') +
                     "</td>" +
                     "<td></td>" +
                 "</tr>" +
@@ -149,15 +159,15 @@ class CellableEmail
                 "</tr>" +
                 "<tr>" +
                     "<td>" +
-                        paymentType +
+                        $payment_type['name'] +
                     "</td>" +
                     "<td style='width: 30px;'></td>" +
                     "<td>" +
-                        paymentUserName +
+                        $order['payment_username'] +
                     "</td>" +
                     "<td style='width: 30px;'></td>" +
                     "<td>" +
-                        email +
+                        $user->user_email +
                     "</td>" +
                     "<td style='width: 30px;'></td>" +
                 "</tr>" +
@@ -202,11 +212,11 @@ class CellableEmail
                     "</td>" +
                 "</tr>" +
                 "<tr>" +
-                    "<td><b>Click <a href='" + mailLabel + "'>HERE</a> to download your shipping label</b>" +
+                    "<td><b>Click <a href='" + $order['mailing_label'] + "'>HERE</a> to download your shipping label</b>" +
                     "</td>" +
                 "</tr>" +
                 "<tr>" +
-                    "<td><b>Click <a href='" + packingSheet + "'>HERE</a> to download your packing slip</b>" +
+                    "<td><b>Click <a href='" + $packing_sheet + "'>HERE</a> to download your packing slip</b>" +
                     "</td>" +
                 "</tr>" +
             "</table>" +
@@ -235,7 +245,7 @@ class CellableEmail
                             "Cellable is not affiliated with the manufacturers of the items available for trade-in." +
                         "</p>" +
                         "<p style='text-align: center; font-size: xx-small;'>" +
-                            CellableAddress +
+                            $POSTAL_ADDRESS +
                         "</p>" +
                     "</td>" +
                 "</tr>" +

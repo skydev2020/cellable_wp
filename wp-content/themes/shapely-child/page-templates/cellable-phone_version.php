@@ -3,8 +3,8 @@
 Template Name: Cellable Phone Version
 Template Post Type: page
 */
+require('wp-blog-header.php');
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
-
 get_header(); 
 ?>
 
@@ -20,12 +20,12 @@ get_header();
 			$brand_id = $_GET['brand_id'];
 			if ($search_str) {
 				// Get filtered Phone Versions list
-				$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_phone_versions where name like %s order by position desc", 
+				$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix. "cellable_phone_versions where name like %s order by position desc", 
 				'%'.$wpdb->esc_like($search_str).'%'), ARRAY_A);
 			}
 			else {
 				// Get entire list of Phone Versions to pass to the view
-				$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM wp_cellable_phone_versions where active = true and phone_id = %d order by position desc", 
+				$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix. "cellable_phone_versions where active = true and phone_id = %d order by position desc", 
 				$wpdb->esc_like($brand_id)), ARRAY_A);
 			}
 			?>
@@ -37,7 +37,7 @@ get_header();
 					</a>
 					<br />
 					<?php
-					$phone = $wpdb->get_row("SELECT brand FROM wp_cellable_phones WHERE id=" . $ele['phone_id']);					
+					$phone = $wpdb->get_row("SELECT brand FROM ". $wpdb->base_prefix. "cellable_phones WHERE id=" . $ele['phone_id']);					
 					?>
 					<?= $phone->brand?>
 					<br />

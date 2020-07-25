@@ -87,7 +87,7 @@ get_header();
 				$wpdb->query('START TRANSACTION');
 							
 				// Save User Phone
-				$r = $wpdb->insert("wp_cellable_user_phones", array(
+				$r = $wpdb->insert("wp_cellable_order_details", array(
 					'user_id' => $user->ID,
 					'phone_id' => $phone_brand['id'],
 					'carrier_id' => $carrier['id'],
@@ -99,7 +99,7 @@ get_header();
 					throw new Exception('User Phone Insert Failed');
 				}
 
-				$user_phone_id = $wpdb->insert_id;
+				$order_detail_id = $wpdb->insert_id;
 				//Create Order
 				$order_id = null;
 				$r = $wpdb->insert("wp_cellable_orders", array(
@@ -110,7 +110,7 @@ get_header();
 					'created_by' => 'System',
 					'payment_type_id' => $payment_type_id,
 					'promo_id' => $promo_id,
-					'user_phone_id' => $user_phone_id,
+					'order_detail_id' => $order_detail_id,
 					'payment_user_name' => $payment_username					
 				));
 				

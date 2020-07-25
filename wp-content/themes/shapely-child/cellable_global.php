@@ -5,6 +5,7 @@
 $PHONE_IMAGE_LOCATION = "https://cellableimages.blob.core.windows.net/phoneimages";
 $IMAGE_LOCATION = "https://cellableimages.blob.core.windows.net/systemimages";
 $CONTACT_US_PHONE = "(404) 216-6093";
+$POSTAL_ADDRESS = "4120 Manor House Drive Marietta, GA 30062";
 
 // USPS API Settings
 $USPS_API_USERNAME = "060BRITT4961";
