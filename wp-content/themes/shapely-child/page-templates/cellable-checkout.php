@@ -139,7 +139,9 @@ get_header();
 							<input name="phone_version_id" type="hidden" value="<?= $phone_version_id ?>">
 							<input name="carrier_id" type="hidden" value="<?= $carrier_id ?>">
 							<input name="capacity_id" type="hidden" value="<?= $capacity_id ?>">							
-
+							<?php foreach ($defect_ids as $defect_id): ?>
+								<input name="defect_ids[]" type="hidden" value="<?=$defect_id?>"/>
+							<?php endforeach; ?>
                             <table>
                                 <tr>
                                     <td class="text-left" style="width:100%; padding:10px;">

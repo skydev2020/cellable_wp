@@ -24,6 +24,7 @@ get_header();
 			$phone_version_id = $_REQUEST['phone_version_id'];
 			$capacity_id = $_REQUEST['capacity_id'];
 			$carrier_id = $_REQUEST['carrier_id'];
+			$defect_ids = $_REQUEST['defect_ids'];
 
 			$payment_username = $_REQUEST["payment_username"];
 			$payment_type_id = $_REQUEST["payment_type_id"];
@@ -33,8 +34,8 @@ get_header();
 			$capacity = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_storage_capacities WHERE id=" . $capacity_id, ARRAY_A);
 			$phone_version_capacity = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_version_capacities 
 				WHERE phone_version_id=" . $phone_version_id." and storage_capacity_id =" . $capacity_id, ARRAY_A);
-						
-			if (!$phone_version || !$carrier || !$capacity || !$phone_version_capacity || !$payment_type_id || !$payment_username ) {
+									
+			if (!$phone_version || !$carrier || !$capacity || !$phone_version_capacity || !$payment_type_id || !$payment_username || !$defect_ids || !is_array($defect_ids)) {
 			?>
 			<p>There are some incorrect variables.</p>
 			<a href="<?=get_home_url() ?>">Go To Homepage</a>
