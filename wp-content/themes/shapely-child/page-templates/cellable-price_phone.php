@@ -46,7 +46,7 @@ get_header();
 			$promo_code = isset($_REQUEST['promo_code']) ? $_REQUEST['promo_code'] : null;
 			$promo = null;
 
-			if (!$promo_code) {
+			if ($promo_code) {
 				$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_promos WHERE code= %s
 					and start_date <= CURDATE() and end_date >= CURDATE()", $wpdb->esc_like($promo_code)), ARRAY_A);
 			}

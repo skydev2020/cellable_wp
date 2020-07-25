@@ -46,31 +46,32 @@ get_header();
 			$price = $phone_version_capacity['value'];
 			$original_price = $price;
 			$defect_ids_str = implode(', ', $defect_ids);
-			var_dump($defect_ids);
-			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM ". $wpdb->base_prefix ."cellable_possible_defects WHERE id in ($defect_ids_str)") );
+			
+			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM ".$wpdb->base_prefix
+				."cellable_possible_defects WHERE id in (%s)", $defect_ids_str) );
 			
 			$price = $price-$total_defect_value;
 			
 			// Promotion Code
-			$promo_code = $_REQUEST['promo_code'];
+			$promo_code = isset($_REQUEST['promo_code']) ? $_REQUEST['promo_code'] : null;
 			$promo_id = null;
 			$promo = null;
 
-			if (isset($promo_code)) {
+			if ($promo_code) {
 				$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix ."cellable_promos WHERE code= %s
 					and start_date <= CURDATE() and end_date >= CURDATE()", $wpdb->esc_like($promo_code)), ARRAY_A);
 				$promo_id = $promo['id'];
 			}
-			var_dump($promo);
-			if ($promo['discount']>0):
+			
+			if ($promo && $promo['discount']>0):
 				$price += $price * $promo['discount'] / 100;	
-			else:
+			elseif ($promo && $promo['dollar_value']>0):
 				$price += $promo['dollar_value'];
 			endif;
 			
 			$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
 						
-			$capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix ."cellable_storage_capacities"), ARRAY_A);
+			$capacities = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix ."cellable_storage_capacities", ARRAY_A);
 			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix ."cellable_version_capacities 
 				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
 
@@ -103,7 +104,7 @@ get_header();
 					'payment_type_id' => $payment_type_id,
 					'promo_id' => $promo_id,
 					'order_detail_id' => $order_detail_id,
-					'payment_user_name' => $payment_username					
+					'payment_username' => $payment_username					
 				));
 				
 				if ($r == false) {

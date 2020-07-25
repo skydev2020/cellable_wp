@@ -131,9 +131,15 @@ class CellableShipping
         //}
 
         public function GetShippingLabel($user_id, $order_id) {
-            // Generate Mailing Label
-            Shippo:setApiKey($SHIPPO_API_LIVE_API_TOKEN);
 
+            global $SHIPPO_API_LIVE_API_TOKEN;
+            global $wpdb;
+            global $CONTACT_US_PHONE;
+            global $CONTACT_EMAIL;
+
+            // Generate Mailing Label
+            Shippo::setApiKey($SHIPPO_API_LIVE_API_TOKEN);
+             
             // To Address
             //Get Cellable Mail Info
             $address_setting = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_system_settings WHERE name='LocationAddress'", ARRAY_A);
