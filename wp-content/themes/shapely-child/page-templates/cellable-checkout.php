@@ -21,8 +21,9 @@ get_header();
 				the_content();
 			endwhile; // End of the loop.
 			
-			$phone_version_id = $_GET['phone_version_id'];
+			$phone_version_id = $_REQUEST['phone_version_id'];
 			$capacity_id = $_REQUEST['capacity_id'];
+			$carrier_id = $_REQUEST['carrier_id'];
 			$defect_ids = $_REQUEST['defect_ids'];
 
 			$payment_types =  $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix."cellable_payment_types", ARRAY_A);
@@ -32,7 +33,7 @@ get_header();
 			$phone_version_capacity = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix."cellable_version_capacities 
 				WHERE phone_version_id=" . $phone_version_id." and storage_capacity_id =" . $capacity_id, ARRAY_A);
 			
-			if (!$phone_version || !$capacity || !$phone_version_capacity || !$defect_ids || !is_array($defect_ids)) {
+			if (!$phone_version || !$carrier_id || !$capacity || !$phone_version_capacity || !$defect_ids || !is_array($defect_ids)) {
 			?>
 			<p>There are some incorrect variables.</p>
 			<a href="<?=get_home_url() ?>">Go To Homepage</a>
@@ -62,18 +63,10 @@ get_header();
 				$price += $promo['dollar_value'];
 			endif;
 
-			
-			$possible_defect_groups = $wpdb->get_results($wpdb->prepare("SELECT distinct(defect_group_id) id FROM ". $wpdb->base_prefix."cellable_possible_defects 
-				where phone_version_id = %d order by defect_group_id asc", 
-				$wpdb->esc_like($phone_version_id)), ARRAY_A);
-			
 			$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
-						
-
 			$capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_storage_capacities"), ARRAY_A);
 			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_version_capacities 
 				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
-
 
 			?>			
 
@@ -143,6 +136,10 @@ get_header();
 						<form action="<?=get_home_url() ?>/user-register" method="post">
 							<input name="userEmail" type="hidden" value="<?= $user->user_email ?>">
 							<input name="UserExists" type="hidden" value="True">
+							<input name="phone_version_id" type="hidden" value="<?= $phone_version_id ?>">
+							<input name="carrier_id" type="hidden" value="<?= $carrier_id ?>">
+							<input name="capacity_id" type="hidden" value="<?= $capacity_id ?>">							
+
                             <table>
                                 <tr>
                                     <td class="text-left" style="width:100%; padding:10px;">

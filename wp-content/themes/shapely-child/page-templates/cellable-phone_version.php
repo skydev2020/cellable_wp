@@ -3,7 +3,6 @@
 Template Name: Cellable Phone Version
 Template Post Type: page
 */
-require('wp-blog-header.php');
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
 get_header(); 
 ?>
@@ -18,6 +17,8 @@ get_header();
 			
 			$search_str = $_GET['q'];
 			$brand_id = $_GET['brand_id'];
+			$carrier_id = $_REQUEST['carrier_id'];
+
 			if ($search_str) {
 				// Get filtered Phone Versions list
 				$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix. "cellable_phone_versions where name like %s order by position desc", 
@@ -32,7 +33,7 @@ get_header();
 			<div class="text-center">
 				<?php foreach ($phone_versions as $ele): ?>
 				<div class="col-sm-3 text-center phone-version">
-					<a class="btn btn-default" href="<?=get_home_url() ?>/defect-questions/?phone_version_id=<?=$ele['id']?>">
+					<a class="btn btn-default" href="<?=get_home_url() ?>/defect-questions/?phone_version_id=<?=$ele['id']?>&carrier_id=<?= $carrier_id?>">
 						<img src="<?= $PHONE_IMAGE_LOCATION ?>/<?= $ele['image_file'] ?>" alt="<?= $ele['name'] ?>">
 					</a>
 					<br />

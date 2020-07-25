@@ -17,23 +17,22 @@ get_header();
 			endwhile; // End of the loop.
 			
 			$phone_version_id = $_GET['phone_version_id'];
+			$carrier_id = $_REQUEST['carrier_id'];
 			// Get filtered Phone Versions list
 			$phone_version = $wpdb->get_row("SELECT * FROM " . $wpdb->base_prefix ."cellable_phone_versions WHERE id=" . $phone_version_id, ARRAY_A);
 
-			if (!$phone_version) {
+			if (!$phone_version || !$carrier_id) {
 			?>
 			<p>Proper Phone Version can't be found.</p>
 			<a href="<?=get_home_url() ?>">Go To Homepage</a>
 			
 			<?php
 				return;
-			}
-			
+			}			
 
 			$possible_defect_groups = $wpdb->get_results($wpdb->prepare("SELECT distinct(defect_group_id) id FROM ". $wpdb->base_prefix. "cellable_possible_defects 
 				where phone_version_id = %d order by defect_group_id asc", 
 				$wpdb->esc_like($phone_version_id)), ARRAY_A);
-
 			
 			// Update Phone Version View Count to DB		
 			if ($phone_version['views'] !=null) {
@@ -56,6 +55,7 @@ get_header();
 			?>
 			<form action="<?=get_home_url() ?>/price-phone/?phone_version_id=<?= $phone_version_id ?>" method="post">
 			    <input id="id" name="id" type="hidden" value="<?= $phone_version_id?>" />
+				<input name="carrier_id" type="hidden" value="<?= $carrier_id?>" />
 				<table style="width:70%; margin-left:auto; margin-right:auto; font-family:'HP Simplified'">
 					<tr>
 						<td class="text-center" style="vertical-align:top; width:30%;">
