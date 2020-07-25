@@ -136,11 +136,11 @@ class CellableShipping
 
             // To Address
             //Get Cellable Mail Info
-            $address_setting = $wpdb->get_row("SELECT * FROM wp_cellable_system_settings WHERE name='LocationAddress'", ARRAY_A);
-            $city_setting = $wpdb->get_row("SELECT * FROM wp_cellable_system_settings WHERE name='LocationCity'", ARRAY_A);
-            $state_setting = $wpdb->get_row("SELECT * FROM wp_cellable_system_settings WHERE name='LocationState'", ARRAY_A);
-            $zip_setting = $wpdb->get_row("SELECT * FROM wp_cellable_system_settings WHERE name='LocationZip'", ARRAY_A);
-            $phone_setting = $wpdb->get_row("SELECT * FROM wp_cellable_system_settings WHERE name='Phone'", ARRAY_A);
+            $address_setting = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_system_settings WHERE name='LocationAddress'", ARRAY_A);
+            $city_setting = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_system_settings WHERE name='LocationCity'", ARRAY_A);
+            $state_setting = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_system_settings WHERE name='LocationState'", ARRAY_A);
+            $zip_setting = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_system_settings WHERE name='LocationZip'", ARRAY_A);
+            $phone_setting = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_system_settings WHERE name='Phone'", ARRAY_A);
             
             $user =get_userdata($user_id);
 
@@ -201,14 +201,13 @@ class CellableShipping
             ));
 
             if ($transaction['status'] == 'SUCCESS'){
-                $order = $wpdb->get_row("SELECT * FROM wp_cellable_orders WHERE id=" . $orderId, ARRAY_A);
-                $wpdb->update('wp_cellable_orders', array(
+                $order = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_orders WHERE id=" . $orderId, ARRAY_A);
+                $wpdb->update($wpdb->base_prefix."cellable_orders", array(
                     'mailing_label' => $transaction['label_url'],
                     'usps_tracking_id' => $transaction['tracking_number']
                 ), array(
                     'id' => $order_id,
                 ));
-                
             } 
             else {
                 error_log("Transaction failed with messages:");

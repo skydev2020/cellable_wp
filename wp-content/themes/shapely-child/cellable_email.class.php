@@ -51,54 +51,10 @@ class CellableEmail
         $mail_label = "";
         $packing_sheet = "https://cellableimages.blob.core.windows.net/systemimages/PackingSheet.pdf";
 
-        var results = (from o in db.Orders.DefaultIfEmpty()
-                        join up in db.UserPhones on o.UserId equals up.UserId into userPhoneGrp
-                        from up in userPhoneGrp.DefaultIfEmpty()
-                        join pv in db.PhoneVersions on up.VersionId equals pv.VersionId into phoneVersionsGrp
-                        from pv in phoneVersionsGrp.DefaultIfEmpty()
-                        join os in db.OrderStatus on o.OrderStatusId equals os.OrderStatusId into orderStatusGrp
-                        from os in orderStatusGrp.DefaultIfEmpty()
-                        join pt in db.PaymentTypes on o.PaymentTypeId equals pt.PaymentTypeId into paymentTypesGrp
-                        from pt in paymentTypesGrp.DefaultIfEmpty()
-                        join p in db.Promos on o.PromoId equals p.PromoId into promosGrp
-                        from p in promosGrp.DefaultIfEmpty()
-                        join ph in db.Phones on pv.PhoneId equals ph.PhoneId into phonesGrp
-                        from ph in phonesGrp.DefaultIfEmpty()
-                        join u in db.Users on o.UserId equals u.UserId into userGroup
-                        from u in userGroup.DefaultIfEmpty()
-                        where o.OrderID == orderId
-
-                        select new {
-                            firstName = u.FirstName,
-                            lastName = u.LastName,
-                            email = u.Email,
-                            OrderId = o.OrderID,
-                            amount = o.Amount,
-                            phoneVersion = pv.Version,
-                            paymentType = pt.PaymentType1,
-                            paymentUserName = o.PaymentUserName,
-                            trackingNumber = o.USPSTrackingId,
-                            mailLabel = o.MailingLabel
-                        });
-
-        foreach(var item in results)
-        {
-            firstName = item.firstName;
-            lastName = item.lastName;
-            email = item.email;
-            oId = item.OrderId.ToString();
-            amount = decimal.Round(item.amount, 2).ToString();
-            paymentType = item.paymentType;
-            paymentUserName = item.paymentUserName;
-            phoneVersion = item.phoneVersion;
-            trackingNumber = item.trackingNumber;
-            mailLabel = item.mailLabel;
-        }
-
-        $order = $wpdb->get_row("SELECT * FROM wp_cellable_orders WHERE id=".$order_id, ARRAY_A);
-        $payment_type = $wpdb->get_row("SELECT * FROM wp_cellable_payment_types WHERE id=".$order['payment_type_id'], ARRAY_A);
-        $order_detail = $wpdb->get_row("SELECT * FROM wp_cellable_order_details WHERE id=".$order['order_detail_id'], ARRAY_A);
-        $phone_version = $wpdb->get_row("SELECT * FROM wp_cellable_phone_versions WHERE id=".$order_detail['phone_version_id'], ARRAY_A);
+        $order = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_orders WHERE id=".$order_id, ARRAY_A);
+        $payment_type = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_payment_types WHERE id=".$order['payment_type_id'], ARRAY_A);
+        $order_detail = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_order_details WHERE id=".$order['order_detail_id'], ARRAY_A);
+        $phone_version = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phone_versions WHERE id=".$order_detail['phone_version_id'], ARRAY_A);
 
         $user =get_userdata($order['user_id']);
 
@@ -106,7 +62,7 @@ class CellableEmail
         $last_name = $user->last_name;
         $email = $user->user_email;
 
-        string HTML = "<table style='margin-top: 50px;'>" +
+        $html = "<table style='margin-top: 50px;'>" +
                 "<tr style='border: solid; border-width: thin; background-color: black;'>" +
                     "<th style='color: white;'>First Name" +
                     "</th>" +
@@ -251,45 +207,39 @@ class CellableEmail
                 "</tr>" +
             "</table>";
 
-        return HTML;
+        return $html;
     }
 
-        protected string BuildPasswordHTML(string userEmail)
-        {
-            string HTML;
+    public function build_password_html($user_email) {
+    
+        $html= "<html>" +
+                    "<head>" +
+                    "</head>" +
+                    "<body>" +
+                    "<table>" +
+                        "<tr>" +
+                            "<td>" +
+                                "We received a request to reset the password associated with this email address. " +
+                                "If you made this request, please follow these instructions." +
+                                "<p>" +
+                                "Click this link to reset your password using our secure server." +
+                                "<p>" +
+                                "<a href='" + get_home_url() + "/users/forgot_password/?email=" + $user_email + "'> Reset Password</a>" +
+                                "<p>" +
+                                "If clicking on the link doesn't work, copy and paste it into the address window of your browser or retype it there." +
+                                "<p>" +
+                                "If you did not make this request, please ignore this email." +
+                                "<p>" +
+                                "Thank you for using Cellable!" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                    "</body>" +
+                "</html>";
 
-            // Get Web Site's Base URL
-            string baseUrl = System.Web.HttpContext.Current.Request.Url.ToString();
-            string url = baseUrl.Replace("/Users/Login", "/Users/ForgotPassword");
-
-            HTML = "<html>" +
-                        "<head>" +
-                        "</head>" +
-                        "<body>" +
-                        "<table>" +
-                            "<tr>" +
-                                "<td>" +
-                                    "We received a request to reset the password associated with this email address. " +
-                                    "If you made this request, please follow these instructions." +
-                                    "<p>" +
-                                    "Click this link to reset your password using our secure server." +
-                                    "<p>" +
-                                    "<a href='" + url + "?email=" + userEmail + "'> Reset Password</a>" +
-                                    "<p>" +
-                                    "If clicking on the link doesn't work, copy and paste it into the address window of your browser or retype it there." +
-                                    "<p>" +
-                                    "If you did not make this request, please ignore this email." +
-                                    "<p>" +
-                                    "Thank you for using Cellable!" +
-                                "</td>" +
-                            "</tr>" +
-                        "</table>" +
-                        "</body>" +
-                    "</html>";
-
-            return HTML;
-        }
-      
+        return HTML;
+    }
+    
 } 
    
 
