@@ -3,11 +3,7 @@ require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
 
 class CellableEmail
 { 
-    // Constructor 
-    public function __construct(){ 
-        echo 'The class "' . __CLASS__ . '" was initiated!<br>'; 
-    } 
-
+    
     public function send_email($order_id, $type, $to_email) {
             
         $html_body = "";

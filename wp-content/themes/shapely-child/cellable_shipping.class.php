@@ -3,11 +3,7 @@ require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
 require_once(ABSPATH . 'wp-content/themes/shapely-child/vendor/autoload.php');
 class CellableShipping
 { 
-    // Constructor 
-    public function __construct(){ 
-        echo 'The class "' . __CLASS__ . '" was initiated!<br>'; 
-    } 
-
+    
     public function _USPSTrackingMessage($trackingNumber) {
         // USPSManager mgr = new USPSManager(USPSAPIUserName, true);
         // string msg = mgr.GetTrackingInfo(USPSAPIUserName, USPSAPIPassword, trackingNumber);
@@ -165,7 +161,7 @@ class CellableShipping
             // from address
             // Get User Mail Info
             $from_address = array(
-                'name' => $user->first_name + " " + $user->last_name,
+                'name' => $user->first_name . " " . $user->last_name,
                 'street1' => 'User Address', //$user->address
                 'city' => 'User City', //$user->city
                 'state' => 'User State', //$user->state
@@ -173,9 +169,9 @@ class CellableShipping
                 'country' => 'US',
                 'phone' => '+1 User Phone',
                 'email' => $user->user_email,
-                'metadata' => "Order ID " . $order_id,
+                'metadata' => "Order ID " . $order_id
             );
-
+            
             // parcel
             $parcel = array(
                 'length'=> '6',
