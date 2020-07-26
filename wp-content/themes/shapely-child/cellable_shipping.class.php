@@ -162,10 +162,10 @@ class CellableShipping
             // Get User Mail Info
             $from_address = array(
                 'name' => $user->first_name . " " . $user->last_name,
-                'street1' => 'User Address', //$user->address
-                'city' => 'User City', //$user->city
-                'state' => 'User State', //$user->state
-                'zip' => 'User Zip', //$user->zip
+                'street1' => '76 may apple lane', //$user->address
+                'city' => 'Franklin', //$user->city
+                'state' => 'NC', //$user->state
+                'zip' => '28734', //$user->zip
                 'country' => 'US',
                 'phone' => '+1 User Phone',
                 'email' => $user->user_email,
@@ -203,13 +203,14 @@ class CellableShipping
             ));
 
             if ($transaction['status'] == 'SUCCESS'){
-                $order = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_orders WHERE id=" . $orderId, ARRAY_A);
-                $wpdb->update($wpdb->base_prefix."cellable_orders", array(
-                    'mailing_label' => $transaction['label_url'],
-                    'usps_tracking_id' => $transaction['tracking_number']
-                ), array(
-                    'id' => $order_id,
-                ));
+                $order = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_orders WHERE id=" . $order_id, ARRAY_A);
+                $r = $wpdb->query(
+                    $wpdb->prepare(
+                        "UPDATE ". $wpdb->base_prefix. "cellable_orders SET mailing_label = %s, usps_tracking_id = %s where id = %d;",
+                        $transaction['label_url'], $transaction['tracking_number'], $order_id
+                    ) // $wpdb->prepare
+                ); // $wpdb->query
+              
             } 
             else {
                 error_log("Transaction failed with messages:");

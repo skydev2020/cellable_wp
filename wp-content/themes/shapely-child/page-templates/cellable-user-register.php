@@ -4,6 +4,7 @@ Template Name: Cellable User Register
 Template Post Type: page
 */
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_shipping.class.php');
+require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_email.class.php');
 
 $user = wp_get_current_user(); // ID->0: if user is not logged in
 if ($user->ID==0):
@@ -77,7 +78,7 @@ get_header();
 
 			try {
 				// begin DB transaction
-				$wpdb->query('START TRANSACTION');
+				// $wpdb->query('START TRANSACTION');
 							
 				// Save User Phone
 				$r = $wpdb->insert($wpdb->base_prefix ."cellable_order_details", array(
@@ -125,17 +126,22 @@ get_header();
 				), array(
 					'id' => $phone_version_id,
 				));
-				$wpdb->query('COMMIT');
+				// $wpdb->query('COMMIT');
 
 				// Get/Save Shipping Label
 				$shipping_mail = new CellableShipping;				
 				$shipping_mail->GetShippingLabel($user->ID, $order_id);
+				$wpdb->query('COMMIT');
 
 				// Send Confirmation Email(s)
 				$cellable_email = new CellableEmail;
 				$cellable_email->send_email($order_id, "Confirm", $user->user_email);
+				// $wpdb->query('COMMIT');
+				
 			} catch (Exception $e) {
+				$wpdb->query('ROLLBACK');
 				error_log($e->getMessage());
+				
 			}
 
 			?>			
