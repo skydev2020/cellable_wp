@@ -73,6 +73,8 @@ get_header();
 					$order_detail = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_order_details WHERE id=" . $order['id'], ARRAY_A);
 					$order_status = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_order_statuses WHERE id=" . $order['order_status_id'], ARRAY_A);
 					$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix ."cellable_promos WHERE id=%d", $order['promo_id']),  ARRAY_A);
+					$payment_type = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix ."cellable_payment_types 
+						WHERE id=%d", $order['payment_type_id']),  ARRAY_A);
 					
 					// "SELECT * FROM ". $wpdb->base_prefix ."cellable_promos WHERE id=" . $order['promo_id'], ARRAY_A);
 
@@ -105,27 +107,29 @@ get_header();
 						<?= isset($order_status) ? $order_status['name'] : "" ?>
 					</td>
 					<td>
-						<?= isset($promo) ? $promo['code'] : "" ?>
+						<?= isset($promo) ? $promo['code'] : "---" ?>
 					</td>
 					<td>
-						<?= isset($promo) ? $promo['name'] : "" ?>
+						<?= isset($promo) ? $promo['name'] : "---" ?>
 					</td>
 					<td>
-		---
+						<?= isset($promo) ? $promo['discount'] ."%" : "---" ?>
 					</td>
 					<td>
-						<?= $order['payment_type_name'] ?>
+						<?= isset($payment_type) ? $payment_type['name'] : "" ?>
 					</td>
 					<td>
 						<?= $order['payment_username'] ?>
 					</td>
 					<td>
 						<?php if ($order['mailing_label']): ?>
-							<div onclick="popupLabelWindow('@item.MailLabel', window, 800, 600)" style="color:blue; cursor:pointer;">Print Label</div>
+							<div onclick="popupLabelWindow('<?= $order['mailing_label'] ?>', window, 800, 600)" style="color:blue; cursor:pointer;">Print Label</div>
 						<?php endif; ?>
 					</td>
 					<td>
-						<div onclick="popupTrackingWindow('<?= $order['tracking_number'] ?>', window, 400, 400)" style="color:blue; cursor:pointer;"><?= $order['tracking_number'] ?></div>
+						<div onclick="popupTrackingWindow('<?= $order['usps_tracking_id'] ?>', window, 400, 400)" style="color:blue; cursor:pointer;">
+							<?= $order['usps_tracking_id'] ?>
+						</div>
 					</td>
 					<td>
 						<?= $order['created_date'] ?>
