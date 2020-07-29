@@ -3,13 +3,13 @@
 Template Name: Cellable Track Orders
 Template Post Type: page
 */
-ob_start(); // this line is for the issue: header already sent while redirecting
+
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_shipping.class.php');
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_email.class.php');
 
 $user = wp_get_current_user(); // ID->0: if user is not logged in
 if ($user->ID==0):
-	header("Location: ".get_home_url()."/wp-login.php?action=register");
+	header("Location: ".get_home_url()."/wp-login.php?action=login");
 	exit();
 endif;
 get_header(); 
@@ -23,131 +23,106 @@ get_header();
 				the_content();
 			endwhile; // End of the loop.
 			
-			$phone_version_id = $_REQUEST['phone_version_id'];
-			$capacity_id = $_REQUEST['capacity_id'];
-			$carrier_id = $_REQUEST['carrier_id'];
-			$defect_ids = $_REQUEST['defect_ids'];
+			// $orders = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_orders WHERE user_id=" . $user->ID, ARRAY_A);
+			$orders = $wpdb->get_results("SELECT o.id oid, o.amount amount, o.payment_username payment_username,
+				o.usps_tracking_id tracking_number, o.mailing_label mailing_label, o.created_date created_date,
+				od.id odid, od.phone_id phone_id, od.carrier_id carrier_id, od.phone_version_id phone_version_id,
+				pt.name payment_type_name, ph.name phone_name, os.name status_name   
+				FROM `wp_cellable_orders` o, `wp_cellable_order_details` od , `wp_cellable_payment_types` pt,
+					`wp_cellable_phones` ph, `wp_cellable_order_statuses` os 
+				where o.user_id=1 and o.order_detail_id=od.id and o.payment_type_id=pt.id  and od.phone_id = ph.id
+					and o.order_status_id = os.id
+				order by o.id  DESC", ARRAY_A);
 
-			$payment_username = $_REQUEST["payment_username"];
-			$payment_type_id = $_REQUEST["payment_type_id"];
-			
-			$phone_version = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phone_versions WHERE id=" . $phone_version_id, ARRAY_A);
-			$carrier = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_carriers WHERE id=" . $carrier_id, ARRAY_A);
-			$capacity = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_storage_capacities WHERE id=" . $capacity_id, ARRAY_A);
-			$phone_version_capacity = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_version_capacities 
-				WHERE phone_version_id=" . $phone_version_id." and storage_capacity_id =" . $capacity_id, ARRAY_A);
-									
-			if (!$phone_version || !$carrier || !$capacity || !$phone_version_capacity || !$payment_type_id || !$payment_username || !$defect_ids || !is_array($defect_ids)) {
-			?>
-			<p>There are some incorrect variables.</p>
-			<a href="<?=get_home_url() ?>">Go To Homepage</a>
-			<?php
-				return;
-			}
-			
-			$price = $phone_version_capacity['value'];
-			$original_price = $price;
-			$defect_ids_str = implode(', ', $defect_ids);
-			
-			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM ".$wpdb->base_prefix
-				."cellable_possible_defects WHERE id in (%s)", $defect_ids_str) );
-			
-			$price = $price-$total_defect_value;
-			
-			// Promotion Code
-			$promo_code = isset($_REQUEST['promo_code']) ? $_REQUEST['promo_code'] : null;
-			$promo_id = null;
-			$promo = null;
-
-			if ($promo_code) {
-				$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix ."cellable_promos WHERE code= %s
-					and start_date <= CURDATE() and end_date >= CURDATE()", $wpdb->esc_like($promo_code)), ARRAY_A);
-				$promo_id = $promo['id'];
-			}
-			
-			if ($promo && $promo['discount']>0):
-				$price += $price * $promo['discount'] / 100;	
-			elseif ($promo && $promo['dollar_value']>0):
-				$price += $promo['dollar_value'];
-			endif;
-			
 			$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
 						
 			$capacities = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix ."cellable_storage_capacities", ARRAY_A);
 			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix ."cellable_version_capacities 
 				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
+			?>
+			<div id="myModal" class="modal fade">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title">How did we do?</h4>
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						</div>
+						<div class="modal-body">
+							<p>Please take a moment to rate our service and leave a comment.</p>
+							<form action="<?=get_home_url() ?>/save-testimonial" method="post">
+								<div class="form-group">
+									<div id="1" name="1" style="display:inline-block;" onclick="CheckStar(this)"><span class="fa fa-star"></span></div>
+									<div id="2" name="2" style="display:inline-block;" onclick="CheckStar(this)"><span class="fa fa-star"></span></div>
+									<div id="3" name="3" style="display:inline-block;" onclick="CheckStar(this)"><span class="fa fa-star"></span></div>
+									<div id="4" name="4" style="display:inline-block;" onclick="CheckStar(this)"><span class="fa fa-star"></span></div>
+									<div id="5" name="5" style="display:inline-block;" onclick="CheckStar(this)"><span class="fa fa-star"></span></div>
+									<input id="stars" name="stars" type="hidden">
+								</div>
+								<div class="form-group">
+									<input type="text" id="comment" name="comment" class="form-control" placeholder="Leave a comment">
+								</div>
+								<button type="submit" class="btn btn-primary">Submit</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
 
-			try {
-				// begin DB transaction
-				// $wpdb->query('START TRANSACTION');
-							
-				// Save User Phone
-				$r = $wpdb->insert($wpdb->base_prefix ."cellable_order_details", array(
-					'user_id' => $user->ID,
-					'phone_id' => $phone_brand['id'],
-					'carrier_id' => $carrier['id'],
-					'phone_version_id' => $phone_version['id'],
-					'created_date' => date_create()->format('Y-m-d H:i:s')
-				));
-
-				if ($r == false) {
-					throw new Exception('User Phone Insert Failed');
-				}
-
-				$order_detail_id = $wpdb->insert_id;
-				//Create Order
-				$order_id = null;
-				$r = $wpdb->insert($wpdb->base_prefix ."cellable_orders", array(
-					'amount' => $price,
-					'user_id' => $user->ID,
-					'order_status_id' => 1,
-					'created_date' => date_create()->format('Y-m-d H:i:s'),
-					'created_by' => 'System',
-					'payment_type_id' => $payment_type_id,
-					'promo_id' => $promo_id,
-					'order_detail_id' => $order_detail_id,
-					'payment_username' => $payment_username					
-				));
-				
-				if ($r == false) {
-					throw new Exception('Order Insert Failed');
-				}
-				$order_id = $wpdb->insert_id;
-				
-				$view_count = 0;
-				if ($phone_version['views'] == null ) {
-					$view_count = 1;
-				}
-				else {
-					$view_count = 1+ $phone_version['views'];
-				}
-				
-				$wpdb->update($wpdb->base_prefix ."cellable_phone_versions", array(            
-					'views' => $phone_version['views']
-				), array(
-					'id' => $phone_version_id,
-				));
-				// $wpdb->query('COMMIT');
-
-				// Get/Save Shipping Label
-				$shipping_mail = new CellableShipping;				
-				$shipping_mail->GetShippingLabel($user->ID, $order_id);
-				$wpdb->query('COMMIT');
-
-				// Send Confirmation Email(s)
-				$cellable_email = new CellableEmail;
-				$cellable_email->send_email($order_id, "Confirm", $user->user_email);
-				// $wpdb->query('COMMIT');
-				
-				header("Location: ".get_home_url()."/track-orders/?new_order=true");
-				exit();
-			} catch (Exception $e) {
-				$wpdb->query('ROLLBACK');
-				error_log($e->getMessage());
-				
-			}
-
-			?>			
+			<table class="table">
+				<tr style="background-color:black; color:lawngreen">
+					<th>Phone</th>
+					<th>Amount</th>
+					<th>Status Type</th>
+					<th>Promo Code</th>
+					<th>Promo Name</th>
+					<th>Discount</th>
+					<th>Payment Type</th>
+					<th>Payment User Name</th>
+					<th>Mailing Label</th>
+					<th>Tracking Number</th>
+					<th>Created Date</th>
+				</tr>
+				<?php foreach ($orders as $ele): ?>
+				<tr style="background-color:lightgrey">
+					<td>
+						<?= $ele['phone_name'] ?>
+					</td>
+					<td>
+						<?= $ele['amount'] ?>
+					</td>
+					<td>
+						<?= $ele['status_name'] ?>
+					</td>
+					<td>
+		---
+					</td>
+					<td>
+		---
+					</td>
+					<td>
+		---
+					</td>
+					<td>
+						<?= $ele['payment_type_name'] ?>
+					</td>
+					<td>
+						<?= $ele['payment_username'] ?>
+					</td>
+					<td>
+						<?php if ($ele['mailing_label']): ?>
+							<div onclick="popupLabelWindow('@item.MailLabel', window, 800, 600)" style="color:blue; cursor:pointer;">Print Label</div>
+						<?php endif; ?>
+					</td>
+					<td>
+						<div onclick="popupTrackingWindow('<?= $ele['tracking_number'] ?>', window, 400, 400)" style="color:blue; cursor:pointer;"><?= $ele['tracking_number'] ?></div>
+					</td>
+					<td>
+						<?= $ele['created_date'] ?>
+					</td>
+				</tr>
+				<?php endforeach; ?>
+			</table>
+						
 
 		</div><!-- #primary -->
 	</div>
