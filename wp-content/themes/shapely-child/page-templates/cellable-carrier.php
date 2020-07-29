@@ -15,8 +15,8 @@ get_header();
 				the_content();
 			endwhile; // End of the loop.
 			$carriers = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix. "cellable_carriers order by position", ARRAY_A);
-			$search = $_GET['search'];
-			$brand_id = $_GET['phone_id'];
+			$search = isset($_GET['search']) ? $_GET['search'] : "";
+			$brand_id = isset($_GET['phone_id']) ? $_GET['phone_id'] : "";
 			?>
 			<div class="text-center">
 				<?php foreach ($carriers as $carrier): ?>

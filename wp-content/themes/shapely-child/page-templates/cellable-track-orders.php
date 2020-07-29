@@ -1,15 +1,15 @@
 <?php
 /*
-Template Name: Cellable User Register
+Template Name: Cellable Track Orders
 Template Post Type: page
 */
-ob_start(); // this line is for the issue: header already sent
+ob_start(); // this line is for the issue: header already sent while redirecting
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_shipping.class.php');
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_email.class.php');
 
 $user = wp_get_current_user(); // ID->0: if user is not logged in
 if ($user->ID==0):
-	header("Location: ".get_home_url()."/wp-login.php?action=login");
+	header("Location: ".get_home_url()."/wp-login.php?action=register");
 	exit();
 endif;
 get_header(); 

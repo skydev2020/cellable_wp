@@ -7,7 +7,7 @@ require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
 
 $user = wp_get_current_user(); // ID->0: if user is not logged in
 if ($user->ID==0):
-	header("Location: ".get_home_url()."/wp-login.php?action=register");
+	header("Location: ".get_home_url()."/wp-login.php?action=login");
 	exit();
 endif;
 get_header(); 

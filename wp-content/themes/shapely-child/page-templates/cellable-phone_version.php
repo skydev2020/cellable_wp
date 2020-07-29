@@ -15,9 +15,9 @@ get_header();
 				the_content();
 			endwhile; // End of the loop.
 			
-			$search_str = $_GET['q'];
-			$brand_id = $_GET['brand_id'];
-			$carrier_id = $_REQUEST['carrier_id'];
+			$search_str = isset($_GET['q']) ? $_GET['q'] : "";
+			$brand_id = isset($_GET['brand_id']) ? $_GET['brand_id'] : ""; 
+			$carrier_id = isset($_REQUEST['carrier_id']) ? $_REQUEST['carrier_id'] : ""; 
 
 			if ($search_str) {
 				// Get filtered Phone Versions list
@@ -38,9 +38,9 @@ get_header();
 					</a>
 					<br />
 					<?php
-					$phone = $wpdb->get_row("SELECT brand FROM ". $wpdb->base_prefix. "cellable_phones WHERE id=" . $ele['phone_id']);					
+					$phone = $wpdb->get_row("SELECT name FROM ". $wpdb->base_prefix. "cellable_phones WHERE id=" . $ele['phone_id']);					
 					?>
-					<?= $phone->brand?>
+					<?= $phone->name?>
 					<br />
 					<?= $ele['name']?>
 				</div>
