@@ -26,7 +26,7 @@ get_header();
 			$orders = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix ."cellable_orders o WHERE user_id=" . $user->ID ." order by id desc", ARRAY_A);
 			
 			?>
-			<div id="myModal" class="modal fade">
+			<div id="rating-modal" class="modal">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -141,6 +141,96 @@ get_header();
 
 		</div><!-- #primary -->
 	</div>
+	
+	<script type="text/javascript">
+		function CheckStar(control) {
+			var one = document.getElementById("1");
+			var two = document.getElementById("2");
+			var three = document.getElementById("3");
+			var four = document.getElementById("4");
+			var five = document.getElementById("5");
+			var stars = document.getElementById("Stars");
 
+			switch (control.id) {
+				case "1":
+					one.innerHTML = "<span class='fa fa-star checked'></span>";
+					two.innerHTML = "<span class='fa fa-star'></span>";
+					three.innerHTML = "<span class='fa fa-star'></span>";
+					four.innerHTML = "<span class='fa fa-star'></span>";
+					five.innerHTML = "<span class='fa fa-star'></span>";
+					stars.value = "1";
+					break;
+				case "2":
+					one.innerHTML = "<span class='fa fa-star checked'></span>";
+					two.innerHTML = "<span class='fa fa-star checked'></span>";
+					three.innerHTML = "<span class='fa fa-star'></span>";
+					four.innerHTML = "<span class='fa fa-star'></span>";
+					five.innerHTML = "<span class='fa fa-star'></span>";
+					stars.value = "2";
+					break;
+				case "3":
+					one.innerHTML = "<span class='fa fa-star checked'></span>";
+					two.innerHTML = "<span class='fa fa-star checked'></span>";
+					three.innerHTML = "<span class='fa fa-star checked'></span>";
+					four.innerHTML = "<span class='fa fa-star'></span>";
+					five.innerHTML = "<span class='fa fa-star'></span>";
+					stars.value = "3";
+					break;
+				case "4":
+					one.innerHTML = "<span class='fa fa-star checked'></span>";
+					two.innerHTML = "<span class='fa fa-star checked'></span>";
+					three.innerHTML = "<span class='fa fa-star checked'></span>";
+					four.innerHTML = "<span class='fa fa-star checked'></span>";
+					five.innerHTML = "<span class='fa fa-star'></span>";
+					stars.value = "4";
+					break;
+				case "5":
+					one.innerHTML = "<span class='fa fa-star checked'></span>";
+					two.innerHTML = "<span class='fa fa-star checked'></span>";
+					three.innerHTML = "<span class='fa fa-star checked'></span>";
+					four.innerHTML = "<span class='fa fa-star checked'></span>";
+					five.innerHTML = "<span class='fa fa-star checked'></span>";
+					stars.value = "5";
+					break;
+			}
+		}
+
+		var modalShow = function () {
+			var queryString = window.location.search;
+			var urlParams = new URLSearchParams(queryString);
+			var newOrder = urlParams.has('new_order')
+
+			if (newOrder) {
+				jQuery('#rating-modal').modal('show');
+				// alert(1);
+			}
+		}
+
+		jQuery(window).on('load', function () {
+			
+
+			// setTimeout(modalShow(), 0);
+			var queryString = window.location.search;
+			var urlParams = new URLSearchParams(queryString);
+			var newOrder = urlParams.has('new_order')
+
+			if (newOrder) {
+				jQuery('#rating-modal').modal('show');
+				// alert(1);
+			}
+		});
+
+		function popupTrackingWindow(trackingNumber, win, w, h) {
+			const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
+			const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
+			return win.open("/Mail/_USPSTrackingMessage?trackingNumber=" + trackingNumber, "USPS Tracking", 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + y + ', left=' + x);
+		}
+
+		function popupLabelWindow(url, win, w, h) {
+			const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
+			const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
+			return win.open(url, "Print Mailing Label", 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + y + ', left=' + x);
+		}
+	</script>
 <?php
 get_footer();
