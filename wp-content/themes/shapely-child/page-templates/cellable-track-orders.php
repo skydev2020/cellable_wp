@@ -23,22 +23,8 @@ get_header();
 				the_content();
 			endwhile; // End of the loop.
 			
-			// $orders = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_orders WHERE user_id=" . $user->ID, ARRAY_A);
-			$orders = $wpdb->get_results("SELECT o.id oid, o.amount amount, o.payment_username payment_username,
-				o.usps_tracking_id tracking_number, o.mailing_label mailing_label, o.created_date created_date,
-				od.id odid, od.phone_id phone_id, od.carrier_id carrier_id, od.phone_version_id phone_version_id,
-				pt.name payment_type_name, ph.name phone_name, os.name status_name   
-				FROM `wp_cellable_orders` o, `wp_cellable_order_details` od , `wp_cellable_payment_types` pt,
-					`wp_cellable_phones` ph, `wp_cellable_order_statuses` os 
-				where o.user_id=1 and o.order_detail_id=od.id and o.payment_type_id=pt.id  and od.phone_id = ph.id
-					and o.order_status_id = os.id
-				order by o.id  DESC", ARRAY_A);
-
-			$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
-						
-			$capacities = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix ."cellable_storage_capacities", ARRAY_A);
-			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix ."cellable_version_capacities 
-				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
+			$orders = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix ."cellable_orders o WHERE user_id=" . $user->ID ." order by id desc", ARRAY_A);
+			
 			?>
 			<div id="myModal" class="modal fade">
 				<div class="modal-dialog">
@@ -82,42 +68,67 @@ get_header();
 					<th>Tracking Number</th>
 					<th>Created Date</th>
 				</tr>
-				<?php foreach ($orders as $ele): ?>
+				<?php 
+				foreach ($orders as $order): 
+					$order_detail = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_order_details WHERE id=" . $order['id'], ARRAY_A);
+					$order_status = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_order_statuses WHERE id=" . $order['order_status_id'], ARRAY_A);
+					$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix ."cellable_promos WHERE id=%d", $order['promo_id']),  ARRAY_A);
+					
+					// "SELECT * FROM ". $wpdb->base_prefix ."cellable_promos WHERE id=" . $order['promo_id'], ARRAY_A);
+
+					$phone = null;
+
+					if ($order_detail) {
+						$phone = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $order_detail['phone_id'], ARRAY_A);
+					}
+					
+					
+					// $orders = $wpdb->get_results("SELECT o.id oid, o.amount amount, o.payment_username payment_username,
+			// 	o.usps_tracking_id tracking_number, o.mailing_label mailing_label, o.created_date created_date,
+			// 	od.id odid, od.phone_id phone_id, od.carrier_id carrier_id, od.phone_version_id phone_version_id,
+			// 	pt.name payment_type_name, ph.name phone_name, os.name status_name, pr.code promo_code   
+			// 	FROM `wp_cellable_orders` o, `wp_cellable_order_details` od , `wp_cellable_payment_types` pt,
+			// 		`wp_cellable_phones` ph, `wp_cellable_order_statuses` os, `wp_cellable_promos` pr 
+			// 	where o.user_id=1 and o.order_detail_id=od.id and o.payment_type_id=pt.id  and od.phone_id = ph.id
+			// 		and o.order_status_id = os.id and o.promo_id = pr.id
+			// 	order by o.id  DESC", ARRAY_A);
+
+				?>
 				<tr style="background-color:lightgrey">
 					<td>
-						<?= $ele['phone_name'] ?>
+						<?= isset($phone) ? $phone['name'] : "" ?>
 					</td>
 					<td>
-						<?= $ele['amount'] ?>
+						$<?= $order['amount'] ?>
 					</td>
 					<td>
-						<?= $ele['status_name'] ?>
+						<?= isset($order_status) ? $order_status['name'] : "" ?>
+					</td>
+					<td>
+						<?= isset($promo) ? $promo['code'] : "" ?>
+					</td>
+					<td>
+						<?= isset($promo) ? $promo['name'] : "" ?>
 					</td>
 					<td>
 		---
 					</td>
 					<td>
-		---
+						<?= $order['payment_type_name'] ?>
 					</td>
 					<td>
-		---
+						<?= $order['payment_username'] ?>
 					</td>
 					<td>
-						<?= $ele['payment_type_name'] ?>
-					</td>
-					<td>
-						<?= $ele['payment_username'] ?>
-					</td>
-					<td>
-						<?php if ($ele['mailing_label']): ?>
+						<?php if ($order['mailing_label']): ?>
 							<div onclick="popupLabelWindow('@item.MailLabel', window, 800, 600)" style="color:blue; cursor:pointer;">Print Label</div>
 						<?php endif; ?>
 					</td>
 					<td>
-						<div onclick="popupTrackingWindow('<?= $ele['tracking_number'] ?>', window, 400, 400)" style="color:blue; cursor:pointer;"><?= $ele['tracking_number'] ?></div>
+						<div onclick="popupTrackingWindow('<?= $order['tracking_number'] ?>', window, 400, 400)" style="color:blue; cursor:pointer;"><?= $order['tracking_number'] ?></div>
 					</td>
 					<td>
-						<?= $ele['created_date'] ?>
+						<?= $order['created_date'] ?>
 					</td>
 				</tr>
 				<?php endforeach; ?>
