@@ -81,3 +81,15 @@
 .fa-star.checked {
     color: orange;
 }
+
+.bg-black {
+    background-color: black;
+}
+
+.bg-lightgrey {
+    background-color:lightgrey;
+}
+
+.lawngreen {
+    color:lawngreen;
+}

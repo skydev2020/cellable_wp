@@ -55,7 +55,7 @@ get_header();
 			</div>
 
 			<table class="table">
-				<tr style="background-color:black; color:lawngreen">
+				<tr class="bg-black lawngreen">
 					<th>Phone</th>
 					<th>Amount</th>
 					<th>Status Type</th>
@@ -69,6 +69,7 @@ get_header();
 					<th>Created Date</th>
 				</tr>
 				<?php 
+				$index = 0;
 				foreach ($orders as $order): 
 					$order_detail = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_order_details WHERE id=" . $order['id'], ARRAY_A);
 					$order_status = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_order_statuses WHERE id=" . $order['order_status_id'], ARRAY_A);
@@ -83,10 +84,10 @@ get_header();
 					if ($order_detail) {
 						$phone = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $order_detail['phone_id'], ARRAY_A);
 					}
-					
+					$index++;
 
 				?>
-				<tr style="background-color:lightgrey">
+				<tr class="<?= ($index % 2==0) ? "bg-lightgrey" : "" ?>">
 					<td>
 						<?= isset($phone) ? $phone['name'] : "" ?>
 					</td>
