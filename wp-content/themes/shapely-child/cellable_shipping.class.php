@@ -1,13 +1,74 @@
 <?php 
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
 require_once(ABSPATH . 'wp-content/themes/shapely-child/vendor/autoload.php');
+
+class USPSManager {
+    protected $testmode;
+    protected $_userid;
+    protected $production_url = "http://production.shippingapis.com/ShippingAPI.dll";
+    protected $testing_url = "https://secure.shippingapis.com/ShippingAPI.dll";
+
+    public function __construct($usps_webtool_userid, $testmode) {
+        $this->_userid = $usps_webtool_userid;
+        $this->testmode = isset($testmode) ? $testmode : false;
+    }
+
+    public function get_url() {
+        return ($this->testmode == true) ? $this->testing_url : $this->production_url;
+    }
+
+    public function get_data($url) {
+        $ch = curl_init();
+        $timeout = 5;
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        $data = curl_exec($ch);
+        curl_close($ch);
+        return $data;
+    }
+
+    public function get_tracking_info($usps_api_username, $usps_api_password, $tracking_number) {
+        try
+        {         
+            $tracking_number = "92001901755477000262391804";
+            $service = "TrackV2";
+            $xml = rawurlencode("
+            <TrackRequest USERID='". $usps_api_username."'>
+                <TrackID ID=\"".$tracking_number."\"></TrackID>
+                </TrackRequest>");
+            $url = $this->get_url() . "?API=" . $service . "&XML=" . $xml;
+
+            $xml = file_get_contents($url);
+            error_log($xml);
+            if (strpos($xml, "<Error>") !== false) {
+                $idx1 = strpos($xml, "<Description>") + 13;
+                $idx2 = strpos($xml, "<Description>");                
+                $l = strlen($xml);
+                $err_desc=substr($xml, $idx1, $idx2-$idx1);
+                return $err_desc;
+            }
+
+            return $xml;
+        }
+        catch (Exception $e)
+        {            
+            error_log($e->getMessage());
+            return $e->getMessage();
+        }
+    }
+}
+
 class CellableShipping
 { 
     
-    public function _USPSTrackingMessage($trackingNumber) {
-        // USPSManager mgr = new USPSManager(USPSAPIUserName, true);
-        // string msg = mgr.GetTrackingInfo(USPSAPIUserName, USPSAPIPassword, trackingNumber);
+    public function _USPSTrackingMessage($tracking_number) {
+        global $USPS_API_USERNAME;
+        global $USPS_API_PASSWORD;
 
+        $mgr = new USPSManager($USPS_API_USERNAME, true);
+        $msg = $mgr->get_tracking_info($USPS_API_USERNAME, $USPS_API_PASSWORD, $tracking_number);
+        return $msg;
         // MailHelper.TrackingMessage = msg;
 
         // return View();

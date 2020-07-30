@@ -159,7 +159,8 @@ get_header();
 		function popupTrackingWindow(trackingNumber, win, w, h) {
 			const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
 			const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
-			return win.open("/Mail/_USPSTrackingMessage?trackingNumber=" + trackingNumber, "USPS Tracking", 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + y + ', left=' + x);
+			// return win.open("/Mail/_USPSTrackingMessage?trackingNumber=" + trackingNumber, "USPS Tracking", 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + y + ', left=' + x);
+			return win.open("<?=get_home_url() ?>/usps-tracking-message/?tracking_number=" + trackingNumber, "USPS Tracking", 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + y + ', left=' + x);
 		}
 
 		function popupLabelWindow(url, win, w, h) {
