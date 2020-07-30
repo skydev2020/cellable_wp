@@ -37,12 +37,12 @@ get_header();
 							<p>Please take a moment to rate our service and leave a comment.</p>
 							<form action="<?=get_home_url() ?>/save-testimonial" method="post">
 								<div class="form-group">
-									<div id="star_1" name="star_1" class="inline-block" onclick="CheckStar(this)"><span class="fa fa-star pointer"></span></div>
-									<div id="star_2" name="star_2" class="inline-block" onclick="CheckStar(this)"><span class="fa fa-star pointer"></span></div>
-									<div id="star_3" name="star_3" class="inline-block" onclick="CheckStar(this)"><span class="fa fa-star pointer"></span></div>
-									<div id="star_4" name="star_4" class="inline-block" onclick="CheckStar(this)"><span class="fa fa-star pointer"></span></div>
-									<div id="star_5" name="star_5" class="inline-block" onclick="CheckStar(this)"><span class="fa fa-star pointer"></span></div>
-									<input id="stars" name="stars" type="hidden">
+									<div id="star_1" name="star_1" class="inline-block" onclick="CheckStar(1)"><span class="fa fa-star pointer"></span></div>
+									<div id="star_2" name="star_2" class="inline-block" onclick="CheckStar(2)"><span class="fa fa-star pointer"></span></div>
+									<div id="star_3" name="star_3" class="inline-block" onclick="CheckStar(3)"><span class="fa fa-star pointer"></span></div>
+									<div id="star_4" name="star_4" class="inline-block" onclick="CheckStar(4)"><span class="fa fa-star pointer"></span></div>
+									<div id="star_5" name="star_5" class="inline-block" onclick="CheckStar(5)"><span class="fa fa-star pointer"></span></div>
+									<input id="rating" name="rating" type="hidden">
 								</div>
 								<div class="form-group">
 									<input type="text" id="comment" name="comment" class="form-control" placeholder="Leave a comment">
@@ -133,56 +133,14 @@ get_header();
 	</div>
 	
 	<script type="text/javascript">
-		function CheckStar(control) {
-			var one = document.getElementById("star_1");
-			var two = document.getElementById("star_2");
-			var three = document.getElementById("star_3");
-			var four = document.getElementById("star_4");
-			var five = document.getElementById("star_5");
-			var stars = document.getElementById("stars");
+		function CheckStar(index) {
+			
+			jQuery(".fa.fa-star").removeClass("checked");
+			jQuery("#rating").val(index);
 
-			switch (control.id) {
-				case "star_1":
-					one.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					two.innerHTML = "<span class='fa fa-star pointer'></span>";
-					three.innerHTML = "<span class='fa fa-star pointer'></span>";
-					four.innerHTML = "<span class='fa fa-star pointer'></span>";
-					five.innerHTML = "<span class='fa fa-star pointer'></span>";
-					stars.value = "1";
-					break;
-				case "star_2":
-					one.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					two.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					three.innerHTML = "<span class='fa fa-star pointer'></span>";
-					four.innerHTML = "<span class='fa fa-star pointer'></span>";
-					five.innerHTML = "<span class='fa fa-star pointer'></span>";
-					stars.value = "2";
-					break;
-				case "star_3":
-					one.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					two.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					three.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					four.innerHTML = "<span class='fa fa-star pointer'></span>";
-					five.innerHTML = "<span class='fa fa-star pointer'></span>";
-					stars.value = "3";
-					break;
-				case "star_4":
-					one.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					two.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					three.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					four.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					five.innerHTML = "<span class='fa fa-star pointer'></span>";
-					stars.value = "4";
-					break;
-				case "star_5":
-					one.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					two.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					three.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					four.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					five.innerHTML = "<span class='fa fa-star checked pointer'></span>";
-					stars.value = "5";
-					break;
-			}
+			for (var i=1; i<=index; i++) {
+				jQuery("#star_" + i + " .fa.fa-star").addClass("checked");
+			}			
 		}
 
 		jQuery(window).on('load', function () {

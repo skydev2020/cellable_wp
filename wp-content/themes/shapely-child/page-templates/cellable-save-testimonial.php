@@ -12,9 +12,9 @@ if ($user->ID==0):
 	header("Location: ".get_home_url()."/wp-login.php?action=login");
 	exit();
 endif;
-$stars = isset($_REQUEST['stars']) ? $_REQUEST['stars'] : null;
+$rating = isset($_REQUEST['rating']) ? $_REQUEST['rating'] : null;
 									
-if (!$stars) {
+if (!$rating) {
 	header("Location: ".get_home_url());
 	exit();
 }
@@ -24,8 +24,8 @@ $comment = isset($_REQUEST['comment']) ? $_REQUEST['comment'] : "";
 $sql_query = "INSERT INTO ". $wpdb->base_prefix . "cellable_testimonials (comment, rating, user_id, created_date) VALUES (%s, %d, %d, %s)";
 
 $wpdb->query( $wpdb->prepare($sql_query, 
-	$stars,
-	$comment, 
+	$comment,
+	$rating, 
 	$user->ID, 
 	date_create()->format('Y-m-d H:i:s')
 ));
