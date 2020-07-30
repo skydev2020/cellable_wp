@@ -24,7 +24,7 @@ $msg = str_replace("&lt;SUP>&amp;reg;&lt;/SUP>", $replace, $msg);
 <table style="width:100%; margin-left:auto; margin-right:auto;">
     <tr>
         <td style="width:100%; text-align:center;">
-            <img src="https://cellablepictures.blob.core.windows.net/systemimages/usps-logo.jpg" style="width:380px; text-align:center;" />
+            <img src="<?= $IMAGE_LOCATION ?>/usps-logo.jpg" style="width:380px; text-align:center;" />
         </td>
     </tr>
 </table>

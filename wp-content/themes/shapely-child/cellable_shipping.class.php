@@ -30,8 +30,7 @@ class USPSManager {
 
     public function get_tracking_info($usps_api_username, $usps_api_password, $tracking_number) {
         try
-        {         
-            $tracking_number = "92001901755477000262391804";
+        {                     
             $service = "TrackV2";
             $xml = rawurlencode("
             <TrackRequest USERID='". $usps_api_username."'>

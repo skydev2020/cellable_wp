@@ -86,6 +86,8 @@ get_header();
 					}
 					$index++;
 
+					$date = new DateTime($order['created_date']);
+					$created_date = $date->format('m/d/Y h:i:s A');
 				?>
 				<tr class="<?= ($index % 2==0) ? "bg-lightgrey" : "" ?>">
 					<td>
@@ -114,16 +116,16 @@ get_header();
 					</td>
 					<td>
 						<?php if ($order['mailing_label']): ?>
-							<div onclick="popupLabelWindow('<?= $order['mailing_label'] ?>', window, 800, 600)" style="color:blue; cursor:pointer;">Print Label</div>
+							<div onclick="popupLabelWindow('<?= $order['mailing_label'] ?>', window, 800, 600)" class="pointer" style="color:blue;">Print Label</div>
 						<?php endif; ?>
 					</td>
 					<td>
-						<div onclick="popupTrackingWindow('<?= $order['usps_tracking_id'] ?>', window, 400, 400)" style="color:blue; cursor:pointer;">
+						<div onclick="popupTrackingWindow('<?= $order['usps_tracking_id'] ?>', window, 400, 400)" class="pointer" style="color:blue;">
 							<?= $order['usps_tracking_id'] ?>
 						</div>
 					</td>
 					<td>
-						<?= $order['created_date'] ?>
+						<?= $created_date ?>
 					</td>
 				</tr>
 				<?php endforeach; ?>
