@@ -195,20 +195,8 @@ get_header();
 			}
 		}
 
-		var modalShow = function () {
-			var queryString = window.location.search;
-			var urlParams = new URLSearchParams(queryString);
-			var newOrder = urlParams.has('new_order')
-
-			if (newOrder) {
-				jQuery('#rating-modal').modal('show');
-				// alert(1);
-			}
-		}
-
 		jQuery(window).on('load', function () {
 			
-
 			// setTimeout(modalShow(), 0);
 			var queryString = window.location.search;
 			var urlParams = new URLSearchParams(queryString);
@@ -216,7 +204,6 @@ get_header();
 
 			if (newOrder) {
 				jQuery('#rating-modal').modal('show');
-				// alert(1);
 			}
 		});
 
