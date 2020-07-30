@@ -26,7 +26,7 @@ get_header();
 		<div class="text-center">
 			<?php foreach ($phone_versions as $ele): ?>
 			<div class="col-sm-3 text-center phone-version">
-				<a class="btn btn-default" href="<?=get_home_url() ?>/defect-questions/?phone_version_id=<?=$ele['id']?>&carrier_id=<?= $carrier_id?>">
+				<a class="btn btn-default" href="<?=get_home_url() ?>/carriers/?phone_id=<?=$ele['phone_id']?>&phone_version_id=<?=$ele['id']?>">
 					<img src="<?= $PHONE_IMAGE_LOCATION ?>/<?= $ele['image_file'] ?>" alt="<?= $ele['name'] ?>">
 				</a>
 				<br />
