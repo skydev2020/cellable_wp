@@ -70,3 +70,14 @@
     height: 250px;
     width: 130px;
 }
+
+.pointer {
+    cursor: pointer;
+}
+
+.inline-block {
+    display: inline-block;
+}
+.fa-star.checked {
+    color: orange;
+}

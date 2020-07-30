@@ -37,11 +37,11 @@ get_header();
 							<p>Please take a moment to rate our service and leave a comment.</p>
 							<form action="<?=get_home_url() ?>/save-testimonial" method="post">
 								<div class="form-group">
-									<div id="1" name="1" style="display:inline-block;" onclick="CheckStar(this)"><span class="fa fa-star"></span></div>
-									<div id="2" name="2" style="display:inline-block;" onclick="CheckStar(this)"><span class="fa fa-star"></span></div>
-									<div id="3" name="3" style="display:inline-block;" onclick="CheckStar(this)"><span class="fa fa-star"></span></div>
-									<div id="4" name="4" style="display:inline-block;" onclick="CheckStar(this)"><span class="fa fa-star"></span></div>
-									<div id="5" name="5" style="display:inline-block;" onclick="CheckStar(this)"><span class="fa fa-star"></span></div>
+									<div id="star_1" name="star_1" class="inline-block" onclick="CheckStar(this)"><span class="fa fa-star pointer"></span></div>
+									<div id="star_2" name="star_2" class="inline-block" onclick="CheckStar(this)"><span class="fa fa-star pointer"></span></div>
+									<div id="star_3" name="star_3" class="inline-block" onclick="CheckStar(this)"><span class="fa fa-star pointer"></span></div>
+									<div id="star_4" name="star_4" class="inline-block" onclick="CheckStar(this)"><span class="fa fa-star pointer"></span></div>
+									<div id="star_5" name="star_5" class="inline-block" onclick="CheckStar(this)"><span class="fa fa-star pointer"></span></div>
 									<input id="stars" name="stars" type="hidden">
 								</div>
 								<div class="form-group">
@@ -84,16 +84,6 @@ get_header();
 						$phone = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $order_detail['phone_id'], ARRAY_A);
 					}
 					
-					
-					// $orders = $wpdb->get_results("SELECT o.id oid, o.amount amount, o.payment_username payment_username,
-			// 	o.usps_tracking_id tracking_number, o.mailing_label mailing_label, o.created_date created_date,
-			// 	od.id odid, od.phone_id phone_id, od.carrier_id carrier_id, od.phone_version_id phone_version_id,
-			// 	pt.name payment_type_name, ph.name phone_name, os.name status_name, pr.code promo_code   
-			// 	FROM `wp_cellable_orders` o, `wp_cellable_order_details` od , `wp_cellable_payment_types` pt,
-			// 		`wp_cellable_phones` ph, `wp_cellable_order_statuses` os, `wp_cellable_promos` pr 
-			// 	where o.user_id=1 and o.order_detail_id=od.id and o.payment_type_id=pt.id  and od.phone_id = ph.id
-			// 		and o.order_status_id = os.id and o.promo_id = pr.id
-			// 	order by o.id  DESC", ARRAY_A);
 
 				?>
 				<tr style="background-color:lightgrey">
@@ -144,52 +134,52 @@ get_header();
 	
 	<script type="text/javascript">
 		function CheckStar(control) {
-			var one = document.getElementById("1");
-			var two = document.getElementById("2");
-			var three = document.getElementById("3");
-			var four = document.getElementById("4");
-			var five = document.getElementById("5");
-			var stars = document.getElementById("Stars");
+			var one = document.getElementById("star_1");
+			var two = document.getElementById("star_2");
+			var three = document.getElementById("star_3");
+			var four = document.getElementById("star_4");
+			var five = document.getElementById("star_5");
+			var stars = document.getElementById("stars");
 
 			switch (control.id) {
-				case "1":
-					one.innerHTML = "<span class='fa fa-star checked'></span>";
-					two.innerHTML = "<span class='fa fa-star'></span>";
-					three.innerHTML = "<span class='fa fa-star'></span>";
-					four.innerHTML = "<span class='fa fa-star'></span>";
-					five.innerHTML = "<span class='fa fa-star'></span>";
+				case "star_1":
+					one.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					two.innerHTML = "<span class='fa fa-star pointer'></span>";
+					three.innerHTML = "<span class='fa fa-star pointer'></span>";
+					four.innerHTML = "<span class='fa fa-star pointer'></span>";
+					five.innerHTML = "<span class='fa fa-star pointer'></span>";
 					stars.value = "1";
 					break;
-				case "2":
-					one.innerHTML = "<span class='fa fa-star checked'></span>";
-					two.innerHTML = "<span class='fa fa-star checked'></span>";
-					three.innerHTML = "<span class='fa fa-star'></span>";
-					four.innerHTML = "<span class='fa fa-star'></span>";
-					five.innerHTML = "<span class='fa fa-star'></span>";
+				case "star_2":
+					one.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					two.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					three.innerHTML = "<span class='fa fa-star pointer'></span>";
+					four.innerHTML = "<span class='fa fa-star pointer'></span>";
+					five.innerHTML = "<span class='fa fa-star pointer'></span>";
 					stars.value = "2";
 					break;
-				case "3":
-					one.innerHTML = "<span class='fa fa-star checked'></span>";
-					two.innerHTML = "<span class='fa fa-star checked'></span>";
-					three.innerHTML = "<span class='fa fa-star checked'></span>";
-					four.innerHTML = "<span class='fa fa-star'></span>";
-					five.innerHTML = "<span class='fa fa-star'></span>";
+				case "star_3":
+					one.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					two.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					three.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					four.innerHTML = "<span class='fa fa-star pointer'></span>";
+					five.innerHTML = "<span class='fa fa-star pointer'></span>";
 					stars.value = "3";
 					break;
-				case "4":
-					one.innerHTML = "<span class='fa fa-star checked'></span>";
-					two.innerHTML = "<span class='fa fa-star checked'></span>";
-					three.innerHTML = "<span class='fa fa-star checked'></span>";
-					four.innerHTML = "<span class='fa fa-star checked'></span>";
-					five.innerHTML = "<span class='fa fa-star'></span>";
+				case "star_4":
+					one.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					two.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					three.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					four.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					five.innerHTML = "<span class='fa fa-star pointer'></span>";
 					stars.value = "4";
 					break;
-				case "5":
-					one.innerHTML = "<span class='fa fa-star checked'></span>";
-					two.innerHTML = "<span class='fa fa-star checked'></span>";
-					three.innerHTML = "<span class='fa fa-star checked'></span>";
-					four.innerHTML = "<span class='fa fa-star checked'></span>";
-					five.innerHTML = "<span class='fa fa-star checked'></span>";
+				case "star_5":
+					one.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					two.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					three.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					four.innerHTML = "<span class='fa fa-star checked pointer'></span>";
+					five.innerHTML = "<span class='fa fa-star checked pointer'></span>";
 					stars.value = "5";
 					break;
 			}
