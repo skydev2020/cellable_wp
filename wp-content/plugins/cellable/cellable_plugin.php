@@ -7,6 +7,7 @@
 * Author: Sky Dev 
 **/
 
+require_once('views/settings.php');
 
 /**
  * Add Admin Pages
@@ -26,33 +27,10 @@ if ( ! function_exists( 'page_admin_spark_pages' ) ) {
 /**
  * Add Super Admin Pages
  */
-if ( ! function_exists( 'page_super_spark_users' ) ) {
-    function page_super_spark_users(){
-        render_super_spark_users();
-    }
-}
 
-if ( ! function_exists( 'page_super_spark_pages' ) ) {
-    function page_super_spark_pages(){
-        render_super_admin_pages_table();
-    }
-}
-
-if ( ! function_exists( 'page_my_landing_pages' ) ) {
-    function page_my_landing_pages(){
-        render_my_landing_pages_table();
-    }
-}
-
-if ( ! function_exists( 'page_client_register' ) ) {
-    function page_client_register(){
-        render_page_client_register();
-    }
-}
-
-if ( ! function_exists( 'page_lead_list' ) ) {
-    function page_lead_list(){
-        render_page_lead_list();
+if ( ! function_exists( 'setting_pages' ) ) {
+    function setting_pages(){
+        render_settings_list();
     }
 }
 
@@ -64,42 +42,20 @@ if ( ! function_exists( 'page_lead_list' ) ) {
 if ( ! function_exists( 'admin_add_pages' ) ) {
    
     function admin_add_pages() {
-        if(is_super_admin())
-        {
-            add_menu_page("Spark Ignite", "Spark Ignite", "manage_options", "spark","page_super_spark_users","dashicons-networking", 4);
-            add_submenu_page("spark", "Spark Admins", "Spark Admins",'manage_options', "super_spark_users", 'page_super_spark_users');
-            add_submenu_page("spark", "Ignite Templates", "Ignite Templates",'manage_options', "super_spark_pages", 'page_super_spark_pages');
-            add_submenu_page("spark", "Client Registration", "New Client Site",'manage_options', "client_register", 'page_client_register');
-            add_submenu_page("spark", "Spark Leads", "Spark Leads",'manage_options', "spark_leads", 'page_lead_list');
-            remove_submenu_page('spark', 'spark');
+        
+        if(current_user_can('administrator')){
+            add_menu_page("Cellable", "Cellable", "manage_options", "cellable","setting_pages","dashicons-networking", 4);
+            add_submenu_page('cellable','Settings', 'System Settings', 'manage_options', 'setting_pages','setting_pages');            
+            remove_submenu_page('cellable', 'cellable');
         }
         else{
-            if(current_user_can('administrator')){
-                add_menu_page("Spark Ignite", "Spark Ignite", "manage_options", "spark","page_super_spark_users","dashicons-networking", 4);
-                add_submenu_page('spark','Ignite Templates', 'Ignite Templates', 'manage_options', 'admin_spark_pages','page_admin_spark_pages');
-                add_submenu_page('spark','My Landing Pages', 'My Landing Pages', 'manage_options', 'my_landing_pages','page_my_landing_pages');
-                add_submenu_page('spark','Spark Fields', 'Spark Fields', 'manage_options', 'spark_fields','page_admin_spark_fields');
-            }
-            else{
-                add_menu_page("Spark Ignite", "Spark Ignite", "edit_posts", "spark","page_super_spark_users","dashicons-networking", 4);
-                add_submenu_page('spark','Ignite Templates', 'Ignite Templates', 'edit_posts', 'admin_spark_pages','page_admin_spark_pages');
-                add_submenu_page('spark','My Landing Pages', 'My Landing Pages', 'edit_posts', 'my_landing_pages','page_my_landing_pages');
-                add_submenu_page('spark','Spark Fields', 'Spark Fields', 'edit_posts', 'spark_fields','page_admin_spark_fields');
-            }
-
-            remove_menu_page( 'tools.php' );
-            // This should not be called in the beginning, otherwise it will generate warning and returns empty
-            require_once( ABSPATH . 'wp-includes/pluggable.php' );
-            $current_user = wp_get_current_user();
-
-            if ($current_user->user_email!='websites@sparkmembership.com') {
-                remove_menu_page( 'edit.php?post_type=elementor_library' );
-                remove_menu_page( 'admin.php?page=elementor' );
-            }
-            
-            remove_menu_page( 'ns-cloner');
-            remove_submenu_page('spark', 'spark');
+            // add_menu_page("Spark Ignite", "Spark Ignite", "edit_posts", "spark","page_super_spark_users","dashicons-networking", 4);
+            // add_submenu_page('spark','Ignite Templates', 'Ignite Templates', 'edit_posts', 'admin_spark_pages','page_admin_spark_pages');
+            // add_submenu_page('spark','My Landing Pages', 'My Landing Pages', 'edit_posts', 'my_landing_pages','page_my_landing_pages');
+            // add_submenu_page('spark','Spark Fields', 'Spark Fields', 'edit_posts', 'spark_fields','page_admin_spark_fields');
         }
+
+        
     }
 }
 
