@@ -165,3 +165,14 @@
 .active, .dot:hover {
     background-color: #717171;
 }
+
+footer {
+    padding: 10px 0;
+}
+
+.back-to-top {
+    margin-bottom: 3px;
+}
+#colophon .site-info {
+    margin-top: 0px;
+}
