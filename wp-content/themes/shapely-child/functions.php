@@ -26,3 +26,4 @@ function cellable_search_form( $form ) {
 }
 
 add_filter( 'get_search_form', 'cellable_search_form', 101 ); // Higher Priority means redefine the form
+

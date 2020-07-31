@@ -46,8 +46,23 @@
 							<i class="fa fa-bars"></i>
 						</div>
 						<div class="module-group right menu-container">
-							<div class="module left">
+							<div class="module left" style="padding-right: 0px;">
 								<?php shapely_header_menu(); // main navigation ?>
+							</div>
+							<div class="module left" style="padding-left: 0px;">
+								<div class="collapse navbar-collapse navbar-ex1-collapse">
+									<ul id="menu" class="menu">
+										<?php if (get_current_user_id()==0) : ?>
+										<li class="menu-item menu-item-type-post_type menu-item-object-page">
+											<a title="Login" href="<?=get_home_url() ?>/wp-login.php">Login</a>
+										</li>
+										<?php else: ?>
+										<li class="menu-item menu-item-type-post_type menu-item-object-page">
+											<a title="Tracking Orders" href="<?=get_home_url() ?>/track-orders/">Tracking</a>
+										</li>	
+										<?php endif; ?>
+									</ul>
+								</div>
 							</div>
 							<!--end of menu module-->
 							<div class="module widget-handle search-widget-handle left hidden-xs hidden-sm">
