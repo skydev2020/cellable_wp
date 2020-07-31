@@ -60,6 +60,12 @@
 										<li class="menu-item menu-item-type-post_type menu-item-object-page">
 											<a title="Tracking Orders" href="<?=get_home_url() ?>/track-orders/">Tracking</a>
 										</li>	
+										<li class="menu-item menu-item-type-post_type menu-item-object-page">
+											<a title="Profile" href="<?=get_edit_profile_url() ?>">Profile</a>
+										</li>
+										<li class="menu-item menu-item-type-post_type menu-item-object-page">
+											<a title="Logout" href="<?=wp_logout_url() ?>">Logout</a>
+										</li>
 										<?php endif; ?>
 									</ul>
 								</div>
