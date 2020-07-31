@@ -176,3 +176,55 @@ footer {
 #colophon .site-info {
     margin-top: 0px;
 }
+
+.site-title-container {
+    line-height: 0px;
+    color: lawngreen;
+    font-size: 16px;
+    padding-bottom: 5px;
+}
+
+.site-title-container .rating-score {
+    color: lawngreen;
+}
+
+.footer .footer-credits {
+    color: lawngreen;
+}
+
+#colophon {
+    font-size: 18px;
+}
+
+.site-title-container .site-title {
+    color: lawngreen;
+    font-family: 'Manrope', sans-serif;
+    font-size: 30px;
+}
+
+body {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+}
+
+.main-navigation .menu li a {
+    font-size: 18px;
+    text-transform: initial;
+    color: white;
+    font-weight: normal;
+}
+
+.search .fa.fa-search {
+    font-size: 18px;
+    color: lawngreen;
+}
+footer.bg-dark a:hover {
+    color: lawngreen;
+}
+
+.main-navigation {
+    padding: 0px 0px;
+}
+
+#site-navigation .menu-container{
+    padding-top: 15px;
+}

@@ -88,35 +88,10 @@ function spark_css_js()
     wp_localize_script('wp-media-uploader', 'spark_admin_url',array( 'ajax_url' => plugins_url('views/actions.php', __FILE__) ));
 }
 
-if(isset($_GET['action'])){
-    // var_dump(222);
-    // Removed code and add to individual bulk action
-}
-
-if ( ! function_exists( 'delete_landing_post' ) ) {
-    function delete_landing_post($post_id) {
-        global $wpdb;
-        
-        $blog_id = get_current_blog_id();
-        $blog_str ="";
-        if ($blog_id != 1) {
-            $blog_str = "_".$blog_id;
-        }
-        $isExist = $wpdb->get_var("SELECT count(*) FROM wp" . $blog_str . "_posts WHERE id='" . $post_id . "'");
-        if ($isExist > 0) {
-            $wpdb->delete("wp_spark_pages", array(
-                'post_id' => $post_id
-            ));
-        }
-    }
-}
-
 
 add_action('admin_menu', 'admin_add_pages');
 add_action('admin_enqueue_scripts', 'spark_css_js');
 add_shortcode('spark_fields','shortcode_spark_fields');
-add_action( 'before_delete_post', 'delete_landing_post' );
-add_filter( 'robots_txt', 'spark_robots', 20, 2 ); // Custom Multi Site Robots.txt
 
 // if ( ! function_exists( 'myblogs_blog_callback' ) ) {
 //     // Multi Network My Site Section

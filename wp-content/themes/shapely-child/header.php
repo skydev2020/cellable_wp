@@ -20,22 +20,32 @@
 	<?php wp_head(); ?>
 </head>
 
+<?php
+	
+ 	$rating_avg = $wpdb->get_var("SELECT avg(rating) FROM " .$wpdb->base_prefix. "cellable_testimonials");
+	$rating_count = $wpdb->get_var("SELECT count(rating) FROM " .$wpdb->base_prefix. "cellable_testimonials");
+?>
+
 <body <?php body_class(); ?>>
 <div id="page" class="site">
 	<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'shapely' ); ?></a>
 
 	<header id="masthead" class="site-header" role="banner">
 		<div class="nav-container">
-			<nav id="site-navigation" class="main-navigation" role="navigation">
+			<nav id="site-navigation" class="main-navigation bg-dark" role="navigation">
 				<div class="container nav-bar">
 					<div class="row">
 						<div class="module left site-title-container">
 							<?php shapely_get_header_logo(); ?>
+							<?php for ($i=1; $i<=$rating_avg; $i++): ?>
+							<span class='fa fa-star checked'></span>
+							<?php endfor; ?>
+							<span class="rating-score">(ratings: <?= $rating_count ?>)</span>
 						</div>
 						<div class="module widget-handle mobile-toggle right visible-sm visible-xs">
 							<i class="fa fa-bars"></i>
 						</div>
-						<div class="module-group right">
+						<div class="module-group right menu-container">
 							<div class="module left">
 								<?php shapely_header_menu(); // main navigation ?>
 							</div>
