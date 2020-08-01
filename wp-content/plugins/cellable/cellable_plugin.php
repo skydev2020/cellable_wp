@@ -9,6 +9,60 @@
 
 require_once('views/settings.php');
 
+$states = array(
+    ["name" => "District of Columbia", "abbr" => "DC"],
+    ["name" => "Alabama", "abbr" => "AL"],
+    ["name" => "Alaska", "abbr" => "AK"],
+    ["name" => "Arizona", "abbr" => "AZ"],
+    ["name" => "Arkansas", "abbr" => "AR"],
+    ["name" => "California", "abbr" => "CA"],
+    ["name" => "Colorado", "abbr" => "CO"],
+    ["name" => "Connecticut", "abbr" => "CT"],
+    ["name" => "Delaware", "abbr" => "DE"],
+    ["name" => "Florida", "abbr" => "FL"],
+    ["name" => "Georgia", "abbr" => "GA"],
+    ["name" => "Hawaii", "abbr" => "HI"],
+    ["name" => "Idaho", "abbr" => "ID"],
+    ["name" => "Illinois", "abbr" => "IL"],
+    ["name" => "Indiana", "abbr" => "IN"],
+    ["name" => "Iowa", "abbr" => "IA"],
+    ["name" => "Kansas", "abbr" => "KS"],
+    ["name" => "Kentucky", "abbr" => "KY"],
+    ["name" => "Louisiana", "abbr" => "LA"],
+    ["name" => "Maine", "abbr" => "ME"],
+    ["name" => "Maryland", "abbr" => "MD"],
+    ["name" => "Massachusetts", "abbr" => "MA"],
+    ["name" => "Michigan", "abbr" => "MI"],
+    ["name" => "Minnesota", "abbr" => "MN"],
+    ["name" => "Mississippi", "abbr" => "MS"],
+    ["name" => "Missouri", "abbr" => "MO"],
+    ["name" => "Montana", "abbr" => "MT"],
+    ["name" => "Nebraska", "abbr" => "NE"],
+    ["name" => "Nevada", "abbr" => "NV"],
+    ["name" => "New Hampshire", "abbr" => "NH"],
+    ["name" => "New Jersey", "abbr" => "NJ"],
+    ["name" => "New Mexico", "abbr" => "NM"],
+    ["name" => "New York", "abbr" => "NY"],
+    ["name" => "North Carolina", "abbr" => "NC"],
+    ["name" => "North Dakota", "abbr" => "ND"],
+    ["name" => "Ohio", "abbr" => "OH"],
+    ["name" => "Oklahoma", "abbr" => "OK"],
+    ["name" => "Oregon", "abbr" => "OR"],
+    ["name" => "Pennsylvania", "abbr" => "PA"],
+    ["name" => "Rhode Island", "abbr" => "RI"],
+    ["name" => "South Carolina", "abbr" => "SC"],
+    ["name" => "South Dakota", "abbr" => "SD"],
+    ["name" => "Tennessee", "abbr" => "TN"],
+    ["name" => "Texas", "abbr" => "TX"],
+    ["name" => "Utah", "abbr" => "UT"],
+    ["name" => "Vermont", "abbr" => "VT"],
+    ["name" => "Virginia", "abbr" => "VA"],
+    ["name" => "Washington", "abbr" => "WA"],
+    ["name" => "West Virginia", "abbr" => "WV"],
+    ["name" => "Wisconsin", "abbr" => "WI"],
+    ["name" => "Wyoming", "abbr" => "WY"]
+);
+
 /**
  * Add Admin Pages
  */
@@ -104,6 +158,7 @@ add_action( 'show_user_profile', 'extra_user_profile_fields' );
 add_action( 'edit_user_profile', 'extra_user_profile_fields' );
 
 function crf_registration_form() {
+    global $states;
     $first_name = !empty( $_POST['first_name'] ) ? $_POST['first_name']  : '';
     $last_name = !empty( $_POST['last_name'] ) ? $_POST['last_name']  : '';
     $phone_number = !empty( $_POST['phone_number'] ) ? $_POST['phone_number']  : '';
@@ -112,59 +167,7 @@ function crf_registration_form() {
     $city = !empty( $_POST['city'] ) ? $_POST['city']  : '';
     $state = !empty( $_POST['state'] ) ? $_POST['state']  : '';
     $zip = !empty( $_POST['zip'] ) ? $_POST['zip']  : '';
-    $states = array(
-        ["name" => "District of Columbia", "abbr" => "DC"],
-        ["name" => "Alabama", "abbr" => "AL"],
-        ["name" => "Alaska", "abbr" => "AK"],
-        ["name" => "Arizona", "abbr" => "AZ"],
-        ["name" => "Arkansas", "abbr" => "AR"],
-        ["name" => "California", "abbr" => "CA"],
-        ["name" => "Colorado", "abbr" => "CO"],
-        ["name" => "Connecticut", "abbr" => "CT"],
-        ["name" => "Delaware", "abbr" => "DE"],
-        ["name" => "Florida", "abbr" => "FL"],
-        ["name" => "Georgia", "abbr" => "GA"],
-        ["name" => "Hawaii", "abbr" => "HI"],
-        ["name" => "Idaho", "abbr" => "ID"],
-        ["name" => "Illinois", "abbr" => "IL"],
-        ["name" => "Indiana", "abbr" => "IN"],
-        ["name" => "Iowa", "abbr" => "IA"],
-        ["name" => "Kansas", "abbr" => "KS"],
-        ["name" => "Kentucky", "abbr" => "KY"],
-        ["name" => "Louisiana", "abbr" => "LA"],
-        ["name" => "Maine", "abbr" => "ME"],
-        ["name" => "Maryland", "abbr" => "MD"],
-        ["name" => "Massachusetts", "abbr" => "MA"],
-        ["name" => "Michigan", "abbr" => "MI"],
-        ["name" => "Minnesota", "abbr" => "MN"],
-        ["name" => "Mississippi", "abbr" => "MS"],
-        ["name" => "Missouri", "abbr" => "MO"],
-        ["name" => "Montana", "abbr" => "MT"],
-        ["name" => "Nebraska", "abbr" => "NE"],
-        ["name" => "Nevada", "abbr" => "NV"],
-        ["name" => "New Hampshire", "abbr" => "NH"],
-        ["name" => "New Jersey", "abbr" => "NJ"],
-        ["name" => "New Mexico", "abbr" => "NM"],
-        ["name" => "New York", "abbr" => "NY"],
-        ["name" => "North Carolina", "abbr" => "NC"],
-        ["name" => "North Dakota", "abbr" => "ND"],
-        ["name" => "Ohio", "abbr" => "OH"],
-        ["name" => "Oklahoma", "abbr" => "OK"],
-        ["name" => "Oregon", "abbr" => "OR"],
-        ["name" => "Pennsylvania", "abbr" => "PA"],
-        ["name" => "Rhode Island", "abbr" => "RI"],
-        ["name" => "South Carolina", "abbr" => "SC"],
-        ["name" => "South Dakota", "abbr" => "SD"],
-        ["name" => "Tennessee", "abbr" => "TN"],
-        ["name" => "Texas", "abbr" => "TX"],
-        ["name" => "Utah", "abbr" => "UT"],
-        ["name" => "Vermont", "abbr" => "VT"],
-        ["name" => "Virginia", "abbr" => "VA"],
-        ["name" => "Washington", "abbr" => "WA"],
-        ["name" => "West Virginia", "abbr" => "WV"],
-        ["name" => "Wisconsin", "abbr" => "WI"],
-        ["name" => "Wyoming", "abbr" => "WY"]
-    );
+    
 ?>
 	<p>
 		<label for="first_name">First Name<br/>
@@ -262,15 +265,19 @@ function save_extra_user_profile_fields( $user_id ) {
 
     if ( !current_user_can( 'edit_user', $user_id ) ) { return false; }
     
-    // update_user_meta( $user_id, 'address', $_POST['address'] );
-    // update_user_meta( $user_id, 'city', $_POST['city'] );
-    // update_user_meta( $user_id, 'province', $_POST['province'] );
-    // update_user_meta( $user_id, 'postalcode', $_POST['postalcode'] );
-    
-    
+    update_user_meta( $user_id, 'phone_number', $_POST['phone_number'] );
+    update_user_meta( $user_id, 'address1', $_POST['address1'] );
+    update_user_meta( $user_id, 'address2', $_POST['address2'] );
+    update_user_meta( $user_id, 'city', $_POST['city'] );
+    update_user_meta( $user_id, 'state', $_POST['state'] );
+    update_user_meta( $user_id, 'zip', $_POST['zip'] );
 }
 
-function extra_user_profile_fields($user) { ?>
+function extra_user_profile_fields($user) { 
+    global $states;
+    $state = esc_attr( get_the_author_meta( 'state', $user->ID ) );
+
+?>
     <h3><?php _e("Extra profile information", "blank"); ?></h3>
 
     <table class="form-table">
@@ -315,7 +322,12 @@ function extra_user_profile_fields($user) { ?>
                 <label for="state"><?php _e("State"); ?></label>
             </th>
             <td>
-                <input type="text" name="state" id="state" value="<?php echo esc_attr( get_the_author_meta( 'state', $user->ID ) ); ?>" class="regular-text" /><br />
+                <select class="input" id="state" name="state">
+                    <option value="">-- Select State --</option>
+                    <?php foreach ($states as $ele) :?>
+                    <option value="<?= $ele['abbr'] ?>" <?= $ele['abbr'] == $state ? "selected" : "" ?> ><?= $ele['name'] ?></option>    
+                    <?php endforeach; ?>
+                </select><br/>
                 <span class="description"><?php _e("Please enter your State."); ?></span>
             </td>
         </tr>
