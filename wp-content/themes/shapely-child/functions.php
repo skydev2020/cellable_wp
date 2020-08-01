@@ -28,11 +28,7 @@ function cellable_search_form( $form ) {
 
 
 
-function admin_default_page() {
-    return "http://127.0.0.1/cellable/";
-  }
-  
-add_filter('login_redirect', 'admin_default_page');
+
 
 add_filter( 'get_search_form', 'cellable_search_form', 101 ); // Higher Priority means redefine the form
 

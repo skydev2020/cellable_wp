@@ -157,6 +157,14 @@ add_action( 'user_register', 'crf_user_register' );
 add_action( 'show_user_profile', 'extra_user_profile_fields' );
 add_action( 'edit_user_profile', 'extra_user_profile_fields' );
 
+// Login & Logout Redirect
+add_filter('login_redirect', 'admin_default_page');
+add_filter('logout_redirect', 'admin_default_page');
+
+function admin_default_page() {
+    return "http://127.0.0.1/cellable/";
+}
+
 function crf_registration_form() {
     global $states;
     $first_name = !empty( $_POST['first_name'] ) ? $_POST['first_name']  : '';
