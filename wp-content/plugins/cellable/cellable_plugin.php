@@ -99,6 +99,10 @@ add_action( 'register_form', 'crf_registration_form' );
 add_filter( 'registration_errors', 'crf_registration_errors', 10, 3 );
 add_action( 'user_register', 'crf_user_register' );
 
+// Show/Edit Extra Profile Information
+add_action( 'show_user_profile', 'extra_user_profile_fields' );
+add_action( 'edit_user_profile', 'extra_user_profile_fields' );
+
 function crf_registration_form() {
     $first_name = !empty( $_POST['first_name'] ) ? $_POST['first_name']  : '';
     $last_name = !empty( $_POST['last_name'] ) ? $_POST['last_name']  : '';
@@ -195,7 +199,7 @@ function crf_registration_form() {
                 <?php endforeach; ?>
             </select>
         </label>
-        <label for="state">Zip<br/>
+        <label for="zip">Zip<br/>
 			<input type="text" id="zip" name="zip" value="<?php echo esc_attr( $zip ); ?>"
 			       class="input"/>
 		</label>
@@ -207,24 +211,123 @@ function crf_registration_errors( $errors, $sanitized_user_login, $user_email ) 
     	
     if ( empty( $_POST['first_name'] ) ) {
 		$errors->add( 'first_name_error', __( '<strong>Error</strong>: Please enter First Name.', 'crf' ) );
-    }
-    
+    }    
     if ( empty( $_POST['last_name'] ) ) {
 		$errors->add( 'last_name_error', __( '<strong>Error</strong>: Please enter Last Name.', 'crf' ) );
+    }
+    if ( empty( $_POST['phone_number'] ) ) {
+		$errors->add( 'phone_number_error', __( '<strong>Error</strong>: Please enter Phone Number.', 'crf' ) );
+    }
+    if ( empty( $_POST['address1'] ) ) {
+		$errors->add( 'address1_error', __( '<strong>Error</strong>: Please enter Street Address.', 'crf' ) );
+    }
+    if ( empty( $_POST['city'] ) ) {
+		$errors->add( 'city_error', __( '<strong>Error</strong>: Please enter City.', 'crf' ) );
+    }
+    if ( empty( $_POST['state'] ) ) {
+		$errors->add( 'state_error', __( '<strong>Error</strong>: Please enter State.', 'crf' ) );
+    }
+    if ( empty( $_POST['zip'] ) ) {
+		$errors->add( 'zip_error', __( '<strong>Error</strong>: Please enter Zip.', 'crf' ) );
     }
 
 	return $errors;
 }
 
-function crf_user_register( $user_id ) {
-	if ( !empty( $_POST['phone_number'] ) ) {
-		update_user_meta( $user_id, 'phone_number', $_POST['phone_number'] ) ;
-    }
+function crf_user_register( $user_id ) {	
     if ( !empty( $_POST['first_name'] ) ) {
 		update_user_meta( $user_id, 'first_name', $_POST['first_name'] ) ;
     }
     if ( !empty( $_POST['last_name'] ) ) {
 		update_user_meta( $user_id, 'last_name', $_POST['last_name'] ) ;
+    }
+    if ( !empty( $_POST['phone_number'] ) ) {
+		update_user_meta( $user_id, 'phone_number', $_POST['phone_number'] ) ;
+	}
+    if ( !empty( $_POST['address1'] ) ) {
+		update_user_meta( $user_id, 'address1', $_POST['address1'] ) ;
+    }
+    if ( !empty( $_POST['city'] ) ) {
+		update_user_meta( $user_id, 'city', $_POST['city'] ) ;
+	}
+    if ( !empty( $_POST['state'] ) ) {
+		update_user_meta( $user_id, 'state', $_POST['state'] ) ;
+    } 
+    if ( !empty( $_POST['zip'] ) ) {
+		update_user_meta( $user_id, 'zip', $_POST['zip'] ) ;
 	}
 }
+
+function save_extra_user_profile_fields( $user_id ) {
+
+    if ( !current_user_can( 'edit_user', $user_id ) ) { return false; }
+    
+    // update_user_meta( $user_id, 'address', $_POST['address'] );
+    // update_user_meta( $user_id, 'city', $_POST['city'] );
+    // update_user_meta( $user_id, 'province', $_POST['province'] );
+    // update_user_meta( $user_id, 'postalcode', $_POST['postalcode'] );
+    
+    
+}
+
+function extra_user_profile_fields($user) { ?>
+    <h3><?php _e("Extra profile information", "blank"); ?></h3>
+
+    <table class="form-table">
+        <tr>
+            <th>
+                <label for="phone_number"><?php _e("Phone Number"); ?></label>
+            </th>
+            <td>
+                <input type="text" name="phone_number" id="phone_number" value="<?php echo esc_attr( get_the_author_meta( 'phone_number', $user->ID ) ); ?>" class="regular-text" /><br />
+                <span class="description"><?php _e("Please enter your Phone Number."); ?></span>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <label for="address1"><?php _e("Street Address"); ?></label>
+            </th>
+            <td>
+                <input type="text" name="address1" id="address1" value="<?php echo esc_attr( get_the_author_meta( 'address1', $user->ID ) ); ?>" class="regular-text" /><br />
+                <span class="description"><?php _e("Please enter your Street."); ?></span>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <label for="address2"><?php _e("Apt/Ste"); ?></label>
+            </th>
+            <td>
+                <input type="text" name="address2" id="address2" value="<?php echo esc_attr( get_the_author_meta( 'address2', $user->ID ) ); ?>" class="regular-text" /><br />
+                <span class="description"><?php _e("Please enter your Apt/Ste."); ?></span>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <label for="city"><?php _e("City"); ?></label>
+            </th>
+            <td>
+                <input type="text" name="city" id="city" value="<?php echo esc_attr( get_the_author_meta( 'city', $user->ID ) ); ?>" class="regular-text" /><br />
+                <span class="description"><?php _e("Please enter your City."); ?></span>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <label for="state"><?php _e("State"); ?></label>
+            </th>
+            <td>
+                <input type="text" name="state" id="state" value="<?php echo esc_attr( get_the_author_meta( 'state', $user->ID ) ); ?>" class="regular-text" /><br />
+                <span class="description"><?php _e("Please enter your State."); ?></span>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <label for="zip"><?php _e("Zip"); ?></label>
+            </th>
+            <td>
+                <input type="text" name="zip" id="zip" value="<?php echo esc_attr( get_the_author_meta( 'zip', $user->ID ) ); ?>" class="regular-text" /><br />
+                <span class="description"><?php _e("Please enter your Zip."); ?></span>
+            </td>
+        </tr>
+    </table>
+<?php }
 
