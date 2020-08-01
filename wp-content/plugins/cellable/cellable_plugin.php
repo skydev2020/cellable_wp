@@ -93,45 +93,138 @@ add_action('admin_menu', 'admin_add_pages');
 add_action('admin_enqueue_scripts', 'spark_css_js');
 add_shortcode('spark_fields','shortcode_spark_fields');
 
-// if ( ! function_exists( 'myblogs_blog_callback' ) ) {
-//     // Multi Network My Site Section
-//     function myblogs_blog_callback( $string, $user_blog ) {
-//         global $wpdb;
-//         // (maybe) modify $string.
-//         // var_dump($user_blog);
-//         $info = $wpdb->get_row("SELECT *  FROM wp_spark_fields WHERE status='Activated' and  site_id=" . $user_blog->userblog_id);
-//         $location_str = "<h4>LocationID: ";
-//         if ($info) {
-//             $location_str .= $info->location_id;
-//         }
-//         $location_str .= "</h4>";
-//         return $location_str. $string;
-//     }
-// }
 
-// add_filter( 'myblogs_blog_actions', 'myblogs_blog_callback', 10, 3);
+// Registration Custom Field
+add_action( 'register_form', 'crf_registration_form' );
+add_filter( 'registration_errors', 'crf_registration_errors', 10, 3 );
+add_action( 'user_register', 'crf_user_register' );
 
-// A send custom WebHook
-// add_action( 'elementor_pro/forms/webhooks/response', function( $response, $record ) {
-//     //make sure its our form
-   
-//     $form_name = $record->get_form_settings( 'form_name' );
+function crf_registration_form() {
+    $first_name = !empty( $_POST['first_name'] ) ? $_POST['first_name']  : '';
+    $last_name = !empty( $_POST['last_name'] ) ? $_POST['last_name']  : '';
+    $phone_number = !empty( $_POST['phone_number'] ) ? $_POST['phone_number']  : '';
+    $address1 = !empty( $_POST['address1'] ) ? $_POST['address1']  : '';
+    $address2 = !empty( $_POST['address2'] ) ? $_POST['address2']  : '';
+    $city = !empty( $_POST['city'] ) ? $_POST['city']  : '';
+    $state = !empty( $_POST['state'] ) ? $_POST['state']  : '';
+    $zip = !empty( $_POST['zip'] ) ? $_POST['zip']  : '';
+    $states = array(
+        ["name" => "District of Columbia", "abbr" => "DC"],
+        ["name" => "Alabama", "abbr" => "AL"],
+        ["name" => "Alaska", "abbr" => "AK"],
+        ["name" => "Arizona", "abbr" => "AZ"],
+        ["name" => "Arkansas", "abbr" => "AR"],
+        ["name" => "California", "abbr" => "CA"],
+        ["name" => "Colorado", "abbr" => "CO"],
+        ["name" => "Connecticut", "abbr" => "CT"],
+        ["name" => "Delaware", "abbr" => "DE"],
+        ["name" => "Florida", "abbr" => "FL"],
+        ["name" => "Georgia", "abbr" => "GA"],
+        ["name" => "Hawaii", "abbr" => "HI"],
+        ["name" => "Idaho", "abbr" => "ID"],
+        ["name" => "Illinois", "abbr" => "IL"],
+        ["name" => "Indiana", "abbr" => "IN"],
+        ["name" => "Iowa", "abbr" => "IA"],
+        ["name" => "Kansas", "abbr" => "KS"],
+        ["name" => "Kentucky", "abbr" => "KY"],
+        ["name" => "Louisiana", "abbr" => "LA"],
+        ["name" => "Maine", "abbr" => "ME"],
+        ["name" => "Maryland", "abbr" => "MD"],
+        ["name" => "Massachusetts", "abbr" => "MA"],
+        ["name" => "Michigan", "abbr" => "MI"],
+        ["name" => "Minnesota", "abbr" => "MN"],
+        ["name" => "Mississippi", "abbr" => "MS"],
+        ["name" => "Missouri", "abbr" => "MO"],
+        ["name" => "Montana", "abbr" => "MT"],
+        ["name" => "Nebraska", "abbr" => "NE"],
+        ["name" => "Nevada", "abbr" => "NV"],
+        ["name" => "New Hampshire", "abbr" => "NH"],
+        ["name" => "New Jersey", "abbr" => "NJ"],
+        ["name" => "New Mexico", "abbr" => "NM"],
+        ["name" => "New York", "abbr" => "NY"],
+        ["name" => "North Carolina", "abbr" => "NC"],
+        ["name" => "North Dakota", "abbr" => "ND"],
+        ["name" => "Ohio", "abbr" => "OH"],
+        ["name" => "Oklahoma", "abbr" => "OK"],
+        ["name" => "Oregon", "abbr" => "OR"],
+        ["name" => "Pennsylvania", "abbr" => "PA"],
+        ["name" => "Rhode Island", "abbr" => "RI"],
+        ["name" => "South Carolina", "abbr" => "SC"],
+        ["name" => "South Dakota", "abbr" => "SD"],
+        ["name" => "Tennessee", "abbr" => "TN"],
+        ["name" => "Texas", "abbr" => "TX"],
+        ["name" => "Utah", "abbr" => "UT"],
+        ["name" => "Vermont", "abbr" => "VT"],
+        ["name" => "Virginia", "abbr" => "VA"],
+        ["name" => "Washington", "abbr" => "WA"],
+        ["name" => "West Virginia", "abbr" => "WV"],
+        ["name" => "Wisconsin", "abbr" => "WI"],
+        ["name" => "Wyoming", "abbr" => "WY"]
+    );
+?>
+	<p>
+		<label for="first_name">First Name<br/>
+			<input type="text" id="first_name" name="first_name" value="<?php echo esc_attr( $first_name ); ?>"
+			       class="input" required/>
+        </label>
+        <label for="last_name">Last Name<br/>
+			<input type="text" id="last_name" name="last_name" value="<?php echo esc_attr( $last_name ); ?>"
+			       class="input"/>
+        </label>
+        <label for="phone_number">Phone Number<br/>
+			<input type="text" id="phone_number" name="phone_number" value="<?php echo esc_attr( $phone_number ); ?>"
+			       class="input"/>
+        </label>
+        <label for="address1">Street Address<br/>
+			<input type="text" id="address1" name="address1" value="<?php echo esc_attr( $address1 ); ?>"
+			       class="input"/>
+        </label>
+        <label for="address2">Apt/Ste<br/>
+			<input type="text" id="address2" name="address2" value="<?php echo esc_attr( $address2 ); ?>"
+			       class="input"/>
+        </label>
+        <label for="city">City<br/>
+			<input type="text" id="city" name="city" value="<?php echo esc_attr( $city ); ?>"
+			       class="input"/>
+        </label>
+        <label for="state">State<br/>
+            <select class="input" id="state" name="state">
+                <option value="">-- Select State --</option>
+                <?php foreach ($states as $ele) :?>
+                <option value="<?= $ele['abbr'] ?>" <?= $ele['abbr'] == $state ? "selected" : "" ?> ><?= $ele['name'] ?></option>    
+                <?php endforeach; ?>
+            </select>
+        </label>
+        <label for="state">Zip<br/>
+			<input type="text" id="zip" name="zip" value="<?php echo esc_attr( $zip ); ?>"
+			       class="input"/>
+		</label>
+	</p>
+<?php
+}
 
-//     // Replace MY_FORM_NAME with the name you gave your form
-//     // if ( 'MY_FORM_NAME' !== $form_name ) {
-//     //     return;
-//     // }
-  
-//     $raw_fields = $record->get( 'fields' );
-//     $fields = [];
-//     foreach ( $raw_fields as $id => $field ) {
-//         $fields[ $id ] = $field['value'];
-//     }
-   
-//     // Replace HTTP://YOUR_WEBHOOK_URL with the actuall URL you want to post the form to
+function crf_registration_errors( $errors, $sanitized_user_login, $user_email ) {
+    	
+    if ( empty( $_POST['first_name'] ) ) {
+		$errors->add( 'first_name_error', __( '<strong>Error</strong>: Please enter First Name.', 'crf' ) );
+    }
     
-//     // header("Location: http://127.0.0.1/sparkignitepro/");
-//     // print('<script>window.location.href="https://ronsell.com/thank-you?c=RDHq&upID=3981011"</script>');
-//     // die();
-// }, 10, 2 );
+    if ( empty( $_POST['last_name'] ) ) {
+		$errors->add( 'last_name_error', __( '<strong>Error</strong>: Please enter Last Name.', 'crf' ) );
+    }
+
+	return $errors;
+}
+
+function crf_user_register( $user_id ) {
+	if ( !empty( $_POST['phone_number'] ) ) {
+		update_user_meta( $user_id, 'phone_number', $_POST['phone_number'] ) ;
+    }
+    if ( !empty( $_POST['first_name'] ) ) {
+		update_user_meta( $user_id, 'first_name', $_POST['first_name'] ) ;
+    }
+    if ( !empty( $_POST['last_name'] ) ) {
+		update_user_meta( $user_id, 'last_name', $_POST['last_name'] ) ;
+	}
+}
 
