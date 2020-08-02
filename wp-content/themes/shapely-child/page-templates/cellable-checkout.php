@@ -75,7 +75,7 @@ get_header();
 				<tr>
 					<td class="text-left v-top">
 						<form action="<?=get_home_url() ?>/update-returning-user" method="post">
-							<input type="submit" value="Update" class="PromoCode" />
+							<input type="submit" value="Update"/>
 						</form>
 					</td>
 					<td class="v-middle">
@@ -110,7 +110,7 @@ get_header();
                             </dd>
                             <dt>Phone Number</dt>
                             <dd>
-								<?= get_the_author_meta( 'phone_number', $user->ID ) ?>
+								<?= get_the_author_meta('phone_number', $user->ID) ?>
                             </dd>                          
                         </dl>
 					</td>
@@ -122,7 +122,14 @@ get_header();
                             </dd>
                             <dt>Last Login</dt>
                             <dd>
-								Last Login Date
+								<?php
+									$last_login_date = get_the_author_meta('last_login', $user->ID);
+									$str = "";
+									if ($last_login_date) {
+										$str = (new DateTime($last_login_date))->format('m/d/Y h:i:s A'); 
+									}
+									echo $str;
+								?>
                             </dd>
                         </dl>
                     </td>
@@ -149,7 +156,7 @@ get_header();
                                     <td class="text-left" style="width:100%; padding:10px;">
                                         <i class="text-danger">*</i>&nbsp;Payment Method:
                                         <br/>
-										<select class="form-control" name="payment_type_id" onchange="validate_form()">
+										<select class="form-control" name="payment_type_id" onchange="validate_form()" required>
 											<option value="">-- How You Get Paid --</option>
 											<?php foreach ($payment_types as $ele):  ?>
 											<option value="<?= $ele['id'] ?>"><?= $ele['name'] ?></option>
@@ -161,11 +168,11 @@ get_header();
                                 <tr>
                                     <td class="text-left"  style="width:100%; padding:10px;">
                                         <div id="PayUserName"><i class="text-danger">*</i>&nbsp;User Name / Email for Payment Method:</div>
-                                        <input type="text" id="PaymentUserName" name="payment_username" class="form-control" onchange="validate_form()" />
+                                        <input type="text" id="PaymentUserName" name="payment_username" class="form-control" required />
                                         <div id="PaymentUserNameValidationMessage" class="text-danger"></div>
                                         <br />
-                                        <input type="submit" name="submit" id="submit" value="Complete Order" class="PromoCode" onclick="return validate_form()" />
-                                        <input type="button" name="reset" id="reset" value="Cancel" class="PromoCode" onclick="window.location.href='<?=get_home_url() ?>/user_delete';" />
+                                        <input type="submit" name="submit" id="submit" value="Complete Order" class="btn" style="width: auto;" />
+                                        <input type="button" name="reset" id="reset" value="Cancel" class="btn" onclick="window.location.href='<?=get_home_url() ?>';" />
                                     </td>
                                 </tr>
                             </table>
@@ -187,7 +194,7 @@ get_header();
                                     <table style="width:100%; left:auto; right:auto;">
                                         <tr>
                                             <td class="text-center" colspan="3">
-                                                <div style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: green; font-size: 55px;">                                                    
+                                                <div style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: green; font-size: 55px; line-height: initial;">
 													$<?= number_format((float)$price, 2, '.', '')  ?>
                                                 </div>
                                             </td>

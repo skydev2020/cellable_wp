@@ -165,7 +165,14 @@ add_filter('login_redirect', 'admin_default_page');
 add_filter('logout_redirect', 'admin_default_page');
 
 function admin_default_page() {
-    return "http://127.0.0.1/cellable/";
+    $user = wp_get_current_user();
+    // Update Last Login Time
+    
+    if ($user->ID>0) {
+        $str = date_create()->format('Y-m-d H:i:s');
+        update_user_meta($user->ID, 'last_login', $str);
+    }    
+    return get_home_url();
 }
 
 function crf_registration_form() {
