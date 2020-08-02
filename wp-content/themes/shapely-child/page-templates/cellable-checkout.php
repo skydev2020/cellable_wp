@@ -73,13 +73,13 @@ get_header();
 
 			<table style="width:100%; margin-left:auto; margin-right:auto;">
 				<tr>
-					<td class="text-center" style="vertical-align:top;">
+					<td class="text-left v-top">
 						<form action="<?=get_home_url() ?>/update-returning-user" method="post">
 							<input type="submit" value="Update" class="PromoCode" />
 						</form>
 					</td>
-					<td style="vertical-align:top;">
-						<dl class="dl-horizontal">
+					<td class="v-middle">
+						<dl class=""> <!--dl-horizontal -->
                             <dt>Name</dt>
                             <dd>
 								<?= $user->first_name ?> <?= $user->last_name ?>
@@ -93,12 +93,13 @@ get_header();
                             </dd>
                         </dl>
 					</td>
-					<td style="vertical-align:top;">
-						<dl class="dl-horizontal">
+					<td class="v-middle">
+						<dl class=""> <!--dl-horizontal -->
                             <dt>Address</dt>
                             <dd>
-								4796 township farm trail
-								marietta, State 30066
+								<?= get_the_author_meta( 'address1', $user->ID ) ?> <br/>
+								<?= get_the_author_meta( 'address2', $user->ID ) ?> <br/>
+								<?= get_the_author_meta( 'city', $user->ID ) ?>, <?= get_the_author_meta( 'state', $user->ID ) ?> <?= get_the_author_meta( 'zip', $user->ID ) ?>
 								<!-- @Html.DisplayFor(model => model.Address)
                                 @if (Model.Address2 != null)
                                 {
@@ -109,15 +110,15 @@ get_header();
                             </dd>
                             <dt>Phone Number</dt>
                             <dd>
-								404-405-1210<!-- @Html.DisplayFor(model => model.PhoneNumber) -->
+								<?= get_the_author_meta( 'phone_number', $user->ID ) ?>
                             </dd>                          
                         </dl>
 					</td>
-					<td style="vertical-align:middle;">
-                        <dl class="dl-horizontal">
+					<td class="v-middle">
+                        <dl class=""> <!--dl-horizontal -->
                             <dt>Created On</dt>
                             <dd>
-								<?= $user->user_registered ?>
+								<?= (new DateTime($user->user_registered))->format('m/d/Y h:i:s A') ?>
                             </dd>
                             <dt>Last Login</dt>
                             <dd>
@@ -133,7 +134,7 @@ get_header();
                     </td>
                 </tr>
 				<tr>
-                    <td style="vertical-align:top; border-right:solid; border-right-color:lightgrey; border-right-width:1px;">
+                    <td class="v-top" style="border-right:solid; border-right-color:lightgrey; border-right-width:1px;">
 						<form action="<?=get_home_url() ?>/user-register" method="post">
 							<input name="userEmail" type="hidden" value="<?= $user->user_email ?>">
 							<input name="UserExists" type="hidden" value="True">
@@ -170,10 +171,10 @@ get_header();
                             </table>
                         </form>
                     </td>
-                    <td colspan="3" style="vertical-align:top;">
+                    <td colspan="3" class="v-middle">
                         <table style="width:80%; margin-left:auto; margin-right:auto; font-family:'HP Simplified'">
                             <tr>
-                                <td class="text-center" style="width:30%; vertical-align:top;">                                    
+                                <td class="text-center v-top" style="width:30%;">                                    
 									<?= $phone_brand['name'] ?>
                                     <br/>
 									<?= $phone_version['name'] ?> (<?= $capacity['description'] ?>)
@@ -182,7 +183,7 @@ get_header();
                                     <br/>
                                     Please Note: We do not pay for devices that have been reported lost or stolen.
                                 </td>
-                                <td style="width:30%; vertical-align:top;">
+                                <td class="v-top" style="width:30%;">
                                     <table style="width:100%; left:auto; right:auto;">
                                         <tr>
                                             <td class="text-center" colspan="3">

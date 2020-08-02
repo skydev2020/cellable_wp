@@ -241,3 +241,11 @@ ul.menu li.active {
 ul.menu li.active a {
     color: lawngreen;
 }
+
+.v-middle {
+    vertical-align: middle;
+}
+
+.v-top {
+    vertical-align: top;
+}
