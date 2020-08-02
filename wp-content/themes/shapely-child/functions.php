@@ -25,17 +25,7 @@ function cellable_search_form( $form ) {
 	return $form;
 }
 
-
-
-
-
-
 add_filter( 'get_search_form', 'cellable_search_form', 101 ); // Higher Priority means redefine the form
-
-
-
-add_action( 'personal_options_update', 'save_extra_user_profile_fields' );
-add_action( 'edit_user_profile_update', 'save_extra_user_profile_fields' );
 
 
 

@@ -57,7 +57,7 @@
 											<a title="Login" href="<?=get_home_url() ?>/wp-login.php">Login</a>
 										</li>
 										<?php else: ?>
-										<li class="menu-item menu-item-type-post_type menu-item-object-page">
+										<li class="menu-item menu-item-type-post_type menu-item-object-page <?= strpos($_SERVER['REQUEST_URI'], "track-orders") !==false ? "active" : ""?>">
 											<a title="Tracking Orders" href="<?=get_home_url() ?>/track-orders/">Tracking</a>
 										</li>	
 										<li class="menu-item menu-item-type-post_type menu-item-object-page">

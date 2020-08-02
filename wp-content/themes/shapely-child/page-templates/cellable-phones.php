@@ -27,7 +27,7 @@ get_header();
 				<?php endforeach; ?>
 			</div>
 			<div class="text-center">
-            	<br/><br/><br/>Tell us what kind of phone you have 
+            	
 			</div>
 		</div><!-- #primary -->
 	</div>

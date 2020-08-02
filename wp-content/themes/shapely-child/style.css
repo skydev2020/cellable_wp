@@ -204,6 +204,7 @@ footer {
 
 body {
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    color: rgb(33,37,41);
 }
 
 .main-navigation .menu li a {
@@ -227,4 +228,16 @@ footer.bg-dark a:hover {
 
 #site-navigation .menu-container{
     padding-top: 15px;
+}
+
+.content-area {
+    min-height: calc(100% - 150px);
+}
+
+ul.menu li.active {
+    background-color: initial;
+}
+
+ul.menu li.active a {
+    color: lawngreen;
 }
