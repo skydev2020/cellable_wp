@@ -3,7 +3,7 @@
 Template Name: Cellable Price Phone
 Template Post Type: page
 */
-require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
+require_once(ABSPATH . 'wp-content/plugins/cellable/cellable_global.php');
 
 get_header(); 
 ?>

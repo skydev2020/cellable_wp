@@ -1,5 +1,5 @@
 <?php 
-require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_global.php');
+require_once(ABSPATH . 'wp-content/plugins/cellable/cellable_global.php');
 
 class CellableEmail
 { 

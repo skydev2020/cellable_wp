@@ -6,62 +6,9 @@
 * Version: 1.0
 * Author: Sky Dev 
 **/
-
+require_once('cellable_global.php');
 require_once('views/settings.php');
 
-$states = array(
-    ["name" => "District of Columbia", "abbr" => "DC"],
-    ["name" => "Alabama", "abbr" => "AL"],
-    ["name" => "Alaska", "abbr" => "AK"],
-    ["name" => "Arizona", "abbr" => "AZ"],
-    ["name" => "Arkansas", "abbr" => "AR"],
-    ["name" => "California", "abbr" => "CA"],
-    ["name" => "Colorado", "abbr" => "CO"],
-    ["name" => "Connecticut", "abbr" => "CT"],
-    ["name" => "Delaware", "abbr" => "DE"],
-    ["name" => "Florida", "abbr" => "FL"],
-    ["name" => "Georgia", "abbr" => "GA"],
-    ["name" => "Hawaii", "abbr" => "HI"],
-    ["name" => "Idaho", "abbr" => "ID"],
-    ["name" => "Illinois", "abbr" => "IL"],
-    ["name" => "Indiana", "abbr" => "IN"],
-    ["name" => "Iowa", "abbr" => "IA"],
-    ["name" => "Kansas", "abbr" => "KS"],
-    ["name" => "Kentucky", "abbr" => "KY"],
-    ["name" => "Louisiana", "abbr" => "LA"],
-    ["name" => "Maine", "abbr" => "ME"],
-    ["name" => "Maryland", "abbr" => "MD"],
-    ["name" => "Massachusetts", "abbr" => "MA"],
-    ["name" => "Michigan", "abbr" => "MI"],
-    ["name" => "Minnesota", "abbr" => "MN"],
-    ["name" => "Mississippi", "abbr" => "MS"],
-    ["name" => "Missouri", "abbr" => "MO"],
-    ["name" => "Montana", "abbr" => "MT"],
-    ["name" => "Nebraska", "abbr" => "NE"],
-    ["name" => "Nevada", "abbr" => "NV"],
-    ["name" => "New Hampshire", "abbr" => "NH"],
-    ["name" => "New Jersey", "abbr" => "NJ"],
-    ["name" => "New Mexico", "abbr" => "NM"],
-    ["name" => "New York", "abbr" => "NY"],
-    ["name" => "North Carolina", "abbr" => "NC"],
-    ["name" => "North Dakota", "abbr" => "ND"],
-    ["name" => "Ohio", "abbr" => "OH"],
-    ["name" => "Oklahoma", "abbr" => "OK"],
-    ["name" => "Oregon", "abbr" => "OR"],
-    ["name" => "Pennsylvania", "abbr" => "PA"],
-    ["name" => "Rhode Island", "abbr" => "RI"],
-    ["name" => "South Carolina", "abbr" => "SC"],
-    ["name" => "South Dakota", "abbr" => "SD"],
-    ["name" => "Tennessee", "abbr" => "TN"],
-    ["name" => "Texas", "abbr" => "TX"],
-    ["name" => "Utah", "abbr" => "UT"],
-    ["name" => "Vermont", "abbr" => "VT"],
-    ["name" => "Virginia", "abbr" => "VA"],
-    ["name" => "Washington", "abbr" => "WA"],
-    ["name" => "West Virginia", "abbr" => "WV"],
-    ["name" => "Wisconsin", "abbr" => "WI"],
-    ["name" => "Wyoming", "abbr" => "WY"]
-);
 
 /**
  * Add Admin Pages
@@ -152,7 +99,7 @@ function spark_css_js()
 
 
 add_action('admin_menu', 'admin_add_pages');
-add_action('admin_enqueue_scripts', 'spark_css_js');
+// add_action('admin_enqueue_scripts', 'spark_css_js');
 add_shortcode('spark_fields','shortcode_spark_fields');
 
 
@@ -184,7 +131,7 @@ function admin_default_page() {
 }
 
 function crf_registration_form() {
-    global $states;
+    global $STATES;
     $first_name = !empty( $_POST['first_name'] ) ? $_POST['first_name']  : '';
     $last_name = !empty( $_POST['last_name'] ) ? $_POST['last_name']  : '';
     $phone_number = !empty( $_POST['phone_number'] ) ? $_POST['phone_number']  : '';
@@ -223,7 +170,7 @@ function crf_registration_form() {
         <label for="state">State<br/>
             <select class="input" id="state" name="state">
                 <option value="">-- Select State --</option>
-                <?php foreach ($states as $ele) :?>
+                <?php foreach ($STATES as $ele) :?>
                 <option value="<?= $ele['abbr'] ?>" <?= $ele['abbr'] == $state ? "selected" : "" ?> ><?= $ele['name'] ?></option>    
                 <?php endforeach; ?>
             </select>
@@ -300,7 +247,7 @@ function save_extra_user_profile_fields( $user_id ) {
 }
 
 function extra_user_profile_fields($user) { 
-    global $states;
+    global $STATES;
     $state = esc_attr( get_the_author_meta( 'state', $user->ID ) );
 
 ?>
@@ -350,7 +297,7 @@ function extra_user_profile_fields($user) {
             <td>
                 <select class="input" id="state" name="state">
                     <option value="">-- Select State --</option>
-                    <?php foreach ($states as $ele) :?>
+                    <?php foreach ($STATES as $ele) :?>
                     <option value="<?= $ele['abbr'] ?>" <?= $ele['abbr'] == $state ? "selected" : "" ?> ><?= $ele['name'] ?></option>    
                     <?php endforeach; ?>
                 </select><br/>
