@@ -45,7 +45,7 @@ if(!class_exists('WP_List_Table')){
  * 
  * Our theme for this list table is going to be movies.
  */
-class Cellable_Settings_List_Table extends WP_List_Table {
+class Cellable_Orders_List_Table extends WP_List_Table {
     
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
@@ -411,7 +411,7 @@ class Cellable_Settings_List_Table extends WP_List_Table {
  * so we've instead called those methods explicitly. It keeps things flexible, and
  * it's the way the list tables are used in the WordPress core.
  */
-function render_settings_list(){
+function render_orders_list(){
 
     if(isset($_GET['action']) && $_GET['action'] == 'edit')
     {
@@ -421,21 +421,21 @@ function render_settings_list(){
     }
 
     //Create an instance of our package class...
-    $setting_list_table = new Cellable_Settings_List_Table();
+    $order_list_table = new Cellable_Orders_List_Table();
     //Fetch, prepare, sort, and filter our data...
     $search_str = isset($_REQUEST['s']) ? $_REQUEST['s']: "";    
-    $setting_list_table->prepare_items($search_str);?>
+    $order_list_table->prepare_items($search_str);?>
     <div class="wrap">
         
         <div id="icon-users" class="icon32"><br/></div>
-        <h2>Cellable Settings</h2>
+        <h2>Cellable Orders</h2>
         <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
-        <form id="settings-filter" method="get">
+        <form id="orders-filter" method="get">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page']?>" />
             <!-- Now we can render the completed list table -->
-            <?php $setting_list_table->search_box('Search','setting_id');?>
-            <?php $setting_list_table->display()?>
+            <?php $order_list_table->search_box('Setting','setting_id');?>
+            <?php $order_list_table->display()?>
             <input type="hidden" name="_wp_http_referer" value="">
         </form>
         
@@ -443,12 +443,12 @@ function render_settings_list(){
     <?php
 }
 
-// function delete_spark_lead($id){
-//     global $wpdb;
-//     $wpdb->delete('wp_spark_leads', array('id' => $id));
-// }
+function delete_spark_lead($id){
+    global $wpdb;
+    $wpdb->delete('wp_spark_leads', array('id' => $id));
+}
 
-function render_edit_setting_page($id){
+function render_edit_order_page($id){
     global $wpdb;
 
     $info = $wpdb->get_row("SELECT * FROM " .$wpdb->base_prefix. "cellable_settings WHERE id='" . $id . "'");

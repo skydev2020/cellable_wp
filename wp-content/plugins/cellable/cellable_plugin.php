@@ -8,29 +8,19 @@
 **/
 require_once('cellable_global.php');
 require_once('views/settings.php');
-
+require_once('views/orders.php');
 
 /**
  * Add Admin Pages
  */
-if ( ! function_exists( 'page_admin_spark_fields' ) ) {
-    function page_admin_spark_fields(){
-        render_spark_fields();
+if ( ! function_exists( 'orders_pages' ) ) {
+    function orders_pages(){
+        render_orders_list();
     }
 }
 
-if ( ! function_exists( 'page_admin_spark_pages' ) ) {
-    function page_admin_spark_pages(){
-        render_import_page_detail();
-    }
-}
-
-/**
- * Add Super Admin Pages
- */
-
-if ( ! function_exists( 'setting_pages' ) ) {
-    function setting_pages(){
+if ( ! function_exists( 'settings_pages' ) ) {
+    function settings_pages(){
         render_settings_list();
     }
 }
@@ -45,8 +35,9 @@ if ( ! function_exists( 'admin_add_pages' ) ) {
     function admin_add_pages() {
         
         if(current_user_can('administrator')){
-            add_menu_page("Cellable", "Cellable", "manage_options", "cellable","setting_pages","dashicons-networking", 4);
-            add_submenu_page('cellable','Settings', 'System Settings', 'manage_options', 'setting_pages','setting_pages');            
+            add_menu_page("Cellable", "Cellable", "manage_options", "cellable","orders","dashicons-networking", 4);
+            add_submenu_page('cellable','Orders', 'Orders', 'manage_options', 'orders_pages','orders_pages');
+            add_submenu_page('cellable','Settings', 'System Settings', 'manage_options', 'settings_pages','settings_pages');
             remove_submenu_page('cellable', 'cellable');
         }
         else{
