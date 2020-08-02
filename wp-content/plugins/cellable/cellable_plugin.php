@@ -133,6 +133,14 @@ function shortcode_spark_fields($atts, $content = null) {
 	return $content;
 }
 
+
+function get_cellable_setting($name) {
+    global $wpdb;
+
+    $content = $wpdb->get_var("SELECT value FROM ". $wpdb->base_prefix ."cellable_settings WHERE name='" . $name."'");    
+	return $content;
+}
+
  
 function spark_css_js()
 {

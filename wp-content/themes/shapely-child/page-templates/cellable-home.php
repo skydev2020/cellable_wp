@@ -28,7 +28,7 @@ get_header();
 			<?php endforeach; ?>
 		</div>
 		<div class="text-center">
-			<br/><br/><br/>See what people are saying about us!<br/><br/><br/>
+			<br/><br/><br/><?= get_cellable_setting('AboutBody') ?><br/><br/><br/>
 		</div>
 		<div class="text-center full-width inline-block">
 			<div class="slideshow-container">
@@ -50,6 +50,9 @@ get_header();
 				<span class='dot' onclick='currentSlide(<?= $i+1 ?>)'></span>
 			<?php endfor; ?>
             </div>
+		</div>
+		<div class="text-center">
+			<br/><br/><br/><?= get_cellable_setting('FrontPageFooter') ?>
 		</div>
 	</div><!-- #primary -->
 </div>

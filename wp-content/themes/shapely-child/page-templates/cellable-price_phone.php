@@ -112,8 +112,8 @@ get_header();
 								<input name="defect_ids[]" type="hidden" value="<?=$defect_id?>"/>
 								<?php endforeach; ?>
 								<p>
-									<input type="submit" value="Sell My Phone" class="button" />
-									<input type="button" value="Cancel" class="button" onclick="location.href='<?=get_home_url() ?>';" />
+									<input type="submit" value="Sell My Phone" class="btn" />
+									<input type="button" value="Cancel" class="btn" onclick="location.href='<?=get_home_url() ?>';" />
 								</p>
 							</form>
 						<?php else:?>

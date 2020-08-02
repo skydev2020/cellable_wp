@@ -74,7 +74,7 @@ get_header();
 			<table style="width:100%; margin-left:auto; margin-right:auto;">
 				<tr>
 					<td class="text-left v-top">
-						<form action="<?=get_home_url() ?>/update-returning-user" method="post">
+						<form action="<?=get_edit_profile_url() ?>" method="post">
 							<input type="submit" value="Update"/>
 						</form>
 					</td>
@@ -100,13 +100,6 @@ get_header();
 								<?= get_the_author_meta( 'address1', $user->ID ) ?> <br/>
 								<?= get_the_author_meta( 'address2', $user->ID ) ?> <br/>
 								<?= get_the_author_meta( 'city', $user->ID ) ?>, <?= get_the_author_meta( 'state', $user->ID ) ?> <?= get_the_author_meta( 'zip', $user->ID ) ?>
-								<!-- @Html.DisplayFor(model => model.Address)
-                                @if (Model.Address2 != null)
-                                {
-                                    @Html.Raw("<br />")@Html.DisplayFor(model => model.Address2)
-                                }
-                                <br />
-                                @Html.DisplayFor(model => model.City), @Html.DisplayNameFor(model => model.State) @Html.DisplayFor(model => model.Zip) -->
                             </dd>
                             <dt>Phone Number</dt>
                             <dd>

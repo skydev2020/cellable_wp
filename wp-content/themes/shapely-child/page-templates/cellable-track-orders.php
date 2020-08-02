@@ -138,7 +138,7 @@ get_header();
 	<script type="text/javascript">
 		function CheckStar(index) {
 			
-			jQuery(".fa.fa-star").removeClass("checked");
+			jQuery("#rating-modal .fa.fa-star").removeClass("checked");
 			jQuery("#rating").val(index);
 
 			for (var i=1; i<=index; i++) {
