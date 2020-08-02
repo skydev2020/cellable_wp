@@ -92,8 +92,9 @@ class Cellable_Orders_List_Table extends WP_List_Table {
      **************************************************************************/
     function column_default($item, $column_name){
         switch($column_name){
-            case 'name':
-            case 'value':
+            case 'status_name':
+            case 'id':
+            case 'pv_name':
                 return $item[$column_name];
             default:
                 return print_r($item,true); //Show the whole array for troubleshooting purposes
@@ -126,8 +127,8 @@ class Cellable_Orders_List_Table extends WP_List_Table {
         );
         
         //Return the title contents
-        return sprintf('%1$s %2$s',
-            /*$1%s*/ $item['name'],
+        return sprintf('%1$s %2$s',            
+            /*$1%s*/ $item['status_name'],
             /*$3%s*/ $this->row_actions($actions)
         );
     }
@@ -167,8 +168,9 @@ class Cellable_Orders_List_Table extends WP_List_Table {
     function get_columns(){
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
-            'name'     => 'Name',
-            'value'  => 'Value',            
+            'status_name'     => 'Status',
+            'id'  => 'Order Id',
+            'pv_name' => "Phone"            
         );
         return $columns;
     }
@@ -190,7 +192,7 @@ class Cellable_Orders_List_Table extends WP_List_Table {
      **************************************************************************/
     function get_sortable_columns() {
         $sortable_columns = array(
-            'name'     => array('name',false),     //true means it's already sorted
+            'id'     => array('id',false),     //true means it's already sorted
             'value'  => array('value',false),
         );
         return $sortable_columns;
@@ -314,17 +316,34 @@ class Cellable_Orders_List_Table extends WP_List_Table {
          **************************************************************************/
    
         $data = array();
-        if($search_str) {
-            $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_settings where `name` like %s ";
-            $sql_str .= "or `value` like %s";
+        $sql_str = "SELECT o.id id, os.name status_name, phv.name pv_name FROM ".$wpdb->base_prefix."cellable_orders o ";
+        $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_statuses os on o.order_status_id = os.id ";
+        $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_details od on o.order_detail_id = od.id ";
+        $sql_str .= "left join ".$wpdb->base_prefix."cellable_phone_versions phv on od.phone_version_id = phv.id ";
+        $sql_str .= "order by o.id";
+        // $sql_str .= "SELECT o.* FROM ".$wpdb->base_prefix."cellable_orders o left join ".$wpdb->base_prefix."cellable_order_stauses os ";
+        $data = $wpdb->get_results($sql_str,ARRAY_A);
+
+        foreach ($data as $ele) {
+
+        }
+
+//         SELECT Customers.CustomerName, Orders.OrderID
+// FROM Customers
+// LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID
+// ORDER BY Customers.CustomerName;
+        // if($search_str) {
             
-            $data = $wpdb->get_results($wpdb->prepare($sql_str, 
-                '%'.$wpdb->esc_like($search_str).'%','%'.$wpdb->esc_like($search_str).'%'
-            ),ARRAY_A);
-        }
-        else {
-            $data = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_settings", ARRAY_A);
-        }
+        //     $sql_str .= "or `value` like %s";
+            
+           
+        //     else {
+        //     $data = $wpdb->get_results("SELECT * FR";
+
+        // }
+        // else {
+        //     $data = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_orders", ARRAY_A);
+        // }
         
         /**
          * This checks for sorting input and sorts the data in our array accordingly.
@@ -335,7 +354,7 @@ class Cellable_Orders_List_Table extends WP_List_Table {
          * sorting technique would be unnecessary.
          */
         function usort_reorder($a,$b){
-            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'name'; //If no sort, default to title
+            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id'; //If no sort, default to title
             $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
             $result = strcmp($a[$orderby], $b[$orderby]); //Determine sort order
             return ($order==='asc') ? $result : -$result; //Send final sort direction to usort
@@ -379,9 +398,7 @@ class Cellable_Orders_List_Table extends WP_List_Table {
          * array_slice() to 
          */
         $data = array_slice($data,(($current_page-1)*$per_page),$per_page);
-        
-        
-        
+
         /**
          * REQUIRED. Now we can add our *sorted* data to the items property, where 
          * it can be used by the rest of the class.
@@ -434,7 +451,7 @@ function render_orders_list(){
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page']?>" />
             <!-- Now we can render the completed list table -->
-            <?php $order_list_table->search_box('Setting','setting_id');?>
+            <?php $order_list_table->search_box('Search','setting_id');?>
             <?php $order_list_table->display()?>
             <input type="hidden" name="_wp_http_referer" value="">
         </form>
