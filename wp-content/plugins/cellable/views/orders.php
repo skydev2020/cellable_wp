@@ -95,7 +95,10 @@ class Cellable_Orders_List_Table extends WP_List_Table {
             case 'status_name':
             case 'id':
             case 'pv_name':
+            case 'pm_code':
                 return $item[$column_name];
+            case 'amount':
+                return "$".$item[$column_name];
             default:
                 return print_r($item,true); //Show the whole array for troubleshooting purposes
         }
@@ -117,20 +120,13 @@ class Cellable_Orders_List_Table extends WP_List_Table {
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
-    function column_name($item){
-        //Build row actions
-        global $wpdb;
-        //Build row actions
-        $actions = array(
-            'edit'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id']),
-            // 'delete'    => sprintf('<a href="?page=%s&action=%s&item=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
-        );
+    function column_amount1($item){        
         
         //Return the title contents
-        return sprintf('%1$s %2$s',            
-            /*$1%s*/ $item['status_name'],
-            /*$3%s*/ $this->row_actions($actions)
-        );
+        // return sprintf('%1$d',            
+        //     /*$1%s*/ "$".$item['amount']
+        // );
+        return "$".$item['amount'];
     }
 
 
@@ -170,7 +166,9 @@ class Cellable_Orders_List_Table extends WP_List_Table {
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
             'status_name'     => 'Status',
             'id'  => 'Order Id',
-            'pv_name' => "Phone"            
+            'pv_name' => "Phone",
+            'amount' => "Amount",
+            'pm_code' => "Promo Code"           
         );
         return $columns;
     }
@@ -316,10 +314,12 @@ class Cellable_Orders_List_Table extends WP_List_Table {
          **************************************************************************/
    
         $data = array();
-        $sql_str = "SELECT o.id id, os.name status_name, phv.name pv_name FROM ".$wpdb->base_prefix."cellable_orders o ";
+        $sql_str = "SELECT o.id id, o.amount amount, os.name status_name, phv.name pv_name, pm.code pm_code ";
+        $sql_str .= "FROM ".$wpdb->base_prefix."cellable_orders o ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_statuses os on o.order_status_id = os.id ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_details od on o.order_detail_id = od.id ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_phone_versions phv on od.phone_version_id = phv.id ";
+        $sql_str .= "left join ".$wpdb->base_prefix."cellable_promos pm on o.promo_id = pm.id ";
         $sql_str .= "order by o.id";
         // $sql_str .= "SELECT o.* FROM ".$wpdb->base_prefix."cellable_orders o left join ".$wpdb->base_prefix."cellable_order_stauses os ";
         $data = $wpdb->get_results($sql_str,ARRAY_A);
