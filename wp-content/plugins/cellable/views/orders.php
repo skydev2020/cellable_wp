@@ -98,6 +98,11 @@ class Cellable_Orders_List_Table extends WP_List_Table {
             case 'pm_code':
             case 'pm_name':
             case 'discount':
+            case 'p_name':
+            case 'p_username':
+            case 'usps_tracking_id':
+            case 'created_date':
+            case 'action':
                 return $item[$column_name];
             case 'amount':
                 return "$".$item[$column_name];
@@ -128,6 +133,18 @@ class Cellable_Orders_List_Table extends WP_List_Table {
         elseif ($item['dis_dollar_value']>0):
             return "$".$item['dis_dollar_value'];
         endif;
+    }
+
+    function column_created_date($item){       
+        $date = new DateTime($item['created_date']);
+        $created_date = $date->format('m/d/Y h:i:s A');
+        return $created_date;        
+    }
+
+    function column_action($item){       
+        return sprintf(
+            '<input type="button" value="eBay" />'
+        );      
     }
 
 
@@ -172,6 +189,11 @@ class Cellable_Orders_List_Table extends WP_List_Table {
             'pm_code' => "Promo Code",
             'pm_name' => "Promo Name",
             'discount' => "Discount",
+            'p_name' => "Payment Type",
+            'p_username' => "Payment User Name",
+            'usps_tracking_id' => "USPS Tracking",
+            'created_date' => "Created Date",
+            'action' => "Action",
         );
         return $columns;
     }
@@ -318,12 +340,15 @@ class Cellable_Orders_List_Table extends WP_List_Table {
    
         $data = array();
         $sql_str = "SELECT o.id id, o.amount amount, os.name status_name, phv.name pv_name, ";
-        $sql_str .= "pm.code pm_code, pm.name pm_name, pm.discount discount, pm.dollar_value dis_dollar_value ";
+        $sql_str .= "pm.code pm_code, pm.name pm_name, pm.discount discount, pm.dollar_value dis_dollar_value, ";
+        $sql_str .= "p.name p_name, o.payment_username p_username, o.usps_tracking_id usps_tracking_id, ";
+        $sql_str .= "o.created_date created_date ";
         $sql_str .= "FROM ".$wpdb->base_prefix."cellable_orders o ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_statuses os on o.order_status_id = os.id ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_details od on o.order_detail_id = od.id ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_phone_versions phv on od.phone_version_id = phv.id ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_promos pm on o.promo_id = pm.id ";
+        $sql_str .= "left join ".$wpdb->base_prefix."cellable_payment_types p on o.payment_type_id = p.id ";
         $sql_str .= "order by o.id";
         // $sql_str .= "SELECT o.* FROM ".$wpdb->base_prefix."cellable_orders o left join ".$wpdb->base_prefix."cellable_order_stauses os ";
         $data = $wpdb->get_results($sql_str,ARRAY_A);
