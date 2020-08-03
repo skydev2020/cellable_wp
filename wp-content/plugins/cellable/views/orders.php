@@ -143,6 +143,16 @@ class Cellable_Orders_List_Table extends WP_List_Table {
             /*$3%s*/ $this->row_actions($actions)
         );
     }
+
+    function column_username($item){                
+        
+        $user = get_user_by('id', $item['user_id']);
+        if ($user) {
+            return $user->first_name. " " . $user->last_name;
+        }
+        
+        return "";
+    }
     
     function column_discount($item){                
         if ($item['discount']>0):
@@ -200,6 +210,7 @@ class Cellable_Orders_List_Table extends WP_List_Table {
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
             'id'  => 'Order Id',
+            'username'  => 'User Name',
             'status_name'     => 'Status',
             'pv_name' => "Phone",
             'amount' => "Amount",
@@ -367,7 +378,7 @@ class Cellable_Orders_List_Table extends WP_List_Table {
         $sql_str = "SELECT o.id id, o.amount amount, os.name status_name, phv.name pv_name, ";
         $sql_str .= "pm.code pm_code, pm.name pm_name, pm.discount discount, pm.dollar_value dis_dollar_value, ";
         $sql_str .= "p.name p_name, o.payment_username p_username, o.usps_tracking_id usps_tracking_id, ";
-        $sql_str .= "o.created_date created_date ";
+        $sql_str .= "o.created_date created_date, o.user_id user_id ";
         $sql_str .= "FROM ".$wpdb->base_prefix."cellable_orders o ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_statuses os on o.order_status_id = os.id ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_details od on o.order_detail_id = od.id ";
@@ -574,8 +585,7 @@ function render_edit_order_page($id){
     }
 
     $order_statuses = $wpdb->get_results("select * from ".$wpdb->base_prefix."cellable_order_statuses", ARRAY_A);
-    var_dump($info->user_id);
-    var_dump($ouser);
+    
     ?>
     <div class="wrap">
         <h2>Order</h2>
@@ -703,7 +713,7 @@ function render_edit_order_page($id){
                         <td>
                             <select name="status_id">
                             <?php foreach ($order_statuses as $ele) :?>
-                                <option id="<?= $ele['id'] ?>" <?= ($info->osid == $ele['id']) ? 
+                                <option value="<?= $ele['id'] ?>" <?= ($info->osid == $ele['id']) ? 
                                 "selected" : "" ?>> <?= $ele['name'] ?> </option>
                             <?php endforeach; ?>
                             </select>                            
@@ -712,7 +722,7 @@ function render_edit_order_page($id){
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_SETTING_UPDATE" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_ORDER_UPDATE" class="button button-primary" value="Save Changes">
             </p>
         </form>
     </div>

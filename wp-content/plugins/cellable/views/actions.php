@@ -13,101 +13,29 @@ if(isset($_POST['CELLABLE_SETTING_UPDATE']))
     if(isset($_POST['id'])){       
         $value = stripslashes($_POST['value']);
 
-        $wpdb->update($wpdb->base_prefix.'cellable_settings', array(
-            'value' => $value
-        ), array(
-            'id' => $_POST['id']
-        ));
+        $r = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE ". $wpdb->base_prefix. "cellable_settings SET value = %s where id = %d;",
+                $value, $_POST['id']
+            ) 
+        );
         
         header('Location: ' . $_SERVER['HTTP_REFERER']);
     }
 }
-if(isset($_POST['SUPER_SPARK_FIELDS']))
-{
-    if(isset($_POST['id'])){
-        //First check whether it has already activated Site with new-site-id, if so rejects it
-        if ($_POST['status']=='Activated') {
-            $info = $wpdb->get_row("SELECT * FROM wp_spark_fields WHERE status='Activated' and site_id='" . $_POST['new_site_id'] . "'");
+
+if(isset($_POST['CELLABLE_ORDER_UPDATE']))
+{   
+    if(isset($_POST['id'])){       
+        $status_id = $_POST['status_id'];
+
+        $r = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE ". $wpdb->base_prefix. "cellable_orders SET order_status_id = %d where id = %d;",
+                $status_id, $_POST['id']
+            ) 
+        );
         
-            if ($info && $info->id != $_POST['id'] ) {
-                // It means there are already existing activated site, so you need to choose another one.
-                // printf("That site is already taken by someone else, please try another one. <a href='../../../../wp-admin/admin.php?page=users_table'>Go To Spark Admins</a>");
-                printf("That site is already taken by someone else, please try another one. <a href='javascript:window.history.back();'>Go Back</a>");
-                // header('Location: ' . $_SERVER['HTTP_REFERER']);
-                return;
-            }
-        }
-
-        $new_site_id = $_POST['new_site_id']; 
-        if ($new_site_id == 1) {
-            printf("You can not select Super Admin Site. <a href='javascript:window.history.back();'>Go Back</a>");            
-            return;
-        }
-
-        // Get New Domain Name based on New Site Id
-
-        $domain = $wpdb->get_row("SELECT *  FROM wp_domainer where blog_id=".$_POST['new_site_id']);
-        $domain_name = "None";
-        if ($domain) {
-            $domain_name=$domain->name;
-        }
-
-        $site_url = "None";
-
-        // Get New Site Url based on New Site Id
-        
-        if ($new_site_id != '0' && $new_site_id != '-1' ) {
-            $blog_info = get_blog_details($new_site_id);
-            $urls = explode("/", $blog_info->path);
-            if (count($urls) > 1)    {
-                $site_url = $urls[count($urls)-2];
-            }
-        }
-        
-        $location_name = stripslashes($_POST['location_name']);
-        $request_site_name = stripslashes($_POST['request_site_name']);
-
-        $wpdb->update('wp_spark_fields', array(
-            'site_id' => $_POST['new_site_id'],
-            'phone' => $_POST['phone'],
-            'email' => $_POST['email'],
-            'domain' => $domain_name,
-            'api_key' => $_POST['api_key'],
-            'location_id' => $_POST['location_id'],
-            'location_name' => $location_name,
-            'siteurl' => $site_url,
-            'address' => $_POST['address'],
-            'city' => $_POST['city'],
-            'state' => $_POST['state'],
-            'postal_code' => $_POST['postal_code'],
-            'logo' => $_POST['logo'],
-            'location_email' => $_POST['location_email'],
-            'request_site_name' => $request_site_name,
-            'status' => $_POST['status']
-        ), array(
-            'id' => $_POST['id']
-        ));
-
-        // Update Individual Site Status as 'Archived' or Normal according to the status
-        if ($new_site_id>1) {
-            if ($_POST['status'] == 'Activated') {
-                $wpdb->update('wp_blogs', array(
-                    'archived' => 0,
-                    'deleted' => 0                
-                ), array(
-                    'blog_id' => $new_site_id
-                ));
-            }
-            else {
-                $wpdb->update('wp_blogs', array(
-                    'archived' => 1            
-                ), array(
-                    'blog_id' => $new_site_id
-                ));
-            }
-           
-        }
-            
         header('Location: ' . $_SERVER['HTTP_REFERER']);
     }
 }
