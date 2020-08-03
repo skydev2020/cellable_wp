@@ -45,7 +45,7 @@ if(!class_exists('WP_List_Table')){
  * 
  * Our theme for this list table is going to be movies.
  */
-class Cellable_Orders_List_Table extends WP_List_Table {
+class Cellable_Order_List_Table extends WP_List_Table {
     
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
@@ -505,7 +505,7 @@ class Cellable_Orders_List_Table extends WP_List_Table {
  * so we've instead called those methods explicitly. It keeps things flexible, and
  * it's the way the list tables are used in the WordPress core.
  */
-function render_orders_list(){
+function render_order_list(){
 
     if(isset($_GET['action']) && $_GET['action'] == 'edit')
     {
@@ -515,7 +515,7 @@ function render_orders_list(){
     }
 
     //Create an instance of our package class...
-    $order_list_table = new Cellable_Orders_List_Table();
+    $order_list_table = new Cellable_Order_List_Table();
     //Fetch, prepare, sort, and filter our data...
     $search_str = isset($_REQUEST['s']) ? $_REQUEST['s']: "";    
     $order_list_table->prepare_items($search_str);?>

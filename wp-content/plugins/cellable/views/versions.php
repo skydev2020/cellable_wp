@@ -45,7 +45,7 @@ if(!class_exists('WP_List_Table')){
  * 
  * Our theme for this list table is going to be movies.
  */
-class Cellable_Brand_List_Table extends WP_List_Table {
+class Cellable_Version_List_Table extends WP_List_Table {
     
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
@@ -93,7 +93,11 @@ class Cellable_Brand_List_Table extends WP_List_Table {
     function column_default($item, $column_name){
         switch($column_name){
             case 'name':            
-            case 'image_file':
+            case 'basecost':
+            case 'p_name':
+            case 'views':
+            case 'purchases':
+            case 'position':
                 return $item[$column_name];
             default:
                 return print_r($item,true); //Show the whole array for troubleshooting purposes
@@ -134,6 +138,14 @@ class Cellable_Brand_List_Table extends WP_List_Table {
         );
     }
 
+    function column_status($item){                
+        if ($item['status'] == 1) {
+            return 'Active';
+        }
+        return 'Inactive';
+        
+    }
+
     function column_image_file($item){                
         $str = sprintf(
             '<span class="media-icon image-icon"><img width="60" height="60" src="%s" class="attachment-60x60 size-60x60" alt=""></span>',
@@ -142,7 +154,7 @@ class Cellable_Brand_List_Table extends WP_List_Table {
         return $str;
     }
    
-    /** ************************************************************************
+    /** ************************************************************************-
      * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
      * is given special treatment when columns are processed. It ALWAYS needs to
      * have it's own method.
@@ -177,9 +189,35 @@ class Cellable_Brand_List_Table extends WP_List_Table {
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
             'name'  => 'Name',
-            'image_file'     => 'Image',            
+            'basecost'  => 'Basecost',
+            'p_name'  => 'Phone',            
+            'views'  => 'Views',
+            'purchases'  => 'Purchases',
+            'status'  => 'Status',
+            'position'  => 'Position',
         );
         return $columns;
+    }
+
+    function extra_tablenav( $which ) {
+        
+        $move_on_url = '&status=';
+        $status=isset($_GET['status']) ? $_GET['status'] : "-1";
+        if ( $which == "top" ){
+            ?>
+            <div class="alignleft actions bulkactions">
+                <select name="status" class="status-filter" onchange="changeStatus(this)"> 
+                    <option value="-1">Filter by Status</option>
+                    <option value="1" <?= $status=='1'? 'selected' : '' ?>>Active</option>
+                    <option value="0" <?= $status=='0'? 'selected' : '' ?>>Inactive</option>
+                </select>
+            </div>
+            <?php
+        }
+        if ( $which == "bottom" ){
+            //The code that goes after the table is there
+    
+        }
     }
 
 
@@ -201,6 +239,12 @@ class Cellable_Brand_List_Table extends WP_List_Table {
         $sortable_columns = array(
             'id'     => array('id',false),     //true means it's already sorted
             'name'  => array('name',false),
+            'basecost'  => array('basecost',false),
+            'p_name'  => array('p_name',false),            
+            'views'  => array('views',false),
+            'purchases'  => array('purchases',false),
+            'status'  => array('status',false),
+            'position'  => array('position',false),
         );
         return $sortable_columns;
     }
@@ -241,13 +285,13 @@ class Cellable_Brand_List_Table extends WP_List_Table {
                 case 'delete':
                     if(is_array($_GET['item'])) {
                         foreach ($_GET['item'] as $item){
-                            delete_phone($item);
+                            delete_version($item);
                         }                        
                     }
                     else {
-                        delete_phone($_GET['item']);
+                        delete_version($_GET['item']);
                     }
-                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Phone Brand Deleted.' );?></p></div><?php
+                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Phone Version Deleted.' );?></p></div><?php
                     break;
                 default:
                     break;
@@ -291,8 +335,7 @@ class Cellable_Brand_List_Table extends WP_List_Table {
         $columns = $this->get_columns();
         $hidden = array();
         $sortable = $this->get_sortable_columns();
-        
-        
+                
         /**
          * REQUIRED. Finally, we build an array to be used by the class for column 
          * headers. The $this->_column_headers property takes an array which contains
@@ -320,15 +363,36 @@ class Cellable_Brand_List_Table extends WP_List_Table {
          * 
          * @var array 
          **************************************************************************/
-   
-        $data = array();
-        $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phones ";
         
+        $status=isset($_GET['status']) ? $_GET['status'] : "-1";
+        $data = array();
+
+        $sql_str = "SELECT pv.id id, pv.name name, pv.basecost basecost, pv.image_file image_file, p.name p_name, ";
+        $sql_str .= "pv.views views, pv.purchases purchases, ";
+        $sql_str .= "pv.status status, pv.position position ";
+        $sql_str .= "FROM ".$wpdb->base_prefix."cellable_phone_versions pv ";
+        $sql_str .= "left join ".$wpdb->base_prefix."cellable_phones p on pv.phone_id = p.id ";
+                
         if($search_str) {
-            $sql_str .= "where name like %s";
-            $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
+            $sql_str .= "where (pv.name like %s or p.name like %s or basecost like %s or views like %s or purchases like %s";
+            $sql_str .= "or position like %s) ";
+
+            if ($status != "-1") {
+                $sql_str .= "and pv.status = " .$status;
+            } 
+
+            $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',            
+            '%'.$wpdb->esc_like($search_str).'%',
+            '%'.$wpdb->esc_like($search_str).'%',
+            '%'.$wpdb->esc_like($search_str).'%',
+            '%'.$wpdb->esc_like($search_str).'%',
+            '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
+            
         }
-        else {            
+        else {          
+            if ($status != "-1") {
+                $sql_str .= " where pv.status = " .$status;
+            }   
             $data = $wpdb->get_results($sql_str,ARRAY_A);
         }
         
@@ -343,7 +407,7 @@ class Cellable_Brand_List_Table extends WP_List_Table {
         function usort_reorder($a,$b){
             $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id'; //If no sort, default to title
             $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
-            if ($orderby == "id") {
+            if ($orderby == "id" || $orderby == "basecost" || $orderby == "position" || $orderby == "views" || $orderby == "purchases") {
                 if ($a[$orderby] > $b[$orderby]) {
                     $result = 1;
                 }
@@ -429,36 +493,36 @@ class Cellable_Brand_List_Table extends WP_List_Table {
  * so we've instead called those methods explicitly. It keeps things flexible, and
  * it's the way the list tables are used in the WordPress core.
  */
-function render_brand_list(){
+function render_version_list(){
 
     if(isset($_GET['action']) && $_GET['action'] == 'edit')
     {
         $id = $_GET['item'];        
-        render_edit_brand_page($id);
+        render_edit_version_page($id);
         return;
     }
 
     if(isset($_GET['action']) && $_GET['action'] == 'new')
     {        
-        render_new_brand_page();
+        render_new_version_page();
         return;
     }
 
     //Create an instance of our package class...
-    $phone_list_table = new Cellable_Brand_List_Table();
+    $phone_list_table = new Cellable_Version_List_Table();
     //Fetch, prepare, sort, and filter our data...
     $search_str = isset($_REQUEST['s']) ? $_REQUEST['s']: "";    
     $phone_list_table->prepare_items($search_str);?>
     <div class="wrap">
         
         <div id="icon-users" class="icon32"><br/></div>        
-        <h2>Phone Brands <a href="admin.php?page=brands_pages&action=new" class="page-title-action">Add New</a></h2>
+        <h2>Phone Versions <a href="admin.php?page=versions_pages&action=new" class="page-title-action">Add New</a></h2>
         <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
-        <form id="phones-filter" method="get">
+        <form id="versions-filter" method="get">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page']?>" />
             <!-- Now we can render the completed list table -->
-            <?php $phone_list_table->search_box('Search','brand_id');?>
+            <?php $phone_list_table->search_box('Search','version_id');?>
             <?php $phone_list_table->display()?>
             <input type="hidden" name="_wp_http_referer" value="">
         </form>
@@ -467,13 +531,13 @@ function render_brand_list(){
     <?php
 }
 
-function delete_phone($id){
+function delete_version($id){
     global $wpdb;
-    $wpdb->delete($wpdb->base_prefix.'cellable_phones', array('id' => $id));
+    $wpdb->delete($wpdb->base_prefix.'cellable_phone_versions', array('id' => $id));
 }
 
 
-function render_edit_brand_page($id){
+function render_edit_version_page($id){
     global $wpdb;
 
     $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phones where id = %d ";
@@ -511,7 +575,7 @@ function render_edit_brand_page($id){
 <?php
 }
 
-function render_new_brand_page(){    
+function render_new_version_page(){    
     ?>
     <div class="wrap edit-page">
         <h2>Brand</h2>                
@@ -535,4 +599,14 @@ function render_new_brand_page(){
     </div>
 
 <?php
-}
+}?>
+
+<script>
+    function changeStatus(ele) {
+        console.log(ele);
+        // var status = $(this).val();
+        // if( catFilter != '' ){
+            document.location.href = 'admin.php?page=versions_pages&status='+ele.value;    
+        // }
+    }
+</script>
