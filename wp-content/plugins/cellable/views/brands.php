@@ -221,7 +221,7 @@ class Cellable_Brands_List_Table extends WP_List_Table {
      **************************************************************************/
     function get_bulk_actions() {
         $actions = array(
-            // 'delete'    => 'Delete'
+            'delete'    => 'Delete'
         );
         return $actions;
     }
@@ -241,13 +241,13 @@ class Cellable_Brands_List_Table extends WP_List_Table {
                 case 'delete':
                     if(is_array($_GET['item'])) {
                         foreach ($_GET['item'] as $item){
-                            // delete_spark_lead($item);
+                            delete_phone($item);
                         }                        
                     }
                     else {
-                        // delete_spark_lead($_GET['item']);
+                        delete_phone($_GET['item']);
                     }
-                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected User Info Deleted.' );?></p></div><?php
+                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Phone Brand Deleted.' );?></p></div><?php
                     break;
                 default:
                     break;
@@ -466,6 +466,12 @@ function render_brands_list(){
     </div>
     <?php
 }
+
+function delete_phone($id){
+    global $wpdb;
+    $wpdb->delete($wpdb->base_prefix.'cellable_phones', array('id' => $id));
+}
+
 
 function render_edit_brand_page($id){
     global $wpdb;

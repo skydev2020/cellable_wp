@@ -443,11 +443,6 @@ function render_settings_list(){
     <?php
 }
 
-// function delete_spark_lead($id){
-//     global $wpdb;
-//     $wpdb->delete('wp_spark_leads', array('id' => $id));
-// }
-
 function render_edit_setting_page($id){
     global $wpdb;
 
