@@ -123,6 +123,7 @@ class Cellable_Brands_List_Table extends WP_List_Table {
         //Build row actions
         $actions = array(
             'edit'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id']),
+            'delete'      => sprintf('<a href="?page=%s&action=%s&item=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
             'upload'    => sprintf('<a style="cursor:pointer" class="set_brand_images" id="upbtn-%s">Update Image</a>',$item['id']),           
         );
         
@@ -136,7 +137,8 @@ class Cellable_Brands_List_Table extends WP_List_Table {
     function column_image_file($item){                
         $str = sprintf(
             '<span class="media-icon image-icon"><img width="60" height="60" src="%s" class="attachment-60x60 size-60x60" alt=""></span>',
-            $item['image_file']);
+            $item['image_file'] ? $item['image_file'] : 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe');
+            
         return $str;
     }
    
@@ -436,22 +438,28 @@ function render_brands_list(){
         return;
     }
 
+    if(isset($_GET['action']) && $_GET['action'] == 'new')
+    {        
+        render_new_brand_page();
+        return;
+    }
+
     //Create an instance of our package class...
-    $order_list_table = new Cellable_Brands_List_Table();
+    $phone_list_table = new Cellable_Brands_List_Table();
     //Fetch, prepare, sort, and filter our data...
     $search_str = isset($_REQUEST['s']) ? $_REQUEST['s']: "";    
-    $order_list_table->prepare_items($search_str);?>
+    $phone_list_table->prepare_items($search_str);?>
     <div class="wrap">
         
-        <div id="icon-users" class="icon32"><br/></div>
-        <h2>Cellable Phone Brands</h2>
+        <div id="icon-users" class="icon32"><br/></div>        
+        <h2>Phone Brands <a href="admin.php?page=brands_pages&action=new" class="page-title-action">Add New</a></h2>
         <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
-        <form id="orders-filter" method="get">
+        <form id="phones-filter" method="get">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page']?>" />
             <!-- Now we can render the completed list table -->
-            <?php $order_list_table->search_box('Search','brand_id');?>
-            <?php $order_list_table->display()?>
+            <?php $phone_list_table->search_box('Search','brand_id');?>
+            <?php $phone_list_table->display()?>
             <input type="hidden" name="_wp_http_referer" value="">
         </form>
         
@@ -480,7 +488,7 @@ function render_edit_brand_page($id){
                     </tr>
                     <tr class="form-field">
                         <th scope="row">
-                            <label for="name">Brand</label>
+                            <label for="name">Name</label>
                         </th>
                         <td>
                             <input name="name" type="text" value="<?=$info->name;?>" required>
@@ -490,6 +498,32 @@ function render_edit_brand_page($id){
             </table>
             <p class="submit">
                 <input type="submit" name="CELLABLE_BRAND_UPDATE" class="button button-primary" value="Save Changes">
+            </p>
+        </form>
+    </div>
+
+<?php
+}
+
+function render_new_brand_page(){    
+    ?>
+    <div class="wrap edit-page">
+        <h2>Brand</h2>                
+        <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">            
+            <table class="form-table" role="presentation">
+                <tbody>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="name">Name</label>
+                        </th>
+                        <td>
+                            <input name="name" type="text" value="" required>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="submit">
+                <input type="submit" name="CELLABLE_BRAND_NEW" class="button button-primary" value="Create">
             </p>
         </form>
     </div>

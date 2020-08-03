@@ -51,6 +51,20 @@ if(isset($_POST['CELLABLE_BRAND_UPDATE']))
     }
 }
 
+if(isset($_POST['CELLABLE_BRAND_NEW']))
+{   
+    
+    $name = stripslashes($_POST['name']);
+    $r = $wpdb->query(
+        $wpdb->prepare(
+            "INSERT ". $wpdb->base_prefix. "cellable_phones SET name = %s",
+            $name
+        ) 
+    );
+    header('Location: ' . get_admin_url()."admin.php?page=brands_pages");
+    
+}
+
 /**
  * Image Uploading: Phone Brand
  */
