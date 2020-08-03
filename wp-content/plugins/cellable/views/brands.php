@@ -45,7 +45,7 @@ if(!class_exists('WP_List_Table')){
  * 
  * Our theme for this list table is going to be movies.
  */
-class Cellable_Orders_List_Table extends WP_List_Table {
+class Cellable_Brands_List_Table extends WP_List_Table {
     
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
@@ -133,7 +133,8 @@ class Cellable_Orders_List_Table extends WP_List_Table {
         global $wpdb;
         //Build row actions
         $actions = array(
-            'edit'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id'])            
+            'edit'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id']),
+            'delete'    => sprintf('<a href="?page=%s&action=%s&item=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
         );
         
         //Return the title contents
@@ -505,17 +506,17 @@ class Cellable_Orders_List_Table extends WP_List_Table {
  * so we've instead called those methods explicitly. It keeps things flexible, and
  * it's the way the list tables are used in the WordPress core.
  */
-function render_orders_list(){
+function render_brands_list(){
 
     if(isset($_GET['action']) && $_GET['action'] == 'edit')
     {
         $id = $_GET['item'];        
-        render_edit_order_page($id);
+        render_edit_brand_page($id);
         return;
     }
 
     //Create an instance of our package class...
-    $order_list_table = new Cellable_Orders_List_Table();
+    $order_list_table = Cellable_Brands_List_Table();
     //Fetch, prepare, sort, and filter our data...
     $search_str = isset($_REQUEST['s']) ? $_REQUEST['s']: "";    
     $order_list_table->prepare_items($search_str);?>
@@ -537,7 +538,12 @@ function render_orders_list(){
     <?php
 }
 
-function render_edit_order_page($id){
+function delete_cellable_brand($id){
+    global $wpdb;
+    $wpdb->delete('wp_spark_leads', array('id' => $id));
+}
+
+function render_edit_brand_page($id){
     global $wpdb;
 
     $sql_str = "SELECT o.id id, o.amount amount, os.name status_name, phv.name pv_name, ";
