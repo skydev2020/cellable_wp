@@ -128,14 +128,18 @@ class Cellable_Version_List_Table extends WP_List_Table {
         $actions = array(
             'edit'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id']),
             'delete'      => sprintf('<a href="?page=%s&action=%s&item=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
-            'upload'    => sprintf('<a style="cursor:pointer" class="set_brand_images" id="upbtn-%s">Update Image</a>',$item['id']),           
+            'upload'    => sprintf('<a style="cursor:pointer" class="set_version_images" id="upbtn-%s">Update Image</a>',$item['id']),           
         );
         
+        $image = $wpdb->get_var("SELECT image_file FROM ".$wpdb->base_prefix."cellable_phone_versions WHERE id='" . $item['id'] . "'");
         //Return the title contents
-        return sprintf('%1$s %2$s',
+        return sprintf('<img src="%1$s" class="alignleft phone-version-image"/><div class="phone-version-name">%2$s %3$s</div>',
+            $image ? $image:'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe',
             /*$1%s*/ $item['name'],
-            /*$3%s*/ $this->row_actions($actions)
+            /*$2%s*/ $this->row_actions($actions, true)
         );
+
+
     }
 
     function column_status($item){                
@@ -599,14 +603,5 @@ function render_new_version_page(){
     </div>
 
 <?php
-}?>
+}
 
-<script>
-    function changeStatus(ele) {
-        console.log(ele);
-        // var status = $(this).val();
-        // if( catFilter != '' ){
-            document.location.href = 'admin.php?page=versions_pages&status='+ele.value;    
-        // }
-    }
-</script>

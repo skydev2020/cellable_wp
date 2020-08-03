@@ -11,7 +11,7 @@ jQuery(document).ready(function() {
           const phone_id = button.attr("id");
           $.ajax({
             type: "POST",
-            url: spark_admin_url.ajax_url,
+            url: cellable_admin_url.ajax_url,
             data: {
               post_id: post_id,
               phone_id: phone_id.replace("upbtn-", "")
@@ -25,4 +25,35 @@ jQuery(document).ready(function() {
       });
     }
   }
+
+  // Phone Versions Image
+  if ($(".set_version_images").length > 0) {
+    if (typeof wp !== "undefined" && wp.media && wp.media.editor) {
+      $(".set_version_images").on("click", function(e) {
+        e.preventDefault();
+        var button = $(this);
+        wp.media.editor.send.attachment = function(props, attachment) {
+          const post_id = attachment.id;
+          console.log("!!!!:", post_id);
+          const version_id = button.attr("id");
+          $.ajax({
+            type: "POST",
+            url: cellable_admin_url.ajax_url,
+            data: {
+              post_id: post_id,
+              version_id: version_id.replace("upbtn-", "")
+            },
+            success: function(res) {
+              location.reload(true);
+            }
+          });
+        };
+        wp.media.editor.open(button);
+      });
+    }
+  }
 });
+
+
+
+  

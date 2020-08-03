@@ -69,14 +69,14 @@ if(isset($_POST['CELLABLE_BRAND_NEW']))
  * Image Uploading: Phone Brand
  */
 
-if(isset($_POST['post_id']) && isset($_POST['phone_id'])){
+if(isset($_POST['post_id']) && isset($_POST['version_id'])){
     global $wpdb;
     $image = $wpdb->get_var("SELECT guid FROM wp_posts WHERE id='" . $_POST['post_id'] . "'");
-    if($wpdb->get_var("SELECT id FROM ". $wpdb->base_prefix. "cellable_phones WHERE id=" . $_POST['phone_id'] )) {
+    if($wpdb->get_var("SELECT id FROM ". $wpdb->base_prefix. "cellable_phone_versions WHERE id=" . $_POST['version_id'] )) {
         $r = $wpdb->query(
             $wpdb->prepare(
-                "UPDATE ". $wpdb->base_prefix. "cellable_phones SET image_file = %s where id = %d;",
-                $image, $_POST['phone_id']
+                "UPDATE ". $wpdb->base_prefix. "cellable_phone_versions SET image_file = %s where id = %d;",
+                $image, $_POST['version_id']
             ) 
         );
     }

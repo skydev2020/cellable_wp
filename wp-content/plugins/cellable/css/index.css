@@ -5,3 +5,9 @@
 .media-icon img {
   border: 0px;
 }
+
+.phone-version-image {
+  margin-right: 15px;
+  height: 80px;
+  width: 80px;  
+}

@@ -103,7 +103,8 @@ function cellable_css_js()
     wp_enqueue_style('cellable_css', plugins_url('css/index.css',__FILE__ ),'','all');
     wp_enqueue_media();
     wp_enqueue_script( 'wp-media-uploader', plugins_url('js/wp_media_uploader.js', __FILE__), array( 'jquery' ), 1.0 );
-    wp_localize_script('wp-media-uploader', 'spark_admin_url',array( 'ajax_url' => plugins_url('views/actions.php', __FILE__) ));
+    wp_enqueue_script( 'cellable-admin', plugins_url('js/admin.js', __FILE__));
+    wp_localize_script('wp-media-uploader', 'cellable_admin_url',array( 'ajax_url' => plugins_url('views/actions.php', __FILE__) ));
 }
 
 

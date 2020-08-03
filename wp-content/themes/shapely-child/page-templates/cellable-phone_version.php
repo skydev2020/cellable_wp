@@ -26,7 +26,7 @@ get_header();
 		}
 		else {
 			// Get entire list of Phone Versions to pass to the view
-			$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix. "cellable_phone_versions where active = true and phone_id = %d order by position desc", 
+			$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix. "cellable_phone_versions where status = true and phone_id = %d order by position desc", 
 			$wpdb->esc_like($brand_id)), ARRAY_A);
 		}
 		?>
@@ -34,7 +34,7 @@ get_header();
 			<?php foreach ($phone_versions as $ele): ?>
 			<div class="col-sm-3 text-center phone-version">
 				<a class="btn btn-default" href="<?=get_home_url() ?>/defect-questions/?phone_version_id=<?=$ele['id']?>&carrier_id=<?= $carrier_id?>">
-					<img src="<?= $PHONE_IMAGE_LOCATION ?>/<?= $ele['image_file'] ?>" alt="<?= $ele['name'] ?>">
+					<img src="<?= $ele['image_file'] ?>" alt="<?= $ele['name'] ?>">
 				</a>
 				<br />
 				<?php
