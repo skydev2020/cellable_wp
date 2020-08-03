@@ -150,13 +150,7 @@ class Cellable_Version_List_Table extends WP_List_Table {
         
     }
 
-    function column_image_file($item){                
-        $str = sprintf(
-            '<span class="media-icon image-icon"><img width="60" height="60" src="%s" class="attachment-60x60 size-60x60" alt=""></span>',
-            $item['image_file'] ? $item['image_file'] : 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe');
-            
-        return $str;
-    }
+   
    
     /** ************************************************************************-
      * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
@@ -544,20 +538,20 @@ function delete_version($id){
 function render_edit_version_page($id){
     global $wpdb;
 
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phones where id = %d ";
-    
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions where id = %d ";
     $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
     
+    $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
     ?>
     <div class="wrap edit-page">
-        <h2>Brand</h2>                
+        <h2>Phone Version</h2>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">
             <input name="id" hidden type="text" value="<?php echo $id?>">
             <table class="form-table" role="presentation">
                 <tbody>
                     <tr class="form-field">
                         <td colspan="2">
-                            <img width="100" height="100" src="<?=$info->image_file?>" alt="">
+                            <img width="150" src="<?=$info->image_file?>" alt="">
                         </td>
                     </tr>
                     <tr class="form-field">
@@ -566,6 +560,61 @@ function render_edit_version_page($id){
                         </th>
                         <td>
                             <input name="name" type="text" value="<?=$info->name;?>" required>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="phone_id">Brand</label>
+                        </th>
+                        <td>
+                            <select name="phone_id" id="phone_id" required>
+                            <?php foreach ($phone_brands as $phone): ?>
+                                <option value="<?= $phone['id'] ?>" <?= ($info->phone_id == $phone['id']) ? "selected" : "" ?>><?= $phone['name'] ?></option>
+                            <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="basecost">Basecost</label>
+                        </th>
+                        <td>
+                            <input name="basecost" type="number" step="0.01" min="0" value="<?=$info->basecost;?>" required>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="views">Views</label>
+                        </th>
+                        <td>
+                            <input name="views" type="number" min="0" value="<?=$info->views;?>">
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="purchases">Purchases</label>
+                        </th>
+                        <td>
+                            <input name="purchases" type="number" min="0" value="<?=$info->purchases;?>">
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="status">Status</label>
+                        </th>
+                        <td>
+                            <select name="status" id="status" required>
+                                <option value="1" <?= ($info->status == 1) ? "selected" : "" ?>>Active</option>
+                                <option value="0" <?= ($info->status == 0) ? "selected" : "" ?>>Inactive</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="position">Position</label>
+                        </th>
+                        <td>
+                            <input name="position" type="number" step="0.01" min="0" value="<?=$info->position;?>">
                         </td>
                     </tr>
                 </tbody>

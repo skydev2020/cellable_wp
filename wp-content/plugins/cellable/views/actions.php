@@ -61,7 +61,7 @@ if(isset($_POST['CELLABLE_BRAND_NEW']))
             $name
         ) 
     );
-    header('Location: ' . get_admin_url()."admin.php?page=brands_pages");
+    header('Location: ' . get_admin_url()."admin.php?page=brand_pages");
     
 }
 

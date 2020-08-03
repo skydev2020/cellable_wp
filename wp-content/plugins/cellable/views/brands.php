@@ -136,7 +136,7 @@ class Cellable_Brand_List_Table extends WP_List_Table {
 
     function column_image_file($item){                
         $str = sprintf(
-            '<span class="media-icon image-icon"><img width="60" height="60" src="%s" class="attachment-60x60 size-60x60" alt=""></span>',
+            '<span class="media-icon image-icon"><img width="60" src="%s"  alt=""></span>',
             $item['image_file'] ? $item['image_file'] : 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe');
             
         return $str;
@@ -452,7 +452,7 @@ function render_brand_list(){
     <div class="wrap">
         
         <div id="icon-users" class="icon32"><br/></div>        
-        <h2>Phone Brands <a href="admin.php?page=brands_pages&action=new" class="page-title-action">Add New</a></h2>
+        <h2>Phone Brands <a href="admin.php?page=brand_pages&action=new" class="page-title-action">Add New</a></h2>
         <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
         <form id="phones-filter" method="get">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
@@ -489,7 +489,7 @@ function render_edit_brand_page($id){
                 <tbody>
                     <tr class="form-field">
                         <td colspan="2">
-                            <img width="100" height="100" src="<?=$info->image_file?>" alt="">
+                            <img width="150" src="<?=$info->image_file?>" alt="">
                         </td>
                     </tr>
                     <tr class="form-field">

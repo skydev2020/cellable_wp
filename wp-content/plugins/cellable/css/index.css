@@ -1,4 +1,4 @@
-.edit-page .form-field input[type=text] {
+.edit-page .form-field input[type=text], .edit-page .form-field input[type=number] {
   width: 25%;
 }
 
@@ -6,8 +6,11 @@
   border: 0px;
 }
 
+.phone-version-name {  
+  padding-top: 25px;  
+}
+
 .phone-version-image {
   margin-right: 15px;
-  height: 80px;
   width: 80px;  
 }
