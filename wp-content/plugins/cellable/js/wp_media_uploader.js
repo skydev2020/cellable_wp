@@ -8,13 +8,13 @@ jQuery(document).ready(function() {
         wp.media.editor.send.attachment = function(props, attachment) {
           const post_id = attachment.id;
           console.log("!!!!:", post_id);
-          const spark_page_id = button.attr("id");
+          const phone_id = button.attr("id");
           $.ajax({
             type: "POST",
             url: spark_admin_url.ajax_url,
             data: {
               post_id: post_id,
-              spark_page_id: spark_page_id.replace("upbtn-", "")
+              phone_id: phone_id.replace("upbtn-", "")
             },
             success: function(res) {
               location.reload(true);

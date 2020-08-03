@@ -136,7 +136,7 @@ class Cellable_Brands_List_Table extends WP_List_Table {
     function column_image_file($item){                
         $str = sprintf(
             '<span class="media-icon image-icon"><img width="60" height="60" src="%s" class="attachment-60x60 size-60x60" alt=""></span>',
-            get_site_url()."/wp-content/themes/shapely-child/assets/images/".$item['image_file']);
+            $item['image_file']);
         return $str;
     }
    
