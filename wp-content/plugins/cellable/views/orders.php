@@ -208,7 +208,7 @@ class Cellable_Orders_List_Table extends WP_List_Table {
     function get_columns(){
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
-            'id'  => 'Order Id',
+            'id'  => 'Id',
             'username'  => 'User Name',
             'status_name'     => 'Status',
             'pv_name' => "Phone",
@@ -528,7 +528,7 @@ function render_orders_list(){
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page']?>" />
             <!-- Now we can render the completed list table -->
-            <?php $order_list_table->search_box('Search','setting_id');?>
+            <?php $order_list_table->search_box('Search','order_id');?>
             <?php $order_list_table->display()?>
             <input type="hidden" name="_wp_http_referer" value="">
         </form>
@@ -590,7 +590,7 @@ function render_edit_order_page($id){
                 <tbody>                        
                     <tr class="form-field">
                         <th scope="row">
-                            <label>Order Id</label>
+                            <label>Id</label>
                         </th>
                         <td>
                             <?= $info->id;?>

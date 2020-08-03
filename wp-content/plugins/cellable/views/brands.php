@@ -92,20 +92,9 @@ class Cellable_Brands_List_Table extends WP_List_Table {
      **************************************************************************/
     function column_default($item, $column_name){
         switch($column_name){
-            case 'status_name':
-            case 'id':
-            case 'pv_name':
-            case 'pm_code':
-            case 'pm_name':
-            case 'discount':
-            case 'p_name':
-            case 'p_username':
-            case 'usps_tracking_id':
-            case 'created_date':
-            case 'action':
+            case 'name':            
+            case 'image_file':
                 return $item[$column_name];
-            case 'amount':
-                return "$".$item[$column_name];
             default:
                 return print_r($item,true); //Show the whole array for troubleshooting purposes
         }
@@ -128,53 +117,29 @@ class Cellable_Brands_List_Table extends WP_List_Table {
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
     
-    function column_id($item){                
+    function column_name($item){                
         //Build row actions
         global $wpdb;
         //Build row actions
         $actions = array(
             'edit'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id']),
-            'delete'    => sprintf('<a href="?page=%s&action=%s&item=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
+            'upload'    => sprintf('<a style="cursor:pointer" class="set_brand_images" id="upbtn-%s">Update Image</a>',$item['id']),           
         );
         
         //Return the title contents
         return sprintf('%1$s %2$s',
-            /*$1%s*/ $item['id'],
+            /*$1%s*/ $item['name'],
             /*$3%s*/ $this->row_actions($actions)
         );
     }
 
-    function column_username($item){                
-        
-        $user = get_user_by('id', $item['user_id']);
-        if ($user) {
-            return $user->first_name. " " . $user->last_name;
-        }
-        
-        return "";
+    function column_image_file($item){                
+        $str = sprintf(
+            '<span class="media-icon image-icon"><img width="60" height="60" src="%s" class="attachment-60x60 size-60x60" alt=""></span>',
+            get_site_url()."/wp-content/themes/shapely-child/assets/images/".$item['image_file']);
+        return $str;
     }
-    
-    function column_discount($item){                
-        if ($item['discount']>0):
-            return $item['discount']."%";
-        elseif ($item['dis_dollar_value']>0):
-            return "$".$item['dis_dollar_value'];
-        endif;
-    }
-
-    function column_created_date($item){       
-        $date = new DateTime($item['created_date']);
-        $created_date = $date->format('m/d/Y h:i:s A');
-        return $created_date;        
-    }
-
-    function column_action($item){       
-        return sprintf(
-            '<input type="button" value="eBay" />'
-        );      
-    }
-
-
+   
     /** ************************************************************************
      * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
      * is given special treatment when columns are processed. It ALWAYS needs to
@@ -209,19 +174,8 @@ class Cellable_Brands_List_Table extends WP_List_Table {
     function get_columns(){
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
-            'id'  => 'Order Id',
-            'username'  => 'User Name',
-            'status_name'     => 'Status',
-            'pv_name' => "Phone",
-            'amount' => "Amount",
-            'pm_code' => "Promo Code",
-            'pm_name' => "Promo Name",
-            'discount' => "Discount",
-            'p_name' => "Payment Type",
-            'p_username' => "Payment User Name",
-            'usps_tracking_id' => "USPS Tracking",
-            'created_date' => "Created Date",
-            'action' => "Action",
+            'name'  => 'Name',
+            'image_file'     => 'Image',            
         );
         return $columns;
     }
@@ -244,16 +198,7 @@ class Cellable_Brands_List_Table extends WP_List_Table {
     function get_sortable_columns() {
         $sortable_columns = array(
             'id'     => array('id',false),     //true means it's already sorted
-            'status_name'  => array('status_name',false),
-            'pv_name'  => array('pv_name',false),
-            'amount'  => array('amount',false),
-            'pm_code'  => array('pm_code',false),
-            'pm_name'  => array('pm_name',false),
-            'discount'  => array('discount',false),
-            'p_name'  => array('p_name',false),
-            'p_username'  => array('p_username',false),
-            'usps_tracking_id'  => array('usps_tracking_id',false),
-            'created_date'  => array('created_date',false),
+            'name'  => array('name',false),
         );
         return $sortable_columns;
     }
@@ -375,35 +320,11 @@ class Cellable_Brands_List_Table extends WP_List_Table {
          **************************************************************************/
    
         $data = array();
-        $sql_str = "SELECT o.id id, o.amount amount, os.name status_name, phv.name pv_name, ";
-        $sql_str .= "pm.code pm_code, pm.name pm_name, pm.discount discount, pm.dollar_value dis_dollar_value, ";
-        $sql_str .= "p.name p_name, o.payment_username p_username, o.usps_tracking_id usps_tracking_id, ";
-        $sql_str .= "o.created_date created_date, o.user_id user_id ";
-        $sql_str .= "FROM ".$wpdb->base_prefix."cellable_orders o ";
-        $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_statuses os on o.order_status_id = os.id ";
-        $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_details od on o.order_detail_id = od.id ";
-        $sql_str .= "left join ".$wpdb->base_prefix."cellable_phone_versions phv on od.phone_version_id = phv.id ";
-        $sql_str .= "left join ".$wpdb->base_prefix."cellable_promos pm on o.promo_id = pm.id ";
-        $sql_str .= "left join ".$wpdb->base_prefix."cellable_payment_types p on o.payment_type_id = p.id ";
+        $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phones ";
         
-        // $sql_str .= "SELECT o.* FROM ".$wpdb->base_prefix."cellable_orders o left join ".$wpdb->base_prefix."cellable_order_stauses os ";
-
         if($search_str) {
-            $sql_str .= "where phv.name like %s or o.amount like %s or os.name like %s or pm.code like %s ";
-            $sql_str .="or pm.name like %s or pm.discount like %s or pm.dollar_value like %s or p.name like %s ";
-            $sql_str .="or o.payment_username like %s or o.usps_tracking_id like %s or o.created_date like %s ";
-            
-            $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',
-                '%'.$wpdb->esc_like($search_str).'%',
-                '%'.$wpdb->esc_like($search_str).'%',
-                '%'.$wpdb->esc_like($search_str).'%',
-                '%'.$wpdb->esc_like($search_str).'%',
-                '%'.$wpdb->esc_like($search_str).'%',
-                '%'.$wpdb->esc_like($search_str).'%',
-                '%'.$wpdb->esc_like($search_str).'%',
-                '%'.$wpdb->esc_like($search_str).'%',
-                '%'.$wpdb->esc_like($search_str).'%',
-                '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
+            $sql_str .= "where name like %s";
+            $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
         }
         else {            
             $data = $wpdb->get_results($sql_str,ARRAY_A);
@@ -420,7 +341,7 @@ class Cellable_Brands_List_Table extends WP_List_Table {
         function usort_reorder($a,$b){
             $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id'; //If no sort, default to title
             $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
-            if ($orderby == "id" || $orderby == "amount" || $orderby == "discount") {
+            if ($orderby == "id") {
                 if ($a[$orderby] > $b[$orderby]) {
                     $result = 1;
                 }
@@ -516,20 +437,20 @@ function render_brands_list(){
     }
 
     //Create an instance of our package class...
-    $order_list_table = Cellable_Brands_List_Table();
+    $order_list_table = new Cellable_Brands_List_Table();
     //Fetch, prepare, sort, and filter our data...
     $search_str = isset($_REQUEST['s']) ? $_REQUEST['s']: "";    
     $order_list_table->prepare_items($search_str);?>
     <div class="wrap">
         
         <div id="icon-users" class="icon32"><br/></div>
-        <h2>Cellable Orders</h2>
+        <h2>Cellable Phone Brands</h2>
         <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
         <form id="orders-filter" method="get">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page']?>" />
             <!-- Now we can render the completed list table -->
-            <?php $order_list_table->search_box('Search','setting_id');?>
+            <?php $order_list_table->search_box('Search','brand_id');?>
             <?php $order_list_table->display()?>
             <input type="hidden" name="_wp_http_referer" value="">
         </form>
@@ -538,191 +459,37 @@ function render_brands_list(){
     <?php
 }
 
-function delete_cellable_brand($id){
-    global $wpdb;
-    $wpdb->delete('wp_spark_leads', array('id' => $id));
-}
-
 function render_edit_brand_page($id){
     global $wpdb;
 
-    $sql_str = "SELECT o.id id, o.amount amount, os.name status_name, phv.name pv_name, ";
-    $sql_str .= "pm.code pm_code, pm.name pm_name, pm.discount discount, pm.dollar_value dis_dollar_value, ";
-    $sql_str .= "p.name p_name, o.payment_username p_username, o.usps_tracking_id usps_tracking_id, ";
-    $sql_str .= "o.created_date created_date, o.user_id user_id, os.id osid ";
-    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_orders o ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_statuses os on o.order_status_id = os.id ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_details od on o.order_detail_id = od.id ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_phone_versions phv on od.phone_version_id = phv.id ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_promos pm on o.promo_id = pm.id ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_payment_types p on o.payment_type_id = p.id ";
-    $sql_str .= "where o.id = %d ";
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phones where id = %d ";
     
     $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
-    $discount_str = "";
-
-    if ($info->discount>0):
-        $discount_str = $info->discount."%";
-    elseif ($info->dis_dollar_value>0):
-        $discount_str = "$".$info->dis_dollar_value;
-    endif;
-
-    $date = new DateTime($info->created_date);
-    $created_date = $date->format('m/d/Y h:i:s A');    
-
-    $ouser = get_user_by('id', $info->user_id);
-    $username = "";
-    $email = "";
-    $phone = "";
-    $address = "";
-
-    if ($ouser) {
-        $username = $ouser->first_name." ".$ouser->last_name;
-        $email = $ouser->user_email; 
-        $phone = get_the_author_meta('phone_number', $ouser->ID);
-        $address = get_the_author_meta('address1', $ouser->ID). " ". get_the_author_meta('address2', $ouser->ID) 
-        .", " .get_the_author_meta('city', $ouser->ID).", " .get_the_author_meta('state', $ouser->ID);
-    }
-
-    $order_statuses = $wpdb->get_results("select * from ".$wpdb->base_prefix."cellable_order_statuses", ARRAY_A);
     
     ?>
-    <div class="wrap">
-        <h2>Order</h2>
-                
+    <div class="wrap edit-page">
+        <h2>Brand</h2>                
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">
             <input name="id" hidden type="text" value="<?php echo $id?>">
             <table class="form-table" role="presentation">
-                <tbody>                        
+                <tbody>
                     <tr class="form-field">
-                        <th scope="row">
-                            <label>Order Id</label>
-                        </th>
-                        <td>
-                            <?= $info->id;?>
+                        <td colspan="2">
+                            <img width="100" height="100" src="<?=$info->image_file?>" alt="">
                         </td>
                     </tr>
                     <tr class="form-field">
                         <th scope="row">
-                            <label>User Name</label>
+                            <label for="name">Brand</label>
                         </th>
                         <td>
-                            <?= $username;?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>Email</label>
-                        </th>
-                        <td>
-                            <?= $email;?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>Phone</label>
-                        </th>
-                        <td>
-                            <?= $phone?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>Address</label>
-                        </th>
-                        <td>
-                            <?= $address ?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>Phone</label>
-                        </th>
-                        <td>
-                            <?= $info->pv_name;?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>Amount</label>
-                        </th>
-                        <td>
-                            <?= $info->amount;?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>Promo Code</label>
-                        </th>
-                        <td>
-                            <?= $info->pm_code;?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>Promo Name</label>
-                        </th>
-                        <td>
-                            <?= $info->pm_name;?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>Discount</label>
-                        </th>
-                        <td>
-                            <?= $discount_str;?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>Payment Type</label>
-                        </th>
-                        <td>
-                            <?= $info->p_name;?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>Payment UserName</label>
-                        </th>
-                        <td>
-                            <?= $info->p_username;?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>USPS Tracking</label>
-                        </th>
-                        <td>
-                            <?= $info->usps_tracking_id;?>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label>Created Date</label>
-                        </th>
-                        <td>
-                            <?= $created_date;?>
-                        </td>
-                    </tr>
-                    <tr class="form-field form-required">
-                        <th scope="row">
-                            <label for="value">Status</label>
-                        </th>
-                        <td>
-                            <select name="status_id">
-                            <?php foreach ($order_statuses as $ele) :?>
-                                <option value="<?= $ele['id'] ?>" <?= ($info->osid == $ele['id']) ? 
-                                "selected" : "" ?>> <?= $ele['name'] ?> </option>
-                            <?php endforeach; ?>
-                            </select>                            
+                            <input name="name" type="text" value="<?=$info->name;?>" required>
                         </td>
                     </tr>
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_ORDER_UPDATE" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_BRAND_UPDATE" class="button button-primary" value="Save Changes">
             </p>
         </form>
     </div>

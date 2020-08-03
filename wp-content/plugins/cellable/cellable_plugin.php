@@ -88,9 +88,9 @@ function get_cellable_setting($name) {
 }
 
  
-function spark_css_js()
+function cellable_css_js()
 {
-    wp_enqueue_style('spark_css', plugins_url('css/index.css',__FILE__ ),'','all');
+    wp_enqueue_style('cellable_css', plugins_url('css/index.css',__FILE__ ),'','all');
     wp_enqueue_media();
     wp_enqueue_script( 'wp-media-uploader', plugins_url('js/wp_media_uploader.js', __FILE__), array( 'jquery' ), 1.0 );
     wp_localize_script('wp-media-uploader', 'spark_admin_url',array( 'ajax_url' => plugins_url('views/actions.php', __FILE__) ));
@@ -98,7 +98,7 @@ function spark_css_js()
 
 
 add_action('admin_menu', 'admin_add_pages');
-// add_action('admin_enqueue_scripts', 'spark_css_js');
+add_action('admin_enqueue_scripts', 'cellable_css_js');
 add_shortcode('spark_fields','shortcode_spark_fields');
 
 

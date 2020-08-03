@@ -12,7 +12,6 @@ if(isset($_POST['CELLABLE_SETTING_UPDATE']))
 {   
     if(isset($_POST['id'])){       
         $value = stripslashes($_POST['value']);
-
         $r = $wpdb->query(
             $wpdb->prepare(
                 "UPDATE ". $wpdb->base_prefix. "cellable_settings SET value = %s where id = %d;",
@@ -28,64 +27,27 @@ if(isset($_POST['CELLABLE_ORDER_UPDATE']))
 {   
     if(isset($_POST['id'])){       
         $status_id = $_POST['status_id'];
-
         $r = $wpdb->query(
             $wpdb->prepare(
                 "UPDATE ". $wpdb->base_prefix. "cellable_orders SET order_status_id = %d where id = %d;",
                 $status_id, $_POST['id']
             ) 
         );
-        
         header('Location: ' . $_SERVER['HTTP_REFERER']);
     }
 }
 
-if(isset($_POST['IMPORT_PAGE']))
-{
-    if(isset($_POST['id'])){
-        $user_id = get_current_user_id();
-
-        $title = stripslashes($_POST['title']);
-        $tag_list = stripslashes($_POST['tag_list']);
-        $redirect_url = stripslashes($_POST['redirect_url']);
-        $style = stripslashes($_POST['style']);
-        $headline = stripslashes($_POST['headline']);
-        $triallength = stripslashes($_POST['triallength']);
-        $offer_value = stripslashes($_POST['offer_value']);
-
-        generate_popups_widgets($site_id);
-        $new_post_id = import_page($site_id, $_POST['id'], $title, $user_id, $tag_list, $redirect_url, 
-            $style, $headline, $triallength, $offer_value);        
-        
-        //  Switch Back to Current Site
-        //  Switch_to_blog($site_id);
-        $footer_link_vars = isset($_POST["footerlink_vars"]) ? $_POST["footerlink_vars"] : [];
-        if (count($footer_link_vars) > 0) {
-            $link_pages = [];
-
-            for ($j=0; $j<count($footer_link_vars); $j++) {
-                // FOOTERLINK_1#Home
-                $pieces = explode("#", $footer_link_vars[$j]);
-                if (count($pieces)>1) {
-                    $page_id = $_POST[$pieces[0]];
-                    if ($page_id=='0') {
-                        $link_pages[] = [
-                            "key" => $footer_link_vars[$j],
-                            "url" => get_permalink($new_post_id)
-                        ];    
-                    }
-                    else if ($page_id!='-1') {
-                        $link_pages[] = [
-                            "key" => $footer_link_vars[$j],
-                            "url" => get_permalink($page_id)
-                        ];
-                    }
-                }    
-            }
-
-            update_page_footer_links($wpdb, $site_id, $new_post_id, $link_pages);
-        }        
-        wp_redirect(home_url('wp-admin/post.php?post='.$new_post_id.'&action=elementor'));
+if(isset($_POST['CELLABLE_BRAND_UPDATE']))
+{   
+    if(isset($_POST['id'])){       
+        $name = stripslashes($_POST['name']);
+        $r = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE ". $wpdb->base_prefix. "cellable_phones SET name = %s where id = %d;",
+                $name, $_POST['id']
+            ) 
+        );
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
     }
 }
 
