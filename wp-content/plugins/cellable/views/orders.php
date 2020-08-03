@@ -127,6 +127,23 @@ class Cellable_Orders_List_Table extends WP_List_Table {
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
+    
+    function column_id($item){                
+        //Build row actions
+        global $wpdb;
+        //Build row actions
+        $actions = array(
+            'edit'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id']),
+            'delete'    => sprintf('<a href="?page=%s&action=%s&item=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
+        );
+        
+        //Return the title contents
+        return sprintf('%1$s %2$s',
+            /*$1%s*/ $item['id'],
+            /*$3%s*/ $this->row_actions($actions)
+        );
+    }
+    
     function column_discount($item){                
         if ($item['discount']>0):
             return $item['discount']."%";
@@ -483,7 +500,7 @@ function render_orders_list(){
     if(isset($_GET['action']) && $_GET['action'] == 'edit')
     {
         $id = $_GET['item'];        
-        render_edit_setting_page($id);
+        render_edit_order_page($id);
         return;
     }
 
@@ -518,10 +535,50 @@ function delete_spark_lead($id){
 function render_edit_order_page($id){
     global $wpdb;
 
-    $info = $wpdb->get_row("SELECT * FROM " .$wpdb->base_prefix. "cellable_settings WHERE id='" . $id . "'");
+    $sql_str = "SELECT o.id id, o.amount amount, os.name status_name, phv.name pv_name, ";
+    $sql_str .= "pm.code pm_code, pm.name pm_name, pm.discount discount, pm.dollar_value dis_dollar_value, ";
+    $sql_str .= "p.name p_name, o.payment_username p_username, o.usps_tracking_id usps_tracking_id, ";
+    $sql_str .= "o.created_date created_date, o.user_id user_id, os.id osid ";
+    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_orders o ";
+    $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_statuses os on o.order_status_id = os.id ";
+    $sql_str .= "left join ".$wpdb->base_prefix."cellable_order_details od on o.order_detail_id = od.id ";
+    $sql_str .= "left join ".$wpdb->base_prefix."cellable_phone_versions phv on od.phone_version_id = phv.id ";
+    $sql_str .= "left join ".$wpdb->base_prefix."cellable_promos pm on o.promo_id = pm.id ";
+    $sql_str .= "left join ".$wpdb->base_prefix."cellable_payment_types p on o.payment_type_id = p.id ";
+    $sql_str .= "where o.id = %d ";
+    
+    $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
+    $discount_str = "";
+
+    if ($info->discount>0):
+        $discount_str = $info->discount."%";
+    elseif ($info->dis_dollar_value>0):
+        $discount_str = "$".$info->dis_dollar_value;
+    endif;
+
+    $date = new DateTime($info->created_date);
+    $created_date = $date->format('m/d/Y h:i:s A');    
+
+    $ouser = get_user_by('id', $info->user_id);
+    $username = "";
+    $email = "";
+    $phone = "";
+    $address = "";
+
+    if ($ouser) {
+        $username = $ouser->first_name." ".$ouser->last_name;
+        $email = $ouser->user_email; 
+        $phone = get_the_author_meta('phone_number', $ouser->ID);
+        $address = get_the_author_meta('address1', $ouser->ID). " ". get_the_author_meta('address2', $ouser->ID) 
+        .", " .get_the_author_meta('city', $ouser->ID).", " .get_the_author_meta('state', $ouser->ID);
+    }
+
+    $order_statuses = $wpdb->get_results("select * from ".$wpdb->base_prefix."cellable_order_statuses", ARRAY_A);
+    var_dump($info->user_id);
+    var_dump($ouser);
     ?>
     <div class="wrap">
-        <h2>Setting</h2>
+        <h2>Order</h2>
                 
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">
             <input name="id" hidden type="text" value="<?php echo $id?>">
@@ -529,18 +586,127 @@ function render_edit_order_page($id){
                 <tbody>                        
                     <tr class="form-field">
                         <th scope="row">
-                            <label>Name</label>
+                            <label>Order Id</label>
                         </th>
                         <td>
-                            <?= $info->name;?>
+                            <?= $info->id;?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>User Name</label>
+                        </th>
+                        <td>
+                            <?= $username;?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>Email</label>
+                        </th>
+                        <td>
+                            <?= $email;?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>Phone</label>
+                        </th>
+                        <td>
+                            <?= $phone?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>Address</label>
+                        </th>
+                        <td>
+                            <?= $address ?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>Phone</label>
+                        </th>
+                        <td>
+                            <?= $info->pv_name;?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>Amount</label>
+                        </th>
+                        <td>
+                            <?= $info->amount;?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>Promo Code</label>
+                        </th>
+                        <td>
+                            <?= $info->pm_code;?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>Promo Name</label>
+                        </th>
+                        <td>
+                            <?= $info->pm_name;?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>Discount</label>
+                        </th>
+                        <td>
+                            <?= $discount_str;?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>Payment Type</label>
+                        </th>
+                        <td>
+                            <?= $info->p_name;?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>Payment UserName</label>
+                        </th>
+                        <td>
+                            <?= $info->p_username;?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>USPS Tracking</label>
+                        </th>
+                        <td>
+                            <?= $info->usps_tracking_id;?>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label>Created Date</label>
+                        </th>
+                        <td>
+                            <?= $created_date;?>
                         </td>
                     </tr>
                     <tr class="form-field form-required">
                         <th scope="row">
-                            <label for="value">Value</label>
+                            <label for="value">Status</label>
                         </th>
                         <td>
-                            <textarea name="value" cols="70" rows="10" type="text" id="value" required><?=$info->value;?></textarea>
+                            <select name="status_id">
+                            <?php foreach ($order_statuses as $ele) :?>
+                                <option id="<?= $ele['id'] ?>" <?= ($info->osid == $ele['id']) ? 
+                                "selected" : "" ?>> <?= $ele['name'] ?> </option>
+                            <?php endforeach; ?>
+                            </select>                            
                         </td>
                     </tr>
                 </tbody>
