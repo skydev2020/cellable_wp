@@ -182,8 +182,8 @@ class Cellable_Orders_List_Table extends WP_List_Table {
     function get_columns(){
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
-            'status_name'     => 'Status',
             'id'  => 'Order Id',
+            'status_name'     => 'Status',
             'pv_name' => "Phone",
             'amount' => "Amount",
             'pm_code' => "Promo Code",
@@ -216,12 +216,20 @@ class Cellable_Orders_List_Table extends WP_List_Table {
     function get_sortable_columns() {
         $sortable_columns = array(
             'id'     => array('id',false),     //true means it's already sorted
-            'value'  => array('value',false),
+            'status_name'  => array('status_name',false),
+            'pv_name'  => array('pv_name',false),
+            'amount'  => array('amount',false),
+            'pm_code'  => array('pm_code',false),
+            'pm_name'  => array('pm_name',false),
+            'discount'  => array('discount',false),
+            'p_name'  => array('p_name',false),
+            'p_username'  => array('p_username',false),
+            'usps_tracking_id'  => array('usps_tracking_id',false),
+            'created_date'  => array('created_date',false),
         );
         return $sortable_columns;
     }
-
-
+    
     /** ************************************************************************
      * Optional. If you need to include bulk actions in your list table, this is
      * the place to define them. Bulk actions are an associative array in the format
@@ -349,30 +357,29 @@ class Cellable_Orders_List_Table extends WP_List_Table {
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_phone_versions phv on od.phone_version_id = phv.id ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_promos pm on o.promo_id = pm.id ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_payment_types p on o.payment_type_id = p.id ";
-        $sql_str .= "order by o.id";
+        
         // $sql_str .= "SELECT o.* FROM ".$wpdb->base_prefix."cellable_orders o left join ".$wpdb->base_prefix."cellable_order_stauses os ";
-        $data = $wpdb->get_results($sql_str,ARRAY_A);
 
-        foreach ($data as $ele) {
-
+        if($search_str) {
+            $sql_str .= "where phv.name like %s or o.amount like %s or os.name like %s or pm.code like %s ";
+            $sql_str .="or pm.name like %s or pm.discount like %s or pm.dollar_value like %s or p.name like %s ";
+            $sql_str .="or o.payment_username like %s or o.usps_tracking_id like %s or o.created_date like %s ";
+            
+            $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
         }
-
-//         SELECT Customers.CustomerName, Orders.OrderID
-// FROM Customers
-// LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID
-// ORDER BY Customers.CustomerName;
-        // if($search_str) {
-            
-        //     $sql_str .= "or `value` like %s";
-            
-           
-        //     else {
-        //     $data = $wpdb->get_results("SELECT * FR";
-
-        // }
-        // else {
-        //     $data = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_orders", ARRAY_A);
-        // }
+        else {            
+            $data = $wpdb->get_results($sql_str,ARRAY_A);
+        }
         
         /**
          * This checks for sorting input and sorts the data in our array accordingly.
@@ -385,7 +392,21 @@ class Cellable_Orders_List_Table extends WP_List_Table {
         function usort_reorder($a,$b){
             $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id'; //If no sort, default to title
             $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
-            $result = strcmp($a[$orderby], $b[$orderby]); //Determine sort order
+            if ($orderby == "id" || $orderby == "amount" || $orderby == "discount") {
+                if ($a[$orderby] > $b[$orderby]) {
+                    $result = 1;
+                }
+                else if ($a[$orderby] < $b[$orderby]) {
+                    $result = -1;
+                }
+                else {                
+                    $result = 0;                
+                }
+            }
+            else {
+                $result = strcmp($a[$orderby], $b[$orderby]); //Determine sort order
+            }
+            
             return ($order==='asc') ? $result : -$result; //Send final sort direction to usort
         }
         usort($data, 'usort_reorder');
