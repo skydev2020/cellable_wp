@@ -510,7 +510,7 @@ function render_version_list(){
     <div class="wrap">
         
         <div id="icon-users" class="icon32"><br/></div>        
-        <h2>Phone Versions <a href="admin.php?page=versions_pages&action=new" class="page-title-action">Add New</a></h2>
+        <h2>Phone Versions <a href="admin.php?page=version_pages&action=new" class="page-title-action">Add New</a></h2>
         <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
         <form id="versions-filter" method="get">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
@@ -658,10 +658,23 @@ function render_edit_version_page($id){
 <?php
 }
 
-function render_new_version_page(){    
+function render_new_version_page(){
+    global $wpdb;
+
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions where id = %d ";
+    $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
+    
+    $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
+    
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix. "cellable_carriers order by id";    
+    $carriers = $wpdb->get_results($sql_str, ARRAY_A);
+
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_storage_capacities order by capacity";    
+    $storage_capacities = $wpdb->get_results($sql_str, ARRAY_A);
+
     ?>
     <div class="wrap edit-page">
-        <h2>Brand</h2>                
+        <h2>Phone Version</h2>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">            
             <table class="form-table" role="presentation">
                 <tbody>
@@ -673,10 +686,86 @@ function render_new_version_page(){
                             <input name="name" type="text" value="" required>
                         </td>
                     </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="phone_id">Brand</label>
+                        </th>
+                        <td>
+                            <select name="phone_id" id="phone_id" required>
+                            <?php foreach ($phone_brands as $phone): ?>
+                                <option value="<?= $phone['id'] ?>"><?= $phone['name'] ?></option>
+                            <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Carriers (Basecost)<hr></td>
+                    </tr>
+                    <?php foreach ($carriers as $ele): ?>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="cr<?= $ele['id']?>"><?= $ele['name'] ?></label>
+                        </th>
+                        <td>
+                            <input name="cr<?= $ele['id'] ?>" id="cr<?= $ele['id']?>" type="number" step="0.01" min="0" value="">
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <th colspan="2">Capacities (Basecost)<hr></td>
+                    </tr>
+                    <?php foreach ($storage_capacities as $ele): ?>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="cp<?= $ele['id']?>"><?= $ele['description'] ?></label>
+                        </th>
+                        <td>
+                            <input name="cp<?= $ele['id'] ?>" id="cp<?= $ele['id']?>" type="number" step="0.01" min="0" value="">
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <th colspan="2"><hr></td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="views">Views</label>
+                        </th>
+                        <td>
+                            <input name="views" type="number" min="0" value="">
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="purchases">Purchases</label>
+                        </th>
+                        <td>
+                            <input name="purchases" type="number" min="0" value="">
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="position">Position</label>
+                        </th>
+                        <td>
+                            <input name="position" type="number" step="0.01" min="0" value="">
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="status">Status</label>
+                        </th>
+                        <td>
+                            <select name="status" id="status" required>
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_BRAND_NEW" class="button button-primary" value="Create">
+                <input type="submit" name="CELLABLE_VERSION_NEW" class="button button-primary" value="Save Changes">
             </p>
         </form>
     </div>
