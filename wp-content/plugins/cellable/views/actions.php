@@ -243,6 +243,44 @@ if(isset($_POST['CELLABLE_DEFECT_GROUP_UPDATE']))
     }
 }
 
+// Possible Defect
+if(isset($_POST['CELLABLE_POSSIBLE_DEFECT_NEW']))
+{       
+    $name = stripslashes($_POST['name']);
+    $cost = $_POST['cost'];
+    $phone_version_id = $_POST['phone_version_id'];
+    $defect_group_id = $_POST['defect_group_id'];
+
+    $r = $wpdb->query(
+        $wpdb->prepare(
+            "INSERT ". $wpdb->base_prefix. "cellable_possible_defects (name, cost, phone_version_id, defect_group_id) "
+            ."VALUES (%s, %f, %d, %d)",
+            $name, $cost, $phone_version_id, $defect_group_id
+        ) 
+    );
+    
+    header('Location: ' . get_admin_url()."admin.php?page=possible_defect_pages");    
+}
+
+if(isset($_POST['CELLABLE_POSSIBLE_DEFECT_UPDATE']))
+{   
+    if(isset($_POST['id'])){       
+        $name = stripslashes($_POST['name']);
+        $cost = $_POST['cost'];
+        $phone_version_id = $_POST['phone_version_id'];
+        $defect_group_id = $_POST['defect_group_id'];
+
+        $r = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE ". $wpdb->base_prefix. "cellable_possible_defects SET phone_version_id=%d, defect_group_id=%d, 
+                name = %s, cost = %f where id = %d;",
+                $phone_version_id, $defect_group_id, $name, $cost, $_POST['id']
+            ) 
+        );
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+    }
+}
+
 /**
  * Image Uploading: Version
  */

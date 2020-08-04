@@ -510,34 +510,19 @@ function render_possible_defect_list(){
 
 function delete_possible_defect($id){
     global $wpdb;
-    $wpdb->delete($wpdb->base_prefix.'cellable_phone_versions', array('id' => $id));
+    $wpdb->delete($wpdb->base_prefix.'cellable_possible_defects', array('id' => $id));
 }
 
 
 function render_edit_possible_defect_page($id){
     global $wpdb;
 
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions where id = %d ";
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_possible_defects where id = %d ";
     $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
 
-    if (!$info->image_file) {
-        $info->image_file = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe";
-    }
+    $phone_versions = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions", ARRAY_A);
+    $defect_groups = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_defect_groups", ARRAY_A);
     
-    $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
-    
-    $sql_str = "SELECT c.id id, c.name name, vc.value value ";
-    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_carriers c ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_version_carriers vc on c.id = vc.carrier_id and vc.phone_version_id = " .$id;
-    $sql_str .= " order by c.id";    
-    $version_carriers = $wpdb->get_results($sql_str, ARRAY_A);
-
-    $sql_str = "SELECT sc.id id, sc.capacity capacity, sc.description descr, vc.value value ";
-    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_storage_capacities sc ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_version_capacities vc on sc.id = vc.storage_capacity_id and vc.phone_version_id = " .$id;
-    $sql_str .= " order by sc.capacity";    
-    $version_capacities = $wpdb->get_results($sql_str, ARRAY_A);
-
     ?>
     <div class="wrap edit-page">
         <h2>Phone Version</h2>
@@ -546,8 +531,27 @@ function render_edit_possible_defect_page($id){
             <table class="form-table" role="presentation">
                 <tbody>
                     <tr class="form-field">
-                        <td colspan="2">
-                            <img width="150" src="<?=$info->image_file?>" alt="">
+                        <th scope="row">
+                            <label for="defect_group_id">Defect Group</label>
+                        </th>
+                        <td>
+                            <select name="defect_group_id" id="defect_group_id" required>
+                            <?php foreach ($defect_groups as $ele): ?>
+                                <option value="<?= $ele['id'] ?>" <?= ($info->defect_group_id == $ele['id']) ? "selected" : "" ?>><?= $ele['name'] ?></option>
+                            <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="phone_version_id">Phone Version</label>
+                        </th>
+                        <td>
+                            <select name="phone_version_id" id="phone_version_id" required>
+                            <?php foreach ($phone_versions as $ele): ?>
+                                <option value="<?= $ele['id'] ?>" <?= ($info->phone_version_id == $ele['id']) ? "selected" : "" ?>><?= $ele['name'] ?></option>
+                            <?php endforeach; ?>
+                            </select>
                         </td>
                     </tr>
                     <tr class="form-field">
@@ -555,89 +559,21 @@ function render_edit_possible_defect_page($id){
                             <label for="name">Name</label>
                         </th>
                         <td>
-                            <input name="name" type="text" value="<?=$info->name;?>" required>
+                            <input name="name" id="name" type="text" value="<?=$info->name?>">
                         </td>
-                    </tr>
+                    </tr>                    
                     <tr class="form-field">
                         <th scope="row">
-                            <label for="phone_id">Brand</label>
+                            <label for="cost">Defect Cost</label>
                         </th>
                         <td>
-                            <select name="phone_id" id="phone_id" required>
-                            <?php foreach ($phone_brands as $phone): ?>
-                                <option value="<?= $phone['id'] ?>" <?= ($info->phone_id == $phone['id']) ? "selected" : "" ?>><?= $phone['name'] ?></option>
-                            <?php endforeach; ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th colspan="2">Carriers (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($version_carriers as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cr<?= $ele['id']?>"><?= $ele['name'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cr<?= $ele['id'] ?>" id="cr<?= $ele['id']?>" type="number" step="0.01" min="0" value="<?=$ele['value'];?>">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2">Capacities (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($version_capacities as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cp<?= $ele['id']?>"><?= $ele['descr'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cp<?= $ele['id'] ?>" id="cp<?= $ele['id']?>" type="number" step="0.01" min="0" value="<?=$ele['value'];?>">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2"><hr></td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="views">Views</label>
-                        </th>
-                        <td>
-                            <input name="views" type="number" min="0" value="<?=$info->views;?>">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="purchases">Purchases</label>
-                        </th>
-                        <td>
-                            <input name="purchases" type="number" min="0" value="<?=$info->purchases;?>">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="position">Position</label>
-                        </th>
-                        <td>
-                            <input name="position" type="number" step="0.01" min="0" value="<?=$info->position;?>">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="status">Status</label>
-                        </th>
-                        <td>
-                            <select name="status" id="status" required>
-                                <option value="1" <?= ($info->status == 1) ? "selected" : "" ?>>Active</option>
-                                <option value="0" <?= ($info->status == 0) ? "selected" : "" ?>>Inactive</option>
-                            </select>
+                            <input name="cost" id="cost" type="number" step="0.01" min="0" value="<?=$info->cost?>">
                         </td>
                     </tr>
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_VERSION_UPDATE" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_POSSIBLE_DEFECT_UPDATE" class="button button-primary" value="Save Changes">
             </p>
         </form>
     </div>
@@ -647,16 +583,9 @@ function render_edit_possible_defect_page($id){
 
 function render_new_possible_defect_page(){
     global $wpdb;
-
-    $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
-    
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix. "cellable_carriers order by id";    
-    $carriers = $wpdb->get_results($sql_str, ARRAY_A);
-
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_storage_capacities order by capacity";    
-    $storage_capacities = $wpdb->get_results($sql_str, ARRAY_A);
-
-    ?>
+    $phone_versions = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions", ARRAY_A);
+    $defect_groups = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_defect_groups", ARRAY_A);    
+?>
     <div class="wrap edit-page">
         <h2>Phone Version</h2>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">            
@@ -664,92 +593,48 @@ function render_new_possible_defect_page(){
                 <tbody>
                     <tr class="form-field">
                         <th scope="row">
-                            <label for="name">Name</label>
+                            <label for="defect_group_id">Defect Group</label>
                         </th>
                         <td>
-                            <input name="name" type="text" value="" required>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="phone_id">Brand</label>
-                        </th>
-                        <td>
-                            <select name="phone_id" id="phone_id" required>
-                            <?php foreach ($phone_brands as $phone): ?>
-                                <option value="<?= $phone['id'] ?>"><?= $phone['name'] ?></option>
+                            <select name="defect_group_id" id="defect_group_id" required>
+                            <?php foreach ($defect_groups as $ele): ?>
+                                <option value="<?= $ele['id'] ?>"><?= $ele['name'] ?></option>
                             <?php endforeach; ?>
                             </select>
                         </td>
                     </tr>
-                    <tr>
-                        <th colspan="2">Carriers (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($carriers as $ele): ?>
                     <tr class="form-field">
                         <th scope="row">
-                            <label for="cr<?= $ele['id']?>"><?= $ele['name'] ?></label>
+                            <label for="phone_version_id">Phone Version</label>
                         </th>
                         <td>
-                            <input name="cr<?= $ele['id'] ?>" id="cr<?= $ele['id']?>" type="number" step="0.01" min="0" value="">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2">Capacities (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($storage_capacities as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cp<?= $ele['id']?>"><?= $ele['description'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cp<?= $ele['id'] ?>" id="cp<?= $ele['id']?>" type="number" step="0.01" min="0" value="">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2"><hr></td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="views">Views</label>
-                        </th>
-                        <td>
-                            <input name="views" type="number" min="0" value="">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="purchases">Purchases</label>
-                        </th>
-                        <td>
-                            <input name="purchases" type="number" min="0" value="">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="position">Position</label>
-                        </th>
-                        <td>
-                            <input name="position" type="number" step="0.01" min="0" value="">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="status">Status</label>
-                        </th>
-                        <td>
-                            <select name="status" id="status" required>
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
+                            <select name="phone_version_id" id="phone_version_id" required>
+                            <?php foreach ($phone_versions as $ele): ?>
+                                <option value="<?= $ele['id'] ?>"><?= $ele['name'] ?></option>
+                            <?php endforeach; ?>
                             </select>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="name">Name</label>
+                        </th>
+                        <td>
+                            <input name="name" id="name" type="text" value="">
+                        </td>
+                    </tr>                    
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="cost">Defect Cost</label>
+                        </th>
+                        <td>
+                            <input name="cost" id="cost" type="number" step="0.01" min="0" value="">
                         </td>
                     </tr>
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_VERSION_NEW" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_POSSIBLE_DEFECT_NEW" class="button button-primary" value="Save Changes">
             </p>
         </form>
     </div>
