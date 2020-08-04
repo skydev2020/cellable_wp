@@ -92,8 +92,7 @@ class Cellable_Version_List_Table extends WP_List_Table {
      **************************************************************************/
     function column_default($item, $column_name){
         switch($column_name){
-            case 'name':            
-            case 'basecost':
+            case 'name':
             case 'p_name':
             case 'views':
             case 'purchases':
@@ -187,7 +186,6 @@ class Cellable_Version_List_Table extends WP_List_Table {
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
             'name'  => 'Name',
-            'basecost'  => 'Basecost',
             'p_name'  => 'Phone',            
             'views'  => 'Views',
             'purchases'  => 'Purchases',
@@ -237,7 +235,6 @@ class Cellable_Version_List_Table extends WP_List_Table {
         $sortable_columns = array(
             'id'     => array('id',false),     //true means it's already sorted
             'name'  => array('name',false),
-            'basecost'  => array('basecost',false),
             'p_name'  => array('p_name',false),            
             'views'  => array('views',false),
             'purchases'  => array('purchases',false),
