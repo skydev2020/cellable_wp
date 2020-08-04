@@ -129,24 +129,12 @@ class Cellable_Defect_Group_List_Table extends WP_List_Table {
         
         
         //Return the title contents
-        return sprintf(
+        return sprintf('%1$s %2$s',
             /*$1%s*/ $item['name'],
-            /*$2%s*/ $this->row_actions($actions, true)
+            /*$2%s*/ $this->row_actions($actions)
         );
-
-
     }
 
-    function column_status($item){                
-        if ($item['status'] == 1) {
-            return 'Active';
-        }
-        return 'Inactive';
-        
-    }
-
-   
-   
     /** ************************************************************************-
      * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
      * is given special treatment when columns are processed. It ALWAYS needs to
@@ -182,36 +170,11 @@ class Cellable_Defect_Group_List_Table extends WP_List_Table {
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
             'name'  => 'Name',
-            'p_name'  => 'Phone',            
-            'views'  => 'Views',
-            'purchases'  => 'Purchases',
-            'status'  => 'Status',
+            'info'  => 'Info',            
             'position'  => 'Position',
         );
         return $columns;
     }
-
-    function extra_tablenav( $which ) {
-        
-        $move_on_url = '&status=';
-        $status=isset($_GET['status']) ? $_GET['status'] : "-1";
-        if ( $which == "top" ){
-            ?>
-            <div class="alignleft actions bulkactions">
-                <select name="status" class="status-filter" onchange="changeStatus(this)"> 
-                    <option value="-1">Filter by Status</option>
-                    <option value="1" <?= $status=='1'? 'selected' : '' ?>>Active</option>
-                    <option value="0" <?= $status=='0'? 'selected' : '' ?>>Inactive</option>
-                </select>
-            </div>
-            <?php
-        }
-        if ( $which == "bottom" ){
-            //The code that goes after the table is there
-    
-        }
-    }
-
 
     /** ************************************************************************
      * Optional. If you want one or more columns to be sortable (ASC/DESC toggle), 

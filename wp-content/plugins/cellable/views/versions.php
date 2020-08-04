@@ -135,7 +135,7 @@ class Cellable_Version_List_Table extends WP_List_Table {
         return sprintf('<img src="%1$s" class="alignleft phone-version-image"/><div class="phone-version-name">%2$s %3$s</div>',
             $image ? $image:'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe',
             /*$1%s*/ $item['name'],
-            /*$2%s*/ $this->row_actions($actions, true)
+            /*$2%s*/ $this->row_actions($actions)
         );
 
 
