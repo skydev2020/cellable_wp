@@ -536,6 +536,10 @@ function render_edit_version_page($id){
 
     $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions where id = %d ";
     $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
+
+    if (!$info->image_file) {
+        $info->image_file = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe";
+    }
     
     $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
     
@@ -662,7 +666,6 @@ function render_new_version_page(){
     global $wpdb;
 
     $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions where id = %d ";
-    $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
     
     $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
     

@@ -145,10 +145,67 @@ if(isset($_POST['CELLABLE_VERSION_UPDATE']))
                 );
             }            
         endforeach;
-// // var_dump($sql_str);
-// die();
+
         header('Location: ' . $_SERVER['HTTP_REFERER']);
     }
+}
+
+// Phone Version New
+if(isset($_POST['CELLABLE_VERSION_NEW']))
+{   
+    $name = stripslashes($_POST['name']);
+    $phone_id = $_POST['phone_id'];
+    $views = $_POST['views'];
+    $purchases = $_POST['purchases'];
+    $status = $_POST['status'];
+    $position = $_POST['position'];
+    
+    // Update Into Phone Version Table
+    $r = $wpdb->query(
+        $wpdb->prepare(
+            "INSERT ". $wpdb->base_prefix. "cellable_phone_versions (name, phone_id, views, purchases, status, position) "
+            ."VALUES (%s, %d, %d, %d, %d, %f)",
+            $name, $phone_id, $views, $purchases, $status, $position
+        ) 
+    );
+    if ($r != true) {
+        echo("<a href='javascript:window.history.back();'>DB Insert Error</a>");
+        return;
+    }
+
+    $id = $wpdb->insert_id;
+    
+    // Insert Version Capacity
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_storage_capacities ";
+    $storage_capacities = $wpdb->get_results($sql_str, ARRAY_A);
+
+    foreach ($storage_capacities as $ele):
+        $value = isset($_REQUEST["cp".$ele['id']]) ? $_REQUEST["cp".$ele['id']] : 0;             
+        $wpdb->query(
+            $wpdb->prepare(
+                "INSERT ". $wpdb->base_prefix. "cellable_version_capacities (phone_version_id, storage_capacity_id, value) "
+                ."VALUES (%d, %d, %f)",
+                $id, $ele['id'], $value
+            ) 
+        );
+    endforeach;
+    
+    // Insert Version Carrier
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_carriers ";
+    $carriers = $wpdb->get_results($sql_str, ARRAY_A);
+
+    foreach ($carriers as $ele):            
+        $wpdb->query(
+            $wpdb->prepare(
+                "INSERT ". $wpdb->base_prefix. "cellable_version_carriers (phone_version_id, carrier_id, value) "
+                ."VALUES (%d, %d, %f)",
+                $id, $ele['id'], $value
+            ) 
+        );
+    endforeach;
+    
+    header('Location: ' . get_admin_url()."admin.php?page=version_pages");    
+    
 }
 
 /**
