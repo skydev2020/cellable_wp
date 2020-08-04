@@ -451,9 +451,9 @@ function render_defect_group_list(){
     <div class="wrap">
         
         <div id="icon-users" class="icon32"><br/></div>        
-        <h2>Phone Versions <a href="admin.php?page=version_pages&action=new" class="page-title-action">Add New</a></h2>
+        <h2>Defect Groups <a href="admin.php?page=defect_group_pages&action=new" class="page-title-action">Add New</a></h2>
         <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
-        <form id="versions-filter" method="get">
+        <form id="defect-group-filter" method="get">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page']?>" />
             <!-- Now we can render the completed list table -->
@@ -520,22 +520,10 @@ function render_edit_defect_group_page($id){
 <?php
 }
 
-function render_new_defect_group_page(){
-    global $wpdb;
-
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions where id = %d ";
-    
-    $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
-    
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix. "cellable_carriers order by id";    
-    $carriers = $wpdb->get_results($sql_str, ARRAY_A);
-
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_storage_capacities order by capacity";    
-    $storage_capacities = $wpdb->get_results($sql_str, ARRAY_A);
-
-    ?>
+function render_new_defect_group_page(){  
+?>
     <div class="wrap edit-page">
-        <h2>Phone Version</h2>
+        <h2>Defect Group</h2>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">            
             <table class="form-table" role="presentation">
                 <tbody>
@@ -549,59 +537,10 @@ function render_new_defect_group_page(){
                     </tr>
                     <tr class="form-field">
                         <th scope="row">
-                            <label for="phone_id">Brand</label>
+                            <label for="info">Info</label>
                         </th>
                         <td>
-                            <select name="phone_id" id="phone_id" required>
-                            <?php foreach ($phone_brands as $phone): ?>
-                                <option value="<?= $phone['id'] ?>"><?= $phone['name'] ?></option>
-                            <?php endforeach; ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th colspan="2">Carriers (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($carriers as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cr<?= $ele['id']?>"><?= $ele['name'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cr<?= $ele['id'] ?>" id="cr<?= $ele['id']?>" type="number" step="0.01" min="0" value="">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2">Capacities (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($storage_capacities as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cp<?= $ele['id']?>"><?= $ele['description'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cp<?= $ele['id'] ?>" id="cp<?= $ele['id']?>" type="number" step="0.01" min="0" value="">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2"><hr></td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="views">Views</label>
-                        </th>
-                        <td>
-                            <input name="views" type="number" min="0" value="">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="purchases">Purchases</label>
-                        </th>
-                        <td>
-                            <input name="purchases" type="number" min="0" value="">
+                            <textarea name="info" cols="70" rows="10" type="text" id="info"></textarea>
                         </td>
                     </tr>
                     <tr class="form-field">
@@ -609,24 +548,13 @@ function render_new_defect_group_page(){
                             <label for="position">Position</label>
                         </th>
                         <td>
-                            <input name="position" type="number" step="0.01" min="0" value="">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="status">Status</label>
-                        </th>
-                        <td>
-                            <select name="status" id="status" required>
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
+                            <input name="position" type="number" min="0" value="">
                         </td>
                     </tr>
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_VERSION_NEW" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_DEFECT_GROUP_NEW" class="button button-primary" value="Save Changes">
             </p>
         </form>
     </div>

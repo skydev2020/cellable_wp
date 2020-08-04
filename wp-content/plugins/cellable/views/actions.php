@@ -37,6 +37,7 @@ if(isset($_POST['CELLABLE_ORDER_UPDATE']))
     }
 }
 
+// Phone Update
 if(isset($_POST['CELLABLE_BRAND_UPDATE']))
 {   
     if(isset($_POST['id'])){       
@@ -51,6 +52,7 @@ if(isset($_POST['CELLABLE_BRAND_UPDATE']))
     }
 }
 
+// Phone New
 if(isset($_POST['CELLABLE_BRAND_NEW']))
 {       
     $name = stripslashes($_POST['name']);
@@ -206,6 +208,39 @@ if(isset($_POST['CELLABLE_VERSION_NEW']))
     
     header('Location: ' . get_admin_url()."admin.php?page=version_pages");    
     
+}
+
+// Defect Group
+if(isset($_POST['CELLABLE_DEFECT_GROUP_NEW']))
+{       
+    $name = stripslashes($_POST['name']);
+    $info = stripslashes($_POST['info']);
+    $position = $_POST['position'];
+
+    $r = $wpdb->query(
+        $wpdb->prepare(
+            "INSERT ". $wpdb->base_prefix. "cellable_defect_groups (name, info, position) VALUES (%s, %s, %d)",
+            $name, $info, $position
+        ) 
+    );
+    
+    header('Location: ' . get_admin_url()."admin.php?page=defect_group_pages");    
+}
+
+if(isset($_POST['CELLABLE_DEFECT_GROUP_UPDATE']))
+{   
+    if(isset($_POST['id'])){       
+        $name = stripslashes($_POST['name']);
+        $info = stripslashes($_POST['info']);
+        $position = $_POST['position'];
+        $r = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE ". $wpdb->base_prefix. "cellable_defect_groups SET name = %s, info = %s, position = %d where id = %d;",
+                $name, $info, $position, $_POST['id']
+            ) 
+        );
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+    }
 }
 
 /**
