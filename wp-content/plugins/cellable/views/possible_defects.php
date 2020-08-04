@@ -93,10 +93,9 @@ class Cellable_Possible_Defect_List_Table extends WP_List_Table {
     function column_default($item, $column_name){
         switch($column_name){
             case 'name':
-            case 'p_name':
-            case 'views':
-            case 'purchases':
-            case 'position':
+            case 'cost':
+            case 'pv_name':
+            case 'dg_name':
                 return $item[$column_name];
             default:
                 return print_r($item,true); //Show the whole array for troubleshooting purposes
@@ -120,37 +119,24 @@ class Cellable_Possible_Defect_List_Table extends WP_List_Table {
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
     
-    function column_name($item){                
+    function column_dg_name($item){                
         //Build row actions
         global $wpdb;
         //Build row actions
         $actions = array(
             'edit'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id']),
             'delete'      => sprintf('<a href="?page=%s&action=%s&item=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
-            'upload'    => sprintf('<a style="cursor:pointer" class="set_version_images" id="upbtn-%s">Update Image</a>',$item['id']),           
         );
-        
-        $image = $wpdb->get_var("SELECT image_file FROM ".$wpdb->base_prefix."cellable_phone_versions WHERE id='" . $item['id'] . "'");
+                
         //Return the title contents
-        return sprintf('<img src="%1$s" class="alignleft phone-version-image"/><div class="phone-version-name">%2$s %3$s</div>',
-            $image ? $image:'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe',
-            /*$1%s*/ $item['name'],
+        return sprintf('%1$s %2$s',
+            /*$1%s*/ $item['dg_name'],
             /*$2%s*/ $this->row_actions($actions)
         );
 
 
     }
 
-    function column_status($item){                
-        if ($item['status'] == 1) {
-            return 'Active';
-        }
-        return 'Inactive';
-        
-    }
-
-   
-   
     /** ************************************************************************-
      * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
      * is given special treatment when columns are processed. It ALWAYS needs to
@@ -185,27 +171,28 @@ class Cellable_Possible_Defect_List_Table extends WP_List_Table {
     function get_columns(){
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
+            'dg_name'  => 'Defect Group',
             'name'  => 'Name',
-            'p_name'  => 'Phone',            
-            'views'  => 'Views',
-            'purchases'  => 'Purchases',
-            'status'  => 'Status',
-            'position'  => 'Position',
+            'cost'  => 'Cost',            
+            'pv_name'  => 'Phone Version',                        
         );
         return $columns;
     }
 
     function extra_tablenav( $which ) {
-        
-        $move_on_url = '&status=';
-        $status=isset($_GET['status']) ? $_GET['status'] : "-1";
+        global $wpdb;
+        $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions order by phone_id";
+        $phone_versions = $wpdb->get_results($sql_str,ARRAY_A);
+        $phone_version_id=isset($_GET['phone_version_id']) ? $_GET['phone_version_id'] : "-1";
         if ( $which == "top" ){
             ?>
             <div class="alignleft actions bulkactions">
-                <select name="status" class="status-filter" onchange="changeStatus(this)"> 
-                    <option value="-1">Filter by Status</option>
-                    <option value="1" <?= $status=='1'? 'selected' : '' ?>>Active</option>
-                    <option value="0" <?= $status=='0'? 'selected' : '' ?>>Inactive</option>
+                <select name="phone_version_id" class="phone-version-filter" 
+                    onchange="filterByOption('possible_defect_pages', 'phone_version_id', this)"> 
+                    <option value="-1">Filter by Phone Version</option>
+                    <?php foreach ($phone_versions as $ele): ?>
+                    <option value="<?= $ele['id'] ?>" <?= $phone_version_id== $ele['id'] ? 'selected' : '' ?>><?= $ele['name'] ?></option>
+                    <?php endforeach; ?>                     
                 </select>
             </div>
             <?php
@@ -235,11 +222,9 @@ class Cellable_Possible_Defect_List_Table extends WP_List_Table {
         $sortable_columns = array(
             'id'     => array('id',false),     //true means it's already sorted
             'name'  => array('name',false),
-            'p_name'  => array('p_name',false),            
-            'views'  => array('views',false),
-            'purchases'  => array('purchases',false),
-            'status'  => array('status',false),
-            'position'  => array('position',false),
+            'dg_name'  => array('dg_name',false),            
+            'pv_name'  => array('pv_name',false),
+            'cost'  => array('cost',false),
         );
         return $sortable_columns;
     }
@@ -359,33 +344,31 @@ class Cellable_Possible_Defect_List_Table extends WP_List_Table {
          * @var array 
          **************************************************************************/
         
-        $status=isset($_GET['status']) ? $_GET['status'] : "-1";
+        $phone_version_id=isset($_GET['phone_version_id']) ? $_GET['phone_version_id'] : "-1";
         $data = array();
 
-        $sql_str = "SELECT pv.id id, pv.name name, pv.image_file image_file, p.name p_name, ";
-        $sql_str .= "pv.views views, pv.purchases purchases, ";
-        $sql_str .= "pv.status status, pv.position position ";
-        $sql_str .= "FROM ".$wpdb->base_prefix."cellable_phone_versions pv ";
-        $sql_str .= "left join ".$wpdb->base_prefix."cellable_phones p on pv.phone_id = p.id ";
+        $sql_str = "SELECT pd.id id, pd.name name, pd.cost cost, ";
+        $sql_str .= "pv.name pv_name, dg.name dg_name, dg.id dg_id ";
+        $sql_str .= "FROM ".$wpdb->base_prefix."cellable_possible_defects pd ";
+        $sql_str .= "left join ".$wpdb->base_prefix."cellable_phone_versions pv on pv.id = pd.phone_version_id ";
+        $sql_str .= "left join ".$wpdb->base_prefix."cellable_defect_groups dg on dg.id = pd.defect_group_id ";
                 
         if($search_str) {
-            $sql_str .= "where (pv.name like %s or p.name like %s or views like %s or purchases like %s";
-            $sql_str .= "or position like %s) ";
+            $sql_str .= "where (pd.name like %s or pd.cost like %s or pv.name like %s or dg.name like %s)";            
 
-            if ($status != "-1") {
-                $sql_str .= "and pv.status = " .$status;
+            if ($phone_version_id != "-1") {
+                $sql_str .= "and pd.phone_version_id = " .$phone_version_id;
             } 
 
             $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',            
-            '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
             
         }
         else {          
-            if ($status != "-1") {
-                $sql_str .= " where pv.status = " .$status;
+            if ($phone_version_id != "-1") {
+                $sql_str .= " where pd.phone_version_id = " .$phone_version_id;
             }   
             $data = $wpdb->get_results($sql_str,ARRAY_A);
         }
@@ -399,9 +382,9 @@ class Cellable_Possible_Defect_List_Table extends WP_List_Table {
          * sorting technique would be unnecessary.
          */
         function usort_reorder($a,$b){
-            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id'; //If no sort, default to title
+            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'dg_id'; //If no sort, default to title
             $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
-            if ($orderby == "id" || $orderby == "position" || $orderby == "views" || $orderby == "purchases") {
+            if ($orderby == "id" || $orderby == "cost") {
                 if ($a[$orderby] > $b[$orderby]) {
                     $result = 1;
                 }
