@@ -11,6 +11,7 @@ require_once('views/brands.php');
 require_once('views/versions.php');
 require_once('views/settings.php');
 require_once('views/defect_groups.php');
+require_once('views/possible_defects.php');
 require_once('views/orders.php');
 
 /**
@@ -40,6 +41,12 @@ if ( ! function_exists( 'defect_group_pages' ) ) {
     }
 }
 
+if ( !function_exists( 'possible_defect_pages' ) ) {
+    function possible_defect_pages(){
+        render_possible_defect_list();
+    }
+}
+
 if ( ! function_exists( 'setting_pages' ) ) {
     function setting_pages(){
         render_setting_list();
@@ -60,6 +67,7 @@ if ( ! function_exists( 'admin_add_pages' ) ) {
             add_submenu_page('cellable','Brands', 'Brands', 'manage_options', 'brand_pages','brand_pages');
             add_submenu_page('cellable','Phone Versions', 'Phone Versions', 'manage_options', 'version_pages','version_pages');
             add_submenu_page('cellable','Defect Groups', 'Defect Groups', 'manage_options', 'defect_group_pages','defect_group_pages');
+            add_submenu_page('cellable','Possible Defects', 'Possible Defects', 'manage_options', 'possible_defect_pages','possible_defect_pages');
             add_submenu_page('cellable','Orders', 'Orders', 'manage_options', 'order_pages','order_pages');
             add_submenu_page('cellable','Settings', 'System Settings', 'manage_options', 'setting_pages','setting_pages');
             remove_submenu_page('cellable', 'cellable');
