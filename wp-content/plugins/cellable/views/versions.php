@@ -365,14 +365,14 @@ class Cellable_Version_List_Table extends WP_List_Table {
         $status=isset($_GET['status']) ? $_GET['status'] : "-1";
         $data = array();
 
-        $sql_str = "SELECT pv.id id, pv.name name, pv.basecost basecost, pv.image_file image_file, p.name p_name, ";
+        $sql_str = "SELECT pv.id id, pv.name name, pv.image_file image_file, p.name p_name, ";
         $sql_str .= "pv.views views, pv.purchases purchases, ";
         $sql_str .= "pv.status status, pv.position position ";
         $sql_str .= "FROM ".$wpdb->base_prefix."cellable_phone_versions pv ";
         $sql_str .= "left join ".$wpdb->base_prefix."cellable_phones p on pv.phone_id = p.id ";
                 
         if($search_str) {
-            $sql_str .= "where (pv.name like %s or p.name like %s or basecost like %s or views like %s or purchases like %s";
+            $sql_str .= "where (pv.name like %s or p.name like %s or views like %s or purchases like %s";
             $sql_str .= "or position like %s) ";
 
             if ($status != "-1") {
@@ -380,7 +380,6 @@ class Cellable_Version_List_Table extends WP_List_Table {
             } 
 
             $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',            
-            '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
@@ -405,7 +404,7 @@ class Cellable_Version_List_Table extends WP_List_Table {
         function usort_reorder($a,$b){
             $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id'; //If no sort, default to title
             $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
-            if ($orderby == "id" || $orderby == "basecost" || $orderby == "position" || $orderby == "views" || $orderby == "purchases") {
+            if ($orderby == "id" || $orderby == "position" || $orderby == "views" || $orderby == "purchases") {
                 if ($a[$orderby] > $b[$orderby]) {
                     $result = 1;
                 }
@@ -542,6 +541,19 @@ function render_edit_version_page($id){
     $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
     
     $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
+    
+    $sql_str = "SELECT c.id id, c.name name, vc.value value ";
+    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_carriers c ";
+    $sql_str .= "left join ".$wpdb->base_prefix."cellable_version_carriers vc on c.id = vc.carrier_id and vc.phone_version_id = " .$id;
+    $sql_str .= " order by c.id";    
+    $version_carriers = $wpdb->get_results($sql_str, ARRAY_A);
+
+    $sql_str = "SELECT sc.id id, sc.capacity capacity, sc.description descr, vc.value value ";
+    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_storage_capacities sc ";
+    $sql_str .= "left join ".$wpdb->base_prefix."cellable_version_capacities vc on sc.id = vc.storage_capacity_id and vc.phone_version_id = " .$id;
+    $sql_str .= " order by sc.capacity";    
+    $version_capacities = $wpdb->get_results($sql_str, ARRAY_A);
+
     ?>
     <div class="wrap edit-page">
         <h2>Phone Version</h2>
@@ -574,13 +586,34 @@ function render_edit_version_page($id){
                             </select>
                         </td>
                     </tr>
+                    <tr>
+                        <th colspan="2">Carriers (Basecost)<hr></td>
+                    </tr>
+                    <?php foreach ($version_carriers as $ele): ?>
                     <tr class="form-field">
                         <th scope="row">
-                            <label for="basecost">Basecost</label>
+                            <label for="cr<?= $ele['id']?>"><?= $ele['name'] ?></label>
                         </th>
                         <td>
-                            <input name="basecost" type="number" step="0.01" min="0" value="<?=$info->basecost;?>" required>
+                            <input name="cr<?= $ele['id'] ?>" id="cr<?= $ele['id']?>" type="number" step="0.01" min="0" value="<?=$ele['value'];?>">
                         </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <th colspan="2">Capacities (Basecost)<hr></td>
+                    </tr>
+                    <?php foreach ($version_capacities as $ele): ?>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="cp<?= $ele['id']?>"><?= $ele['descr'] ?></label>
+                        </th>
+                        <td>
+                            <input name="cp<?= $ele['id'] ?>" id="cp<?= $ele['id']?>" type="number" step="0.01" min="0" value="<?=$ele['value'];?>">
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <th colspan="2"><hr></td>
                     </tr>
                     <tr class="form-field">
                         <th scope="row">
@@ -600,6 +633,14 @@ function render_edit_version_page($id){
                     </tr>
                     <tr class="form-field">
                         <th scope="row">
+                            <label for="position">Position</label>
+                        </th>
+                        <td>
+                            <input name="position" type="number" step="0.01" min="0" value="<?=$info->position;?>">
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
                             <label for="status">Status</label>
                         </th>
                         <td>
@@ -609,18 +650,10 @@ function render_edit_version_page($id){
                             </select>
                         </td>
                     </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="position">Position</label>
-                        </th>
-                        <td>
-                            <input name="position" type="number" step="0.01" min="0" value="<?=$info->position;?>">
-                        </td>
-                    </tr>
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_BRAND_UPDATE" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_VERSION_UPDATE" class="button button-primary" value="Save Changes">
             </p>
         </form>
     </div>
