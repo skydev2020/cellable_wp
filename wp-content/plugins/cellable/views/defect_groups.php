@@ -315,10 +315,21 @@ class Cellable_Defect_Group_List_Table extends WP_List_Table {
          * @var array 
          **************************************************************************/
         
-        $status=isset($_GET['status']) ? $_GET['status'] : "-1";
+        $data = array();
+        $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_defect_groups ";     
         
-        $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_defect_groups";        
-        $data = $wpdb->get_results($sql_str,ARRAY_A);
+        if($search_str) {
+            $sql_str .= "where name like %s or info like %s";
+            $data = $wpdb->get_results(
+                $wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',
+                                '%'.$wpdb->esc_like($search_str).'%'
+                            ),ARRAY_A);
+        }
+        else {            
+            $data = $wpdb->get_results($sql_str,ARRAY_A);
+        }
+
+        
 
         /**
          * This checks for sorting input and sorts the data in our array accordingly.
@@ -464,39 +475,16 @@ function delete_defect_group($id){
 function render_edit_defect_group_page($id){
     global $wpdb;
 
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions where id = %d ";
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_defect_groups where id = %d ";
     $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
-
-    if (!$info->image_file) {
-        $info->image_file = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe";
-    }
-    
-    $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
-    
-    $sql_str = "SELECT c.id id, c.name name, vc.value value ";
-    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_carriers c ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_version_carriers vc on c.id = vc.carrier_id and vc.phone_version_id = " .$id;
-    $sql_str .= " order by c.id";    
-    $version_carriers = $wpdb->get_results($sql_str, ARRAY_A);
-
-    $sql_str = "SELECT sc.id id, sc.capacity capacity, sc.description descr, vc.value value ";
-    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_storage_capacities sc ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_version_capacities vc on sc.id = vc.storage_capacity_id and vc.phone_version_id = " .$id;
-    $sql_str .= " order by sc.capacity";    
-    $version_capacities = $wpdb->get_results($sql_str, ARRAY_A);
-
+        
     ?>
     <div class="wrap edit-page">
-        <h2>Phone Version</h2>
+        <h2>Defect Group</h2>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">
             <input name="id" hidden type="text" value="<?php echo $id?>">
             <table class="form-table" role="presentation">
                 <tbody>
-                    <tr class="form-field">
-                        <td colspan="2">
-                            <img width="150" src="<?=$info->image_file?>" alt="">
-                        </td>
-                    </tr>
                     <tr class="form-field">
                         <th scope="row">
                             <label for="name">Name</label>
@@ -507,59 +495,10 @@ function render_edit_defect_group_page($id){
                     </tr>
                     <tr class="form-field">
                         <th scope="row">
-                            <label for="phone_id">Brand</label>
+                            <label for="info">Info</label>
                         </th>
                         <td>
-                            <select name="phone_id" id="phone_id" required>
-                            <?php foreach ($phone_brands as $phone): ?>
-                                <option value="<?= $phone['id'] ?>" <?= ($info->phone_id == $phone['id']) ? "selected" : "" ?>><?= $phone['name'] ?></option>
-                            <?php endforeach; ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th colspan="2">Carriers (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($version_carriers as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cr<?= $ele['id']?>"><?= $ele['name'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cr<?= $ele['id'] ?>" id="cr<?= $ele['id']?>" type="number" step="0.01" min="0" value="<?=$ele['value'];?>">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2">Capacities (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($version_capacities as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cp<?= $ele['id']?>"><?= $ele['descr'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cp<?= $ele['id'] ?>" id="cp<?= $ele['id']?>" type="number" step="0.01" min="0" value="<?=$ele['value'];?>">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2"><hr></td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="views">Views</label>
-                        </th>
-                        <td>
-                            <input name="views" type="number" min="0" value="<?=$info->views;?>">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="purchases">Purchases</label>
-                        </th>
-                        <td>
-                            <input name="purchases" type="number" min="0" value="<?=$info->purchases;?>">
+                            <textarea name="info" cols="70" rows="10" type="text" id="info"><?=$info->info;?></textarea>
                         </td>
                     </tr>
                     <tr class="form-field">
@@ -567,24 +506,13 @@ function render_edit_defect_group_page($id){
                             <label for="position">Position</label>
                         </th>
                         <td>
-                            <input name="position" type="number" step="0.01" min="0" value="<?=$info->position;?>">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="status">Status</label>
-                        </th>
-                        <td>
-                            <select name="status" id="status" required>
-                                <option value="1" <?= ($info->status == 1) ? "selected" : "" ?>>Active</option>
-                                <option value="0" <?= ($info->status == 0) ? "selected" : "" ?>>Inactive</option>
-                            </select>
+                            <input name="position" type="number" min="0" value="<?=$info->position;?>">
                         </td>
                     </tr>
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_VERSION_UPDATE" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_DEFECT_GROUP_UPDATE" class="button button-primary" value="Save Changes">
             </p>
         </form>
     </div>

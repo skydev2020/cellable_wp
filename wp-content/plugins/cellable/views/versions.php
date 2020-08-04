@@ -665,8 +665,6 @@ function render_edit_version_page($id){
 function render_new_version_page(){
     global $wpdb;
 
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions where id = %d ";
-    
     $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
     
     $sql_str = "SELECT * FROM ".$wpdb->base_prefix. "cellable_carriers order by id";    
