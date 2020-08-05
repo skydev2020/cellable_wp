@@ -25,3 +25,10 @@
 .red {
   color: red;
 }
+
+.fa-star {
+  font-size: 16px;
+}
+.fa-star.checked {
+  color: orange;
+}

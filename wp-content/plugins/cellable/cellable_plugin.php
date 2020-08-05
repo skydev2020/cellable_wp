@@ -152,6 +152,7 @@ function get_cellable_setting($name) {
  
 function cellable_css_js()
 {
+    wp_enqueue_style('fontawesome_css', plugins_url('css/font-awesome.css',__FILE__ ),'','all');
     wp_enqueue_style('cellable_css', plugins_url('css/admin.css',__FILE__ ),'','all');
     wp_enqueue_media();
     wp_enqueue_script( 'wp-media-uploader', plugins_url('js/wp_media_uploader.js', __FILE__), array( 'jquery' ), 1.0 );

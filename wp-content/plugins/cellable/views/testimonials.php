@@ -155,6 +155,15 @@ class Cellable_Testimonial_List_Table extends WP_List_Table {
         }
         return "";                
     }
+
+    function column_rating($item){
+        $str ="";
+        for ($i=1; $i<=$item['rating']; $i++):
+            $str.="<span class='fa fa-star checked'></span>";
+        endfor; 
+
+        return $str;                
+    }
    
     /** ************************************************************************-
      * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
