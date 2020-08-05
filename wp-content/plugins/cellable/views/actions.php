@@ -281,6 +281,39 @@ if(isset($_POST['CELLABLE_POSSIBLE_DEFECT_UPDATE']))
     }
 }
 
+// Storage Capacity
+if(isset($_POST['CELLABLE_CAPACITY_NEW']))
+{   
+    $capacity = $_POST['capacity'];    
+    $description = stripslashes($_POST['description']);
+    
+    $r = $wpdb->query(
+        $wpdb->prepare(
+            "INSERT ". $wpdb->base_prefix. "cellable_storage_capacities (capacity, description) "
+            ."VALUES (%d, %s)",
+            $capacity, $description
+        ) 
+    );
+    
+    header('Location: ' . get_admin_url()."admin.php?page=capacity_pages");    
+}
+
+if(isset($_POST['CELLABLE_CAPACITY_UPDATE']))
+{   
+    if(isset($_POST['id'])){       
+        $capacity = $_POST['capacity'];    
+        $description = stripslashes($_POST['description']);
+
+        $r = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE ". $wpdb->base_prefix. "cellable_storage_capacities SET capacity=%d, description=%s where id = %d;",
+                $capacity, $description, $_POST['id']
+            ) 
+        );
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+    }
+}
+
 /**
  * Image Uploading: Version
  */

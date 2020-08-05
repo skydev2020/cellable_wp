@@ -10,6 +10,7 @@ require_once('cellable_global.php');
 require_once('views/brands.php');
 require_once('views/versions.php');
 require_once('views/settings.php');
+require_once('views/capacities.php');
 require_once('views/defect_groups.php');
 require_once('views/possible_defects.php');
 require_once('views/orders.php');
@@ -53,7 +54,11 @@ if ( ! function_exists( 'setting_pages' ) ) {
     }
 }
 
-
+if ( ! function_exists( 'capacity_pages' ) ) {
+    function capacity_pages(){
+        render_capacity_list();
+    }
+}
 
 /**
  * Add SuperAdmin & SubAdmin Menus
@@ -68,6 +73,7 @@ if ( ! function_exists( 'admin_add_pages' ) ) {
             add_submenu_page('cellable','Phone Versions', 'Phone Versions', 'manage_options', 'version_pages','version_pages');
             add_submenu_page('cellable','Defect Groups', 'Defect Groups', 'manage_options', 'defect_group_pages','defect_group_pages');
             add_submenu_page('cellable','Possible Defects', 'Possible Defects', 'manage_options', 'possible_defect_pages','possible_defect_pages');
+            add_submenu_page('cellable','Storage Capacities', 'Storage Capacities', 'manage_options', 'capacity_pages','capacity_pages');
             add_submenu_page('cellable','Orders', 'Orders', 'manage_options', 'order_pages','order_pages');
             add_submenu_page('cellable','Settings', 'System Settings', 'manage_options', 'setting_pages','setting_pages');
             remove_submenu_page('cellable', 'cellable');
