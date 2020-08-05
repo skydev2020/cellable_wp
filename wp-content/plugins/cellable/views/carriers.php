@@ -125,7 +125,7 @@ class Cellable_Carrier_List_Table extends WP_List_Table {
         $actions = array(
             'edit'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id']),
             'delete'      => sprintf('<a href="?page=%s&action=%s&item=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
-            'upload'    => sprintf('<a style="cursor:pointer" class="set_version_images" id="upbtn-%s">Update Image</a>',$item['id']),           
+            'upload'    => sprintf('<a style="cursor:pointer" class="set_carrier_images" id="upbtn-%s">Update Image</a>',$item['id']),           
         );
         
         $image = $item['image_file'];

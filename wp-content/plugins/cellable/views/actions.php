@@ -90,7 +90,7 @@ if(isset($_POST['CELLABLE_CARRIER_NEW']))
 
     $r = $wpdb->query(
         $wpdb->prepare(
-            "INSERT ". $wpdb->base_prefix. "cellable_phones (name, position, status) VALUES (%s, %d, %d)",
+            "INSERT ". $wpdb->base_prefix. "cellable_carriers (name, position, status) VALUES (%s, %d, %d)",
             $name, $position, $status_id
         ) 
     );
@@ -363,6 +363,45 @@ if(isset($_POST['post_id']) && isset($_POST['version_id'])){
     }
     else {
         // $wpdb->insert("wp_spark_admin_pages", array('page_id' => $_POST['spark_page_id'], 'image' => $image,'title' => $title));
+    }        
+}
+
+/**
+ * Image Uploading: Carrier
+ */
+
+if(isset($_POST['post_id']) && isset($_POST['carrier_id'])){
+    global $wpdb;
+    $image = $wpdb->get_var("SELECT guid FROM wp_posts WHERE id='" . $_POST['post_id'] . "'");
+    if($wpdb->get_var("SELECT id FROM ". $wpdb->base_prefix. "cellable_carriers WHERE id=" . $_POST['carrier_id'] )) {
+        $r = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE ". $wpdb->base_prefix. "cellable_carriers SET image_file = %s where id = %d;",
+                $image, $_POST['carrier_id']
+            ) 
+        );
     }
-        
+    else {
+        // $wpdb->insert("wp_spark_admin_pages", array('page_id' => $_POST['spark_page_id'], 'image' => $image,'title' => $title));
+    }        
+}
+
+/**
+ * Image Uploading: Phone Brand
+ */
+
+if(isset($_POST['post_id']) && isset($_POST['phone_id'])){
+    global $wpdb;
+    $image = $wpdb->get_var("SELECT guid FROM wp_posts WHERE id='" . $_POST['post_id'] . "'");
+    if($wpdb->get_var("SELECT id FROM ". $wpdb->base_prefix. "cellable_phones WHERE id=" . $_POST['phone_id'] )) {
+        $r = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE ". $wpdb->base_prefix. "cellable_phones SET image_file = %s where id = %d;",
+                $image, $_POST['phone_id']
+            ) 
+        );
+    }
+    else {
+        // $wpdb->insert("wp_spark_admin_pages", array('page_id' => $_POST['spark_page_id'], 'image' => $image,'title' => $title));
+    }        
 }
