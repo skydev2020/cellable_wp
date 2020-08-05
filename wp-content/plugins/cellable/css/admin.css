@@ -21,3 +21,7 @@
 #versions-filter td.column-position {
   vertical-align: middle;
 }
+
+.red {
+  color: red;
+}

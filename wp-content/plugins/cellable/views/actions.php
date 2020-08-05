@@ -376,6 +376,62 @@ if(isset($_POST['CELLABLE_PAYMENT_UPDATE']))
     }
 }
 
+// Payment Types
+if(isset($_POST['CELLABLE_PROMO_NEW']))
+{   
+    $_SESSION['error'] = "";
+    $name = stripslashes($_POST['name']);
+    $code = stripslashes($_POST['code']);
+    $start_date = stripslashes($_POST['start_date']);
+    $end_date = stripslashes($_POST['end_date']);
+    $discount = $_POST['discount'];
+    $dollar_value = $_POST['dollar_value'];
+    
+    $r = $wpdb->query(
+        $wpdb->prepare(
+            "INSERT ". $wpdb->base_prefix. "cellable_promos (name, code, start_date, end_date, discount, dollar_value) "
+            ."VALUES (%s, %s, %s, %s, %f, %f)",
+            $name, $code, $start_date, $end_date, $discount, $dollar_value
+        )
+    );
+    if ($r==false) {
+        $_SESSION['error'] = "There was an error while updating promotion";
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+    }
+    else {
+        header('Location: ' . get_admin_url()."admin.php?page=promo_pages");    
+    }
+    
+    
+}
+
+if(isset($_POST['CELLABLE_PROMO_UPDATE']))
+{   
+    $_SESSION['error'] = "";
+    if(isset($_POST['id'])){               
+        $name = stripslashes($_POST['name']);
+        $code = stripslashes($_POST['code']);
+        $start_date = stripslashes($_POST['start_date']);
+        $end_date = stripslashes($_POST['end_date']);
+        $discount = $_POST['discount'];
+        $dollar_value = $_POST['dollar_value'];
+
+        $r = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE ". $wpdb->base_prefix. "cellable_promos SET name=%s, code=%s, "
+                ."start_date=%s, end_date=%s, discount=%f, dollar_value=%f where id = %d;",
+                $name, $code, $start_date, $end_date, $discount, $dollar_value, $_POST['id']
+            ) 
+        );
+        
+        if ($r==false) {
+            $_SESSION['error'] = "There was an error while updating promotion";
+        }
+        
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+    }
+}
+
 /**
  * Image Uploading: Version
  */

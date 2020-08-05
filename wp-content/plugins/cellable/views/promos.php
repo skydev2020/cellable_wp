@@ -32,6 +32,8 @@ if(!class_exists('WP_List_Table')){
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
+session_start();
+
 /************************** CREATE A PACKAGE CLASS *****************************
  *******************************************************************************
  * Create a new list table package that extends the core WP_List_Table class.
@@ -45,7 +47,7 @@ if(!class_exists('WP_List_Table')){
  * 
  * Our theme for this list table is going to be movies.
  */
-class Cellable_Payment_List_Table extends WP_List_Table {
+class Cellable_Promo_List_Table extends WP_List_Table {
     
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
@@ -93,6 +95,11 @@ class Cellable_Payment_List_Table extends WP_List_Table {
     function column_default($item, $column_name){
         switch($column_name){
             case 'name':
+            case 'code':
+            case 'start_date':
+            case 'end_date':
+            case 'discount':
+            case 'dollar_value':
                 return $item[$column_name];
             default:
                 return print_r($item,true); //Show the whole array for troubleshooting purposes
@@ -130,8 +137,25 @@ class Cellable_Payment_List_Table extends WP_List_Table {
             /*$1%s*/ $item['name'],
             /*$2%s*/ $this->row_actions($actions)
         );
+    }
 
+    function column_start_date($item){       
+        if ($item['start_date']) {
+            $date = new DateTime($item['start_date']);
+            $start_date = $date->format('m/d/Y');
+            return $start_date;
+        }
+        return "";        
+    }
 
+    function column_end_date($item){        
+        if ($item['end_date']) {
+            $date = new DateTime($item['end_date']);
+            $end_date = $date->format('m/d/Y');
+            return $end_date;
+        }
+        return "";
+                
     }
 
     /** ************************************************************************-
@@ -169,6 +193,11 @@ class Cellable_Payment_List_Table extends WP_List_Table {
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
             'name'  => 'Name',
+            'code'  => 'Code',
+            'start_date'  => 'Start Date',
+            'end_date'  => 'End Date',
+            'discount'  => 'Discount',
+            'dollar_value'  => 'Dollar Value',
         );
         return $columns;
     }
@@ -189,11 +218,16 @@ class Cellable_Payment_List_Table extends WP_List_Table {
     function get_sortable_columns() {
         $sortable_columns = array(
             'id'     => array('id',false),     //true means it's already sorted
-            'name'  => array('name',false),            
+            'name'  => array('name',false),
+            'code'  => array('code',false),
+            'start_date'  => array('start_date',false),
+            'end_date'  => array('end_date',false),
+            'discount'  => array('discount',false),
+            'dollar_value'  => array('dollar_value',false),
         );
         return $sortable_columns;
     }
-    
+
     /** ************************************************************************
      * Optional. If you need to include bulk actions in your list table, this is
      * the place to define them. Bulk actions are an associative array in the format
@@ -230,13 +264,13 @@ class Cellable_Payment_List_Table extends WP_List_Table {
                 case 'delete':
                     if(is_array($_GET['item'])) {
                         foreach ($_GET['item'] as $item){
-                            delete_payment($item);
+                            delete_promo($item);
                         }                        
                     }
                     else {
-                        delete_payment($_GET['item']);
+                        delete_promo($_GET['item']);
                     }
-                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Payment Type Deleted.' );?></p></div><?php
+                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Promo Deleted.' );?></p></div><?php
                     break;
                 default:
                     break;
@@ -311,11 +345,18 @@ class Cellable_Payment_List_Table extends WP_List_Table {
         
         $data = array();
 
-        $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_payment_types ";
+        $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_promos ";
                 
         if($search_str) {
-            $sql_str .= "where name like %s"; 
-            $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
+            $sql_str .= "where name like %s or code like %s or start_date like %s "
+                    ."or end_date like %s or discount like %s or dollar_value like %s"; 
+            
+            $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',            
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%',
+                '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
         }
         else {
             $data = $wpdb->get_results($sql_str,ARRAY_A);
@@ -332,7 +373,20 @@ class Cellable_Payment_List_Table extends WP_List_Table {
         function usort_reorder($a,$b){
             $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id'; //If no sort, default to title
             $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
-            $result = strcmp($a[$orderby], $b[$orderby]); //Determine sort order
+            if ($orderby == "id" || $orderby == "discount" || $orderby == "dollar_value") {
+                if ($a[$orderby] > $b[$orderby]) {
+                    $result = 1;
+                }
+                else if ($a[$orderby] < $b[$orderby]) {
+                    $result = -1;
+                }
+                else {                
+                    $result = 0;                
+                }
+            }
+            else {
+                $result = strcmp($a[$orderby], $b[$orderby]); //Determine sort order
+            }
             
             return ($order==='asc') ? $result : -$result; //Send final sort direction to usort
         }
@@ -405,36 +459,36 @@ class Cellable_Payment_List_Table extends WP_List_Table {
  * so we've instead called those methods explicitly. It keeps things flexible, and
  * it's the way the list tables are used in the WordPress core.
  */
-function render_payment_list(){
+function render_promo_list(){
 
     if(isset($_GET['action']) && $_GET['action'] == 'edit')
     {
         $id = $_GET['item'];        
-        render_edit_payment_page($id);
+        render_edit_promo_page($id);
         return;
     }
 
     if(isset($_GET['action']) && $_GET['action'] == 'new')
     {        
-        render_new_payment_page();
+        render_new_promo_page();
         return;
     }
 
     //Create an instance of our package class...
-    $list_table = new Cellable_Payment_List_Table();
+    $list_table = new Cellable_Promo_List_Table();
     //Fetch, prepare, sort, and filter our data...
     $search_str = isset($_REQUEST['s']) ? $_REQUEST['s']: "";    
     $list_table->prepare_items($search_str);?>
     <div class="wrap">
         
         <div id="icon-users" class="icon32"><br/></div>        
-        <h2>Payment Types <a href="admin.php?page=payment_pages&action=new" class="page-title-action">Add New</a></h2>
+        <h2>Promotions <a href="admin.php?page=promo_pages&action=new" class="page-title-action">Add New</a></h2>
         <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
         <form id="list-filter" method="get">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page']?>" />
             <!-- Now we can render the completed list table -->
-            <?php $list_table->search_box('Search','payment_id');?>
+            <?php $list_table->search_box('Search','promo_id');?>
             <?php $list_table->display()?>
             <input type="hidden" name="_wp_http_referer" value="">
         </form>
@@ -443,37 +497,79 @@ function render_payment_list(){
     <?php
 }
 
-function delete_payment($id){
+function delete_promo($id){
     global $wpdb;
-    $wpdb->delete($wpdb->base_prefix.'cellable_payment_types', array('id' => $id));
+    $wpdb->delete($wpdb->base_prefix.'cellable_promos', array('id' => $id));
 }
 
 
-function render_edit_payment_page($id){
+function render_edit_promo_page($id){
     global $wpdb;
 
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_payment_types where id = %d ";
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_promos where id = %d ";
     $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
 
 ?>
     <div class="wrap edit-page">
-        <h2>Payment Type</h2>
+        <h2>Promotion</h2>
+        <p class="red"><strong><?= isset($_SESSION['error']) ? $_SESSION['error'] : ""?></strong></p>
+        <?php $_SESSION['error']=""; ?>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">
             <input name="id" hidden type="text" value="<?php echo $id?>">
             <table class="form-table" role="presentation">
                 <tbody>
                     <tr class="form-field">
                         <th scope="row">
+                            <label for="code">Code</label>
+                        </th>
+                        <td>
+                            <input name="code" id="code" type="text" value="<?= $info->code ?>" required>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
                             <label for="name">Name</label>
                         </th>
                         <td>
-                            <input name="name" id="name" type="text" value="<?=$info->name?>">
+                            <input name="name" id="name" type="text" value="<?= $info->name ?>" required>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="start_date">Start Date</label>
+                        </th>
+                        <td>
+                            <input name="start_date" id="start_date" type="date" value="<?= $info->start_date ?>" >
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="end_date">End Date</label>
+                        </th>
+                        <td>
+                            <input name="end_date" id="end_date" type="date" value="<?= $info->end_date ?>">
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="discount">Discount</label>
+                        </th>
+                        <td>
+                            <input name="discount" id="discount" type="number" step="0.01" value="<?= $info->discount ?>" required>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="dollar_value">Dollar Value</label>
+                        </th>
+                        <td>
+                            <input name="dollar_value" id="dollar_value" type="number" step="0.01" value="<?= $info->dollar_value ?>" required>
                         </td>
                     </tr>
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_PAYMENT_UPDATE" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_PROMO_UPDATE" class="button button-primary" value="Save Changes">
             </p>
         </form>
     </div>
@@ -481,13 +577,23 @@ function render_edit_payment_page($id){
 <?php
 }
 
-function render_new_payment_page(){    
+function render_new_promo_page(){    
 ?>
     <div class="wrap edit-page">
-        <h2>Payment Type</h2>
+        <h2>Promotion</h2>
+        <p class="red"><strong><?= isset($_SESSION['error']) ? $_SESSION['error'] : ""?></strong></p>
+        <?php $_SESSION['error']=""; ?>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">            
             <table class="form-table" role="presentation">
                 <tbody>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="code">Code</label>
+                        </th>
+                        <td>
+                            <input name="code" id="code" type="text" value="" required>
+                        </td>
+                    </tr>
                     <tr class="form-field">
                         <th scope="row">
                             <label for="name">Name</label>
@@ -496,10 +602,42 @@ function render_new_payment_page(){
                             <input name="name" id="name" type="text" value="" required>
                         </td>
                     </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="start_date">Start Date</label>
+                        </th>
+                        <td>
+                            <input name="start_date" id="start_date" type="date" value="" >
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="end_date">End Date</label>
+                        </th>
+                        <td>
+                            <input name="end_date" id="end_date" type="date" value="">
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="discount">Discount</label>
+                        </th>
+                        <td>
+                            <input name="discount" id="discount" type="number" step="0.01" value="" required>
+                        </td>
+                    </tr>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label for="dollar_value">Dollar Value</label>
+                        </th>
+                        <td>
+                            <input name="dollar_value" id="dollar_value" type="number" step="0.01" value="" required>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_PAYMENT_NEW" class="button button-primary" value="Create">
+                <input type="submit" name="CELLABLE_PROMO_NEW" class="button button-primary" value="Create">
             </p>
         </form>
     </div>
