@@ -6,11 +6,11 @@
   border: 0px;
 }
 
-.phone-version-name {  
+.phone-version-name, .image-with-name {  
   padding-top: 25px;  
 }
 
-.phone-version-image {
+.phone-version-image, .cellable-image {
   margin-right: 15px;
   width: 80px;  
 }

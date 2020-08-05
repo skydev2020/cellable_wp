@@ -130,7 +130,7 @@ class Cellable_Version_List_Table extends WP_List_Table {
             'upload'    => sprintf('<a style="cursor:pointer" class="set_version_images" id="upbtn-%s">Update Image</a>',$item['id']),           
         );
         
-        $image = $wpdb->get_var("SELECT image_file FROM ".$wpdb->base_prefix."cellable_phone_versions WHERE id='" . $item['id'] . "'");
+        $image = $item['image_file'];
         //Return the title contents
         return sprintf('<img src="%1$s" class="alignleft phone-version-image"/><div class="phone-version-name">%2$s %3$s</div>',
             $image ? $image:'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe',
@@ -673,7 +673,7 @@ function render_new_version_page(){
     $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_storage_capacities order by capacity";    
     $storage_capacities = $wpdb->get_results($sql_str, ARRAY_A);
 
-    ?>
+?>
     <div class="wrap edit-page">
         <h2>Phone Version</h2>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">            
@@ -766,7 +766,7 @@ function render_new_version_page(){
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_VERSION_NEW" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_VERSION_NEW" class="button button-primary" value="Create">
             </p>
         </form>
     </div>

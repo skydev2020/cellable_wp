@@ -531,7 +531,7 @@ function render_new_capacity_page(){
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_CAPACITY_NEW" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_CAPACITY_NEW" class="button button-primary" value="Create">
             </p>
         </form>
     </div>

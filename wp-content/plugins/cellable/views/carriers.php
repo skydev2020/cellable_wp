@@ -128,9 +128,9 @@ class Cellable_Carrier_List_Table extends WP_List_Table {
             'upload'    => sprintf('<a style="cursor:pointer" class="set_version_images" id="upbtn-%s">Update Image</a>',$item['id']),           
         );
         
-        $image = $wpdb->get_var("SELECT image_file FROM ".$wpdb->base_prefix."cellable_phone_versions WHERE id='" . $item['id'] . "'");
+        $image = $item['image_file'];
         //Return the title contents
-        return sprintf('<img src="%1$s" class="alignleft phone-version-image"/><div class="phone-version-name">%2$s %3$s</div>',
+        return sprintf('<img src="%1$s" class="alignleft cellable-image"/><div class="image-with-name">%2$s %3$s</div>',
             $image ? $image:'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe',
             /*$1%s*/ $item['name'],
             /*$2%s*/ $this->row_actions($actions)
@@ -534,7 +534,7 @@ function render_edit_carrier_page($id){
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_VERSION_UPDATE" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_CARRIER_UPDATE" class="button button-primary" value="Save Changes">
             </p>
         </form>
     </div>
@@ -543,19 +543,10 @@ function render_edit_carrier_page($id){
 }
 
 function render_new_carrier_page(){
-    global $wpdb;
-
-    $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
     
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix. "cellable_carriers order by id";    
-    $carriers = $wpdb->get_results($sql_str, ARRAY_A);
-
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_storage_capacities order by capacity";    
-    $storage_capacities = $wpdb->get_results($sql_str, ARRAY_A);
-
-    ?>
+?>
     <div class="wrap edit-page">
-        <h2>Phone Version</h2>
+        <h2>Carrier</h2>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">            
             <table class="form-table" role="presentation">
                 <tbody>
@@ -569,67 +560,10 @@ function render_new_carrier_page(){
                     </tr>
                     <tr class="form-field">
                         <th scope="row">
-                            <label for="phone_id">Brand</label>
-                        </th>
-                        <td>
-                            <select name="phone_id" id="phone_id" required>
-                            <?php foreach ($phone_brands as $phone): ?>
-                                <option value="<?= $phone['id'] ?>"><?= $phone['name'] ?></option>
-                            <?php endforeach; ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th colspan="2">Carriers (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($carriers as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cr<?= $ele['id']?>"><?= $ele['name'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cr<?= $ele['id'] ?>" id="cr<?= $ele['id']?>" type="number" step="0.01" min="0" value="">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2">Capacities (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($storage_capacities as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cp<?= $ele['id']?>"><?= $ele['description'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cp<?= $ele['id'] ?>" id="cp<?= $ele['id']?>" type="number" step="0.01" min="0" value="">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2"><hr></td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="views">Views</label>
-                        </th>
-                        <td>
-                            <input name="views" type="number" min="0" value="">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="purchases">Purchases</label>
-                        </th>
-                        <td>
-                            <input name="purchases" type="number" min="0" value="">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
                             <label for="position">Position</label>
                         </th>
                         <td>
-                            <input name="position" type="number" step="0.01" min="0" value="">
+                            <input name="position" type="number" min="0" value="">
                         </td>
                     </tr>
                     <tr class="form-field">
@@ -646,7 +580,7 @@ function render_new_carrier_page(){
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_VERSION_NEW" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_CARRIER_NEW" class="button button-primary" value="Create">
             </p>
         </form>
     </div>

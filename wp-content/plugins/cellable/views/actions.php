@@ -37,7 +37,7 @@ if(isset($_POST['CELLABLE_ORDER_UPDATE']))
     }
 }
 
-// Phone Update
+// Phone New/Update
 if(isset($_POST['CELLABLE_BRAND_UPDATE']))
 {   
     if(isset($_POST['id'])){       
@@ -52,7 +52,6 @@ if(isset($_POST['CELLABLE_BRAND_UPDATE']))
     }
 }
 
-// Phone New
 if(isset($_POST['CELLABLE_BRAND_NEW']))
 {       
     $name = stripslashes($_POST['name']);
@@ -64,6 +63,39 @@ if(isset($_POST['CELLABLE_BRAND_NEW']))
     );
     
     header('Location: ' . get_admin_url()."admin.php?page=brand_pages");    
+}
+
+// Carrier New/Update
+if(isset($_POST['CELLABLE_CARRIER_UPDATE']))
+{   
+    if(isset($_POST['id'])){       
+        $name = stripslashes($_POST['name']);
+        $position = stripslashes($_POST['position']);
+        $status = stripslashes($_POST['status']);
+        $r = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE ". $wpdb->base_prefix. "cellable_carriers SET name = %s, position = %d, status = %d where id = %d;",
+                $name, $position, $status, $_POST['id']
+            ) 
+        );
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+    }
+}
+
+if(isset($_POST['CELLABLE_CARRIER_NEW']))
+{       
+    $name = stripslashes($_POST['name']);
+    $position = stripslashes($_POST['position']);
+    $status = stripslashes($_POST['status']);
+
+    $r = $wpdb->query(
+        $wpdb->prepare(
+            "INSERT ". $wpdb->base_prefix. "cellable_phones (name, position, status) VALUES (%s, %d, %d)",
+            $name, $position, $status_id
+        ) 
+    );
+    
+    header('Location: ' . get_admin_url()."admin.php?page=carrier_pages");    
 }
 
 // Phone Version Update

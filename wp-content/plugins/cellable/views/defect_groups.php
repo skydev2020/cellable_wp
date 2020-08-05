@@ -554,7 +554,7 @@ function render_new_defect_group_page(){
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_DEFECT_GROUP_NEW" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_DEFECT_GROUP_NEW" class="button button-primary" value="Create">
             </p>
         </form>
     </div>
