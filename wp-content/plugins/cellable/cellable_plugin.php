@@ -9,6 +9,7 @@
 require_once('cellable_global.php');
 require_once('views/brands.php');
 require_once('views/carriers.php');
+require_once('views/payments.php');
 require_once('views/versions.php');
 require_once('views/settings.php');
 require_once('views/capacities.php');
@@ -28,6 +29,12 @@ if ( ! function_exists( 'brand_pages' ) ) {
 if ( ! function_exists( 'carrier_pages' ) ) {
     function carrier_pages(){
         render_carrier_list();
+    }
+}
+
+if ( ! function_exists( 'payment_pages' ) ) {
+    function payment_pages(){
+        render_payment_list();
     }
 }
 
@@ -78,6 +85,7 @@ if ( ! function_exists( 'admin_add_pages' ) ) {
             add_menu_page("Cellable", "Cellable", "manage_options", "cellable","orders","dashicons-networking", 4);
             add_submenu_page('cellable','Brands', 'Brands', 'manage_options', 'brand_pages','brand_pages');
             add_submenu_page('cellable','Carriers', 'Carriers', 'manage_options', 'carrier_pages','carrier_pages');
+            add_submenu_page('cellable','Payment Types', 'Payment Types', 'manage_options', 'payment_pages','payment_pages');
             add_submenu_page('cellable','Phone Versions', 'Phone Versions', 'manage_options', 'version_pages','version_pages');
             add_submenu_page('cellable','Defect Groups', 'Defect Groups', 'manage_options', 'defect_group_pages','defect_group_pages');
             add_submenu_page('cellable','Possible Defects', 'Possible Defects', 'manage_options', 'possible_defect_pages','possible_defect_pages');

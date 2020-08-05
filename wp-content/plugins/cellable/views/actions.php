@@ -346,6 +346,36 @@ if(isset($_POST['CELLABLE_CAPACITY_UPDATE']))
     }
 }
 
+// Payment Types
+if(isset($_POST['CELLABLE_PAYMENT_NEW']))
+{   
+    $name = stripslashes($_POST['name']);
+    
+    $r = $wpdb->query(
+        $wpdb->prepare(
+            "INSERT ". $wpdb->base_prefix. "cellable_payment_types (name) VALUES (%s)",
+            $name
+        ) 
+    );
+    
+    header('Location: ' . get_admin_url()."admin.php?page=payment_pages");    
+}
+
+if(isset($_POST['CELLABLE_PAYMENT_UPDATE']))
+{   
+    if(isset($_POST['id'])){               
+        $name = stripslashes($_POST['name']);
+
+        $r = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE ". $wpdb->base_prefix. "cellable_payment_types SET name=%s where id = %d;",
+                $name, $_POST['id']
+            ) 
+        );
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+    }
+}
+
 /**
  * Image Uploading: Version
  */

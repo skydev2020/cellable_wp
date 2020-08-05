@@ -45,7 +45,7 @@ if(!class_exists('WP_List_Table')){
  * 
  * Our theme for this list table is going to be movies.
  */
-class Cellable_Capacity_List_Table extends WP_List_Table {
+class Cellable_Payment_List_Table extends WP_List_Table {
     
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
@@ -92,8 +92,7 @@ class Cellable_Capacity_List_Table extends WP_List_Table {
      **************************************************************************/
     function column_default($item, $column_name){
         switch($column_name){
-            case 'capacity':
-            case 'description':
+            case 'name':
                 return $item[$column_name];
             default:
                 return print_r($item,true); //Show the whole array for troubleshooting purposes
@@ -117,7 +116,7 @@ class Cellable_Capacity_List_Table extends WP_List_Table {
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
     
-    function column_capacity($item){                
+    function column_name($item){                
         //Build row actions
         global $wpdb;
         //Build row actions
@@ -128,7 +127,7 @@ class Cellable_Capacity_List_Table extends WP_List_Table {
                 
         //Return the title contents
         return sprintf('%1$s %2$s',
-            /*$1%s*/ $item['capacity'],
+            /*$1%s*/ $item['name'],
             /*$2%s*/ $this->row_actions($actions)
         );
 
@@ -169,8 +168,7 @@ class Cellable_Capacity_List_Table extends WP_List_Table {
     function get_columns(){
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
-            'capacity'  => 'Capacity',
-            'description'  => 'Description',
+            'name'  => 'Name',
         );
         return $columns;
     }
@@ -191,8 +189,7 @@ class Cellable_Capacity_List_Table extends WP_List_Table {
     function get_sortable_columns() {
         $sortable_columns = array(
             'id'     => array('id',false),     //true means it's already sorted
-            'capacity'  => array('capacity',false),
-            'description'  => array('description',false),            
+            'name'  => array('capacity',false),            
         );
         return $sortable_columns;
     }
@@ -233,13 +230,13 @@ class Cellable_Capacity_List_Table extends WP_List_Table {
                 case 'delete':
                     if(is_array($_GET['item'])) {
                         foreach ($_GET['item'] as $item){
-                            delete_capacity($item);
+                            delete_payment($item);
                         }                        
                     }
                     else {
-                        delete_capacity($_GET['item']);
+                        delete_payment($_GET['item']);
                     }
-                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Storage Capacity Deleted.' );?></p></div><?php
+                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Payment Type Deleted.' );?></p></div><?php
                     break;
                 default:
                     break;
@@ -314,10 +311,10 @@ class Cellable_Capacity_List_Table extends WP_List_Table {
         
         $data = array();
 
-        $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_storage_capacities ";
+        $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_payment_types ";
                 
         if($search_str) {
-            $sql_str .= "where description like %s"; 
+            $sql_str .= "where name like %s"; 
             $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
         }
         else {
@@ -333,22 +330,9 @@ class Cellable_Capacity_List_Table extends WP_List_Table {
          * sorting technique would be unnecessary.
          */
         function usort_reorder($a,$b){
-            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'capacity'; //If no sort, default to title
+            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id'; //If no sort, default to title
             $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
-            if ($orderby == "id" || $orderby == "capacity") {
-                if ($a[$orderby] > $b[$orderby]) {
-                    $result = 1;
-                }
-                else if ($a[$orderby] < $b[$orderby]) {
-                    $result = -1;
-                }
-                else {                
-                    $result = 0;                
-                }
-            }
-            else {
-                $result = strcmp($a[$orderby], $b[$orderby]); //Determine sort order
-            }
+            $result = strcmp($a[$orderby], $b[$orderby]); //Determine sort order
             
             return ($order==='asc') ? $result : -$result; //Send final sort direction to usort
         }
@@ -421,36 +405,36 @@ class Cellable_Capacity_List_Table extends WP_List_Table {
  * so we've instead called those methods explicitly. It keeps things flexible, and
  * it's the way the list tables are used in the WordPress core.
  */
-function render_capacity_list(){
+function render_payment_list(){
 
     if(isset($_GET['action']) && $_GET['action'] == 'edit')
     {
         $id = $_GET['item'];        
-        render_edit_capacity_page($id);
+        render_edit_payment_page($id);
         return;
     }
 
     if(isset($_GET['action']) && $_GET['action'] == 'new')
     {        
-        render_new_capacity_page();
+        render_new_payment_page();
         return;
     }
 
     //Create an instance of our package class...
-    $list_table = new Cellable_Capacity_List_Table();
+    $list_table = new Cellable_Payment_List_Table();
     //Fetch, prepare, sort, and filter our data...
     $search_str = isset($_REQUEST['s']) ? $_REQUEST['s']: "";    
     $list_table->prepare_items($search_str);?>
     <div class="wrap">
         
         <div id="icon-users" class="icon32"><br/></div>        
-        <h2>Storage Capacities <a href="admin.php?page=capacity_pages&action=new" class="page-title-action">Add New</a></h2>
+        <h2>Payment Typs <a href="admin.php?page=payment_pages&action=new" class="page-title-action">Add New</a></h2>
         <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
         <form id="list-filter" method="get">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page']?>" />
             <!-- Now we can render the completed list table -->
-            <?php $list_table->search_box('Search','capacity_id');?>
+            <?php $list_table->search_box('Search','payment_id');?>
             <?php $list_table->display()?>
             <input type="hidden" name="_wp_http_referer" value="">
         </form>
@@ -459,45 +443,37 @@ function render_capacity_list(){
     <?php
 }
 
-function delete_capacity($id){
+function delete_payment($id){
     global $wpdb;
-    $wpdb->delete($wpdb->base_prefix.'cellable_storage_capacities', array('id' => $id));
+    $wpdb->delete($wpdb->base_prefix.'cellable_payment_types', array('id' => $id));
 }
 
 
-function render_edit_capacity_page($id){
+function render_edit_payment_page($id){
     global $wpdb;
 
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_storage_capacities where id = %d ";
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_payment_types where id = %d ";
     $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
 
 ?>
     <div class="wrap edit-page">
-        <h2>Storage Capacity</h2>
+        <h2>Payment TYpe</h2>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">
             <input name="id" hidden type="text" value="<?php echo $id?>">
             <table class="form-table" role="presentation">
                 <tbody>
                     <tr class="form-field">
                         <th scope="row">
-                            <label for="capacity">Capacity(GB)</label>
+                            <label for="name">Name</label>
                         </th>
                         <td>
-                            <input name="capacity" id="capacity" type="number" min="0" value="<?=$info->capacity?>">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="description">Description</label>
-                        </th>
-                        <td>
-                            <input name="description" id="description" type="text" value="<?=$info->description?>">
+                            <input name="name" id="name" type="text" value="<?=$info->name?>">
                         </td>
                     </tr>
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_CAPACITY_UPDATE" class="button button-primary" value="Save Changes">
+                <input type="submit" name="CELLABLE_PAYMENT_UPDATE" class="button button-primary" value="Save Changes">
             </p>
         </form>
     </div>
@@ -505,33 +481,25 @@ function render_edit_capacity_page($id){
 <?php
 }
 
-function render_new_capacity_page(){    
+function render_new_payment_page(){    
 ?>
     <div class="wrap edit-page">
-        <h2>Storage Capacity</h2>
+        <h2>Payment Type</h2>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">            
             <table class="form-table" role="presentation">
                 <tbody>
                     <tr class="form-field">
                         <th scope="row">
-                            <label for="capacity">Capacity(GB)</label>
+                            <label for="name">Name</label>
                         </th>
                         <td>
-                            <input name="capacity" id="capacity" type="number" min="0" value="" required>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="description">Description</label>
-                        </th>
-                        <td>
-                            <input name="description" id="description" type="text" value="">
+                            <input name="name" id="name" type="text" value="" required>
                         </td>
                     </tr>
                 </tbody>
             </table>
             <p class="submit">
-                <input type="submit" name="CELLABLE_CAPACITY_NEW" class="button button-primary" value="Create">
+                <input type="submit" name="CELLABLE_PAYMENT_NEW" class="button button-primary" value="Create">
             </p>
         </form>
     </div>
