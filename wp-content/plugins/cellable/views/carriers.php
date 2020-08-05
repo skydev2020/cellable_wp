@@ -93,9 +93,7 @@ class Cellable_Carrier_List_Table extends WP_List_Table {
     function column_default($item, $column_name){
         switch($column_name){
             case 'name':
-            case 'p_name':
-            case 'views':
-            case 'purchases':
+            case 'status':
             case 'position':
                 return $item[$column_name];
             default:
@@ -146,10 +144,8 @@ class Cellable_Carrier_List_Table extends WP_List_Table {
             return 'Active';
         }
         return 'Inactive';
-        
     }
 
-   
    
     /** ************************************************************************-
      * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
@@ -186,36 +182,11 @@ class Cellable_Carrier_List_Table extends WP_List_Table {
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
             'name'  => 'Name',
-            'p_name'  => 'Phone',            
-            'views'  => 'Views',
-            'purchases'  => 'Purchases',
+            'position'  => 'Position',            
             'status'  => 'Status',
-            'position'  => 'Position',
         );
         return $columns;
     }
-
-    function extra_tablenav( $which ) {
-        
-        $move_on_url = '&status=';
-        $status=isset($_GET['status']) ? $_GET['status'] : "-1";
-        if ( $which == "top" ){
-            ?>
-            <div class="alignleft actions bulkactions">
-                <select name="status" class="status-filter" onchange="changeStatus(this)"> 
-                    <option value="-1">Filter by Status</option>
-                    <option value="1" <?= $status=='1'? 'selected' : '' ?>>Active</option>
-                    <option value="0" <?= $status=='0'? 'selected' : '' ?>>Inactive</option>
-                </select>
-            </div>
-            <?php
-        }
-        if ( $which == "bottom" ){
-            //The code that goes after the table is there
-    
-        }
-    }
-
 
     /** ************************************************************************
      * Optional. If you want one or more columns to be sortable (ASC/DESC toggle), 
@@ -235,10 +206,7 @@ class Cellable_Carrier_List_Table extends WP_List_Table {
         $sortable_columns = array(
             'id'     => array('id',false),     //true means it's already sorted
             'name'  => array('name',false),
-            'p_name'  => array('p_name',false),            
-            'views'  => array('views',false),
-            'purchases'  => array('purchases',false),
-            'status'  => array('status',false),
+            'status'  => array('status',false),            
             'position'  => array('position',false),
         );
         return $sortable_columns;
@@ -359,34 +327,17 @@ class Cellable_Carrier_List_Table extends WP_List_Table {
          * @var array 
          **************************************************************************/
         
-        $status=isset($_GET['status']) ? $_GET['status'] : "-1";
         $data = array();
 
-        $sql_str = "SELECT pv.id id, pv.name name, pv.image_file image_file, p.name p_name, ";
-        $sql_str .= "pv.views views, pv.purchases purchases, ";
-        $sql_str .= "pv.status status, pv.position position ";
-        $sql_str .= "FROM ".$wpdb->base_prefix."cellable_phone_versions pv ";
-        $sql_str .= "left join ".$wpdb->base_prefix."cellable_phones p on pv.phone_id = p.id ";
+        $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_carriers ";
                 
         if($search_str) {
-            $sql_str .= "where (pv.name like %s or p.name like %s or views like %s or purchases like %s";
-            $sql_str .= "or position like %s) ";
+            $sql_str .= "where name like %s";
 
-            if ($status != "-1") {
-                $sql_str .= "and pv.status = " .$status;
-            } 
-
-            $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',            
-            '%'.$wpdb->esc_like($search_str).'%',
-            '%'.$wpdb->esc_like($search_str).'%',
-            '%'.$wpdb->esc_like($search_str).'%',
-            '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
+            $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
             
         }
-        else {          
-            if ($status != "-1") {
-                $sql_str .= " where pv.status = " .$status;
-            }   
+        else {
             $data = $wpdb->get_results($sql_str,ARRAY_A);
         }
         
@@ -401,7 +352,7 @@ class Cellable_Carrier_List_Table extends WP_List_Table {
         function usort_reorder($a,$b){
             $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id'; //If no sort, default to title
             $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
-            if ($orderby == "id" || $orderby == "position" || $orderby == "views" || $orderby == "purchases") {
+            if ($orderby == "id" || $orderby == "position") {
                 if ($a[$orderby] > $b[$orderby]) {
                     $result = 1;
                 }
@@ -512,7 +463,7 @@ function render_carrier_list(){
         <div id="icon-users" class="icon32"><br/></div>        
         <h2>Carriers <a href="admin.php?page=carrier_pages&action=new" class="page-title-action">Add New</a></h2>
         <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
-        <form id="versions-filter" method="get">
+        <form id="carriers-filter" method="get">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page']?>" />
             <!-- Now we can render the completed list table -->
@@ -527,37 +478,23 @@ function render_carrier_list(){
 
 function delete_carrier($id){
     global $wpdb;
-    $wpdb->delete($wpdb->base_prefix.'cellable_phone_versions', array('id' => $id));
+    $wpdb->delete($wpdb->base_prefix.'cellable_carriers', array('id' => $id));
 }
 
 
 function render_edit_carrier_page($id){
     global $wpdb;
 
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions where id = %d ";
+    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_carriers where id = %d ";
     $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
 
     if (!$info->image_file) {
         $info->image_file = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe";
     }
     
-    $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
-    
-    $sql_str = "SELECT c.id id, c.name name, vc.value value ";
-    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_carriers c ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_version_carriers vc on c.id = vc.carrier_id and vc.phone_version_id = " .$id;
-    $sql_str .= " order by c.id";    
-    $version_carriers = $wpdb->get_results($sql_str, ARRAY_A);
-
-    $sql_str = "SELECT sc.id id, sc.capacity capacity, sc.description descr, vc.value value ";
-    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_storage_capacities sc ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_version_capacities vc on sc.id = vc.storage_capacity_id and vc.phone_version_id = " .$id;
-    $sql_str .= " order by sc.capacity";    
-    $version_capacities = $wpdb->get_results($sql_str, ARRAY_A);
-
     ?>
     <div class="wrap edit-page">
-        <h2>Phone Version</h2>
+        <h2>Carrier</h2>
         <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">
             <input name="id" hidden type="text" value="<?php echo $id?>">
             <table class="form-table" role="presentation">
@@ -577,67 +514,10 @@ function render_edit_carrier_page($id){
                     </tr>
                     <tr class="form-field">
                         <th scope="row">
-                            <label for="phone_id">Brand</label>
-                        </th>
-                        <td>
-                            <select name="phone_id" id="phone_id" required>
-                            <?php foreach ($phone_brands as $phone): ?>
-                                <option value="<?= $phone['id'] ?>" <?= ($info->phone_id == $phone['id']) ? "selected" : "" ?>><?= $phone['name'] ?></option>
-                            <?php endforeach; ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th colspan="2">Carriers (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($version_carriers as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cr<?= $ele['id']?>"><?= $ele['name'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cr<?= $ele['id'] ?>" id="cr<?= $ele['id']?>" type="number" step="0.01" min="0" value="<?=$ele['value'];?>">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2">Capacities (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($version_capacities as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cp<?= $ele['id']?>"><?= $ele['descr'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cp<?= $ele['id'] ?>" id="cp<?= $ele['id']?>" type="number" step="0.01" min="0" value="<?=$ele['value'];?>">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2"><hr></td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="views">Views</label>
-                        </th>
-                        <td>
-                            <input name="views" type="number" min="0" value="<?=$info->views;?>">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="purchases">Purchases</label>
-                        </th>
-                        <td>
-                            <input name="purchases" type="number" min="0" value="<?=$info->purchases;?>">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
                             <label for="position">Position</label>
                         </th>
                         <td>
-                            <input name="position" type="number" step="0.01" min="0" value="<?=$info->position;?>">
+                            <input name="position" type="number" min="0" value="<?=$info->position;?>">
                         </td>
                     </tr>
                     <tr class="form-field">

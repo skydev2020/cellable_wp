@@ -1,0 +1,23 @@
+.edit-page .form-field input[type=text], .edit-page .form-field input[type=number] {
+  width: 25%;
+}
+
+.media-icon img {
+  border: 0px;
+}
+
+.phone-version-name {  
+  padding-top: 25px;  
+}
+
+.phone-version-image {
+  margin-right: 15px;
+  width: 80px;  
+}
+
+#carriers-filter td.column-status,#carriers-filter td.column-position,
+#versions-filter td.column-p_name, #versions-filter td.column-views,
+#versions-filter td.column-purchases, #versions-filter td.column-status,
+#versions-filter td.column-position {
+  vertical-align: middle;
+}
