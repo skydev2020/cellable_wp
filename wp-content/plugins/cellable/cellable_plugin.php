@@ -381,13 +381,30 @@ function extra_user_profile_fields($user) {
 
 // Custom Dashboard
 add_action('wp_dashboard_setup', 'cellable_new_orders_dashboard_widgets');
-  
+add_action('wp_dashboard_setup', 'cellable_most_viewed_dashboard_widgets');
+add_action('wp_dashboard_setup', 'cellable_most_purchased_dashboard_widgets');
+add_action('wp_dashboard_setup', 'cellable_promotions_dashboard_widgets');
+
 function cellable_new_orders_dashboard_widgets() {
     global $wp_meta_boxes;
     
     wp_add_dashboard_widget('cellable_new_orders_widget', 'New Orders', 'new_orders_widget_section');
 }
+
+function cellable_most_viewed_dashboard_widgets() {
+    wp_add_dashboard_widget('cellable_viewed_versions_widget', 'Top 10 Viewed Versions', 'viewed_versions_widget_section');
+}
+
+function cellable_most_purchased_dashboard_widgets() {
+    wp_add_dashboard_widget('cellable_purchased_versions_widget', 'Top 10 Purchased Versions', 'purchased_versions_widget_section');
+}
+
+function cellable_promotions_dashboard_widgets() {
+    wp_add_dashboard_widget('cellable_promotions_widget', 'Promotions', 'promotions_widget_section');
+}
  
+
+
 function new_orders_widget_section() {
     global $wpdb;
     
@@ -398,8 +415,11 @@ function new_orders_widget_section() {
     $data = $wpdb->get_results($sql_str,ARRAY_A);
     
     $str ="<table style='width:100%;' class='striped cellable-widget'><thead>";
-    $str .="<tr><td style='width: 30%;'>Amount</td><td class='text-center' style='width: 45%;'>Created Date</td><td class='text-center'>Payment Method</td></tr>";
+    $str .="<tr><td class='text-center' style='width: 30%;'>Amount</td>";
+    $str .="<td class='text-center' style='width: 45%;'>Created Date</td>";
+    $str .="<td class='text-center'>Payment Method</td></tr>";
     $str .="</thead><tbody>";
+    
     foreach ($data as $ele):
         $created_date="";
         if ($ele['created_date']) {
@@ -408,9 +428,83 @@ function new_orders_widget_section() {
         }
         
         $str .= "<tr>";
-        $str .= "<td>$". $ele["amount"]. "</td>";
+        $str .= "<td class='text-center'>$". $ele["amount"]. "</td>";
         $str .= "<td class='text-center'>". $created_date. "</td>";
         $str .= "<td class='text-center'>". $ele["pay_name"]. "</td>";
+        $str .= "</tr>";
+    endforeach;
+    $str .="</tbody></table>";
+
+    echo $str;
+}
+
+function viewed_versions_widget_section() {
+    global $wpdb;
+    
+    $sql_str = "select * FROM ".$wpdb->base_prefix . "cellable_phone_versions ";    
+    $sql_str .= "where status=true order by views desc limit 10";
+
+    $data = $wpdb->get_results($sql_str,ARRAY_A);
+    
+    $str ="<table style='width:100%;' class='striped cellable-widget'><thead>";
+    $str .="<tr><td class='text-center'>Version</td><td class='text-center'>Views</td></tr>";
+    $str .="</thead><tbody>";
+    foreach ($data as $ele):
+        $str .= "<tr>";
+        $str .= "<td class='text-center'>". $ele["name"]. "</td>";
+        $str .= "<td class='text-center'>". $ele["views"]. "</td>";
+        $str .= "</tr>";
+    endforeach;
+    $str .="</tbody></table>";
+
+    echo $str;
+}
+
+function purchased_versions_widget_section() {
+    global $wpdb;
+    
+    $sql_str = "select * FROM ".$wpdb->base_prefix . "cellable_phone_versions ";    
+    $sql_str .= "where status=true order by purchases desc limit 10";
+
+    $data = $wpdb->get_results($sql_str,ARRAY_A);
+    
+    $str ="<table style='width:100%;' class='striped cellable-widget'><thead>";
+    $str .="<tr><td class='text-center'>Version</td><td class='text-center'>Sales</td></tr>";
+    $str .="</thead><tbody>";
+    foreach ($data as $ele):
+        $str .= "<tr>";
+        $str .= "<td class='text-center'>". $ele["name"]. "</td>";
+        $str .= "<td class='text-center'>". $ele["purchases"]. "</td>";
+        $str .= "</tr>";
+    endforeach;
+    $str .="</tbody></table>";
+
+    echo $str;
+}
+
+function promotions_widget_section() {
+    global $wpdb;
+    
+    $sql_str = "select * FROM ".$wpdb->base_prefix . "cellable_promos ";
+
+    $data = $wpdb->get_results($sql_str,ARRAY_A);
+    
+    $str ="<table style='width:100%;' class='striped cellable-widget'><thead>";
+    $str .="<tr>";
+    $str .="<td class='text-center'>Code</td><td class='text-center'>Name</td>";
+    $str .="<td class='text-center'>Start Date</td><td class='text-center'>End Date</td>";
+    $str .="<td class='text-center'>Discount</td><td class='text-center'>Dollar Value</td>";
+    $str .="</tr>";
+    $str .="</thead><tbody>";
+
+    foreach ($data as $ele):
+        $str .= "<tr>";
+        $str .= "<td class='text-center'>". $ele["code"]. "</td>";
+        $str .= "<td class='text-center'>". $ele["name"]. "</td>";
+        $str .= "<td class='text-center'>". $ele["start_date"]. "</td>";
+        $str .= "<td class='text-center'>". $ele["end_date"]. "</td>";
+        $str .= "<td class='text-center'>". $ele["discount"]. "</td>";
+        $str .= "<td class='text-center'>". $ele["dollar_value"]. "</td>";
         $str .= "</tr>";
     endforeach;
     $str .="</tbody></table>";
