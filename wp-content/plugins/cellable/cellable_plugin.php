@@ -397,7 +397,9 @@ function new_orders_widget_section() {
 
     $data = $wpdb->get_results($sql_str,ARRAY_A);
     
-    $str ="<table style='width:100%;'>";
+    $str ="<table style='width:100%;' class='striped cellable-widget'><thead>";
+    $str .="<tr><td style='width: 30%;'>Amount</td><td class='text-center' style='width: 45%;'>Created Date</td><td class='text-center'>Payment Method</td></tr>";
+    $str .="</thead><tbody>";
     foreach ($data as $ele):
         $created_date="";
         if ($ele['created_date']) {
@@ -406,12 +408,12 @@ function new_orders_widget_section() {
         }
         
         $str .= "<tr>";
-        $str .= "<td style='width: 30%;'>$". $ele["amount"]. "</td>";
-        $str .= "<td style='width: 45%;'>". $created_date. "</td>";
-        $str .= "<td class='alignleft'>". $ele["pay_name"]. "</td>";
+        $str .= "<td>$". $ele["amount"]. "</td>";
+        $str .= "<td class='text-center'>". $created_date. "</td>";
+        $str .= "<td class='text-center'>". $ele["pay_name"]. "</td>";
         $str .= "</tr>";
     endforeach;
-    $str .="</table>";
+    $str .="</tbody></table>";
 
     echo $str;
 }

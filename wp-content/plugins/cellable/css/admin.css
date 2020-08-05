@@ -36,3 +36,20 @@
 #dashboard-widgets .postbox-container {
   width: 50%;
 }
+
+.text-center {
+  text-align: center;
+}
+
+.cellable-widget {
+  border-collapse: collapse;
+}
+
+.cellable-widget thead {
+  background-color: #366c98;
+  color: white;
+}
+
+.cellable-widget td {
+  padding: 2px 5px;
+}
