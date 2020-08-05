@@ -125,8 +125,8 @@ class Cellable_Testimonial_List_Table extends WP_List_Table {
         global $wpdb;
         //Build row actions
         $actions = array(
-            'publish'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'publish',$item['id']),
-            'hide'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'hide',$item['id']),
+            'publish'      => sprintf('<a href="?page=%s&action=%s&item=%s">Publish</a>',$_REQUEST['page'],'publish',$item['id']),
+            'hide'      => sprintf('<a href="?page=%s&action=%s&item=%s">Hide</a>',$_REQUEST['page'],'hide',$item['id']),
             'delete'      => sprintf('<a href="?page=%s&action=%s&item=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
         );
                 
@@ -137,15 +137,24 @@ class Cellable_Testimonial_List_Table extends WP_List_Table {
         );
     }
 
-    // function column_published($item){                
-    //     if ($item['published'] == 1) {
-    //         return 'Active';
-    //     }
-    //     return 'Inactive';
-        
-    // }
+    function column_published($item){                
+        if ($item['published'] == 1) {
+            return 'Published';
+        }
+        else if ($item['published'] == 0) {
+            return 'Hidden';
+        }
+        return '';        
+    }
 
-   
+    function column_created_date($item){    
+        if ($item['created_date']) {
+            $date = new DateTime($item['created_date']);
+            $created_date = $date->format('m/d/Y h:i:s A');
+            return $created_date;        
+        }
+        return "";                
+    }
    
     /** ************************************************************************-
      * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
@@ -190,6 +199,27 @@ class Cellable_Testimonial_List_Table extends WP_List_Table {
         return $columns;
     }
 
+    function extra_tablenav( $which ) {
+        
+        $move_on_url = '&status=';
+        $status=isset($_GET['status']) ? $_GET['status'] : "-1";
+        if ( $which == "top" ){
+            ?>
+            <div class="alignleft actions bulkactions">
+                <select name="status" class="status-filter" onchange="filterByOption('testimonial_pages','status',this)"> 
+                    <option value="-1">Filter by Status</option>
+                    <option value="1" <?= $status=='1'? 'selected' : '' ?>>Published</option>
+                    <option value="0" <?= $status=='0'? 'selected' : '' ?>>Hidden</option>
+                </select>
+            </div>
+            <?php
+        }
+        if ( $which == "bottom" ){
+            //The code that goes after the table is there
+    
+        }
+    }
+
     /** ************************************************************************
      * Optional. If you want one or more columns to be sortable (ASC/DESC toggle), 
      * you will need to register it here. This should return an array where the 
@@ -231,7 +261,9 @@ class Cellable_Testimonial_List_Table extends WP_List_Table {
      **************************************************************************/
     function get_bulk_actions() {
         $actions = array(
-            'delete'    => 'Delete'
+            'delete'    => 'Delete',
+            'publish'    => 'Publish',
+            'hide'    => 'Hide'
         );
         return $actions;
     }
@@ -257,7 +289,7 @@ class Cellable_Testimonial_List_Table extends WP_List_Table {
                     else {
                         delete_testimonial($_GET['item']);
                     }
-                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Phone Version Deleted.' );?></p></div><?php
+                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Testimonial Deleted.' );?></p></div><?php
                     break;
                 case 'publish':
                     if(is_array($_GET['item'])) {
@@ -268,7 +300,7 @@ class Cellable_Testimonial_List_Table extends WP_List_Table {
                     else {
                         publish_testimonial($_GET['item'], true);
                     }
-                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Phone Version Published.' );?></p></div><?php
+                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Testimonial Published.' );?></p></div><?php
                     break;
                 case 'hide':
                     if(is_array($_GET['item'])) {
@@ -279,7 +311,7 @@ class Cellable_Testimonial_List_Table extends WP_List_Table {
                     else {
                         publish_testimonial($_GET['item'], false);
                     }
-                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Phone Version Hidden.' );?></p></div><?php
+                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Testimonial Hidden.' );?></p></div><?php
                     break;
                 default:
                     break;
@@ -362,18 +394,23 @@ class Cellable_Testimonial_List_Table extends WP_List_Table {
         $sql_str .= "left join ".$wpdb->base_prefix."users u on t.user_id = u.id ";
                 
         if($search_str) {
-            $sql_str .= "where t.comment like %s or t.rating like %s or t.created_date like %s, t.published like %s ";
-            $sql_str .= "or u.user_login like %s or position like %s "; 
+            $sql_str .= "where (t.comment like %s or t.rating like %s or t.created_date like %s ";
+            $sql_str .= "or u.user_login like %s) ";
+            
+            if ($status != "-1") {
+                $sql_str .= "and t.published = " .$status;
+            }
 
             $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',            
-            '%'.$wpdb->esc_like($search_str).'%',
-            '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
             
         }
-        else {            
+        else {      
+            if ($status != "-1") {
+                $sql_str .= " where t.published = " .$status;
+            }      
             $data = $wpdb->get_results($sql_str,ARRAY_A);
         }
         
@@ -501,7 +538,7 @@ function render_testimonial_list(){
 
 function delete_testimonial($id){
     global $wpdb;
-    $wpdb->delete($wpdb->base_prefix.'callable_testimonials', array('id' => $id));
+    $wpdb->delete($wpdb->base_prefix.'cellable_testimonials', array('id' => $id));
 }
 
 function publish_testimonial($id, $status){
@@ -509,8 +546,8 @@ function publish_testimonial($id, $status){
     
     $r = $wpdb->query(
         $wpdb->prepare(
-            "UPDATE ". $wpdb->base_prefix. "callable_testimonials SET published=%d where id = %d;",
-            $status, $_POST['id']
+            "UPDATE ". $wpdb->base_prefix. "cellable_testimonials SET published=%d where id = %d;",
+            $status, $id
         ) 
     );
 }

@@ -161,10 +161,13 @@ class Cellable_Order_List_Table extends WP_List_Table {
         endif;
     }
 
-    function column_created_date($item){       
-        $date = new DateTime($item['created_date']);
-        $created_date = $date->format('m/d/Y h:i:s A');
-        return $created_date;        
+    function column_created_date($item){    
+        if ($item['created_date']) {
+            $date = new DateTime($item['created_date']);
+            $created_date = $date->format('m/d/Y h:i:s A');
+            return $created_date;        
+        }
+        return "";                
     }
 
     function column_action($item){       
