@@ -45,7 +45,7 @@ if(!class_exists('WP_List_Table')){
  * 
  * Our theme for this list table is going to be movies.
  */
-class Cellable_Version_List_Table extends WP_List_Table {
+class Cellable_Testimonial_List_Table extends WP_List_Table {
     
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We 
@@ -92,11 +92,11 @@ class Cellable_Version_List_Table extends WP_List_Table {
      **************************************************************************/
     function column_default($item, $column_name){
         switch($column_name){
-            case 'name':
-            case 'p_name':
-            case 'views':
-            case 'purchases':
-            case 'position':
+            case 'comment':
+            case 'rating':
+            case 'user_login':
+            case 'created_date':
+            case 'published':
                 return $item[$column_name];
             default:
                 return print_r($item,true); //Show the whole array for troubleshooting purposes
@@ -120,34 +120,30 @@ class Cellable_Version_List_Table extends WP_List_Table {
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
     
-    function column_name($item){                
+    function column_comment($item){                
         //Build row actions
         global $wpdb;
         //Build row actions
         $actions = array(
-            'edit'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id']),
+            'publish'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'publish',$item['id']),
+            'hide'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'hide',$item['id']),
             'delete'      => sprintf('<a href="?page=%s&action=%s&item=%s">Delete</a>',$_REQUEST['page'],'delete',$item['id']),
-            'upload'    => sprintf('<a style="cursor:pointer" class="set_version_images" id="upbtn-%s">Update Image</a>',$item['id']),           
         );
-        
-        $image = $item['image_file'];
+                
         //Return the title contents
-        return sprintf('<img src="%1$s" class="alignleft phone-version-image"/><div class="phone-version-name">%2$s %3$s</div>',
-            $image ? $image:'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe',
-            /*$1%s*/ $item['name'],
+        return sprintf('%1$s %2$s',
+            /*$1%s*/ $item['comment'],
             /*$2%s*/ $this->row_actions($actions)
         );
-
-
     }
 
-    function column_status($item){                
-        if ($item['status'] == 1) {
-            return 'Active';
-        }
-        return 'Inactive';
+    // function column_published($item){                
+    //     if ($item['published'] == 1) {
+    //         return 'Active';
+    //     }
+    //     return 'Inactive';
         
-    }
+    // }
 
    
    
@@ -185,37 +181,14 @@ class Cellable_Version_List_Table extends WP_List_Table {
     function get_columns(){
         $columns = array(
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
-            'name'  => 'Name',
-            'p_name'  => 'Phone',            
-            'views'  => 'Views',
-            'purchases'  => 'Purchases',
-            'status'  => 'Status',
-            'position'  => 'Position',
+            'comment'  => 'Comment',
+            'rating'  => 'Rating',            
+            'user_login'  => 'User',
+            'created_date'  => 'Created Date',
+            'published'  => 'Published',
         );
         return $columns;
     }
-
-    function extra_tablenav( $which ) {
-        
-        $move_on_url = '&status=';
-        $status=isset($_GET['status']) ? $_GET['status'] : "-1";
-        if ( $which == "top" ){
-            ?>
-            <div class="alignleft actions bulkactions">
-                <select name="status" class="status-filter" onchange="changeStatus(this)"> 
-                    <option value="-1">Filter by Status</option>
-                    <option value="1" <?= $status=='1'? 'selected' : '' ?>>Active</option>
-                    <option value="0" <?= $status=='0'? 'selected' : '' ?>>Inactive</option>
-                </select>
-            </div>
-            <?php
-        }
-        if ( $which == "bottom" ){
-            //The code that goes after the table is there
-    
-        }
-    }
-
 
     /** ************************************************************************
      * Optional. If you want one or more columns to be sortable (ASC/DESC toggle), 
@@ -234,16 +207,14 @@ class Cellable_Version_List_Table extends WP_List_Table {
     function get_sortable_columns() {
         $sortable_columns = array(
             'id'     => array('id',false),     //true means it's already sorted
-            'name'  => array('name',false),
-            'p_name'  => array('p_name',false),            
-            'views'  => array('views',false),
-            'purchases'  => array('purchases',false),
-            'status'  => array('status',false),
-            'position'  => array('position',false),
+            'comment'  => array('comment',false),
+            'rating'  => array('rating',false),            
+            'user_id'  => array('user_id',false),
+            'created_date'  => array('created_date',false),
+            'published'  => array('published',false),
         );
         return $sortable_columns;
     }
-    
     /** ************************************************************************
      * Optional. If you need to include bulk actions in your list table, this is
      * the place to define them. Bulk actions are an associative array in the format
@@ -280,13 +251,35 @@ class Cellable_Version_List_Table extends WP_List_Table {
                 case 'delete':
                     if(is_array($_GET['item'])) {
                         foreach ($_GET['item'] as $item){
-                            delete_version($item);
+                            delete_testimonial($item);
                         }                        
                     }
                     else {
-                        delete_version($_GET['item']);
+                        delete_testimonial($_GET['item']);
                     }
                     ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Phone Version Deleted.' );?></p></div><?php
+                    break;
+                case 'publish':
+                    if(is_array($_GET['item'])) {
+                        foreach ($_GET['item'] as $item){
+                            publish_testimonial($item, true);
+                        }                        
+                    }
+                    else {
+                        publish_testimonial($_GET['item'], true);
+                    }
+                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Phone Version Published.' );?></p></div><?php
+                    break;
+                case 'hide':
+                    if(is_array($_GET['item'])) {
+                        foreach ($_GET['item'] as $item){
+                            publish_testimonial($item, false);
+                        }                        
+                    }
+                    else {
+                        publish_testimonial($_GET['item'], false);
+                    }
+                    ?><div id="message" class="updated notice is-dismissible"><p><?php _e( 'Selected Phone Version Hidden.' );?></p></div><?php
                     break;
                 default:
                     break;
@@ -362,31 +355,25 @@ class Cellable_Version_List_Table extends WP_List_Table {
         $status=isset($_GET['status']) ? $_GET['status'] : "-1";
         $data = array();
 
-        $sql_str = "SELECT pv.id id, pv.name name, pv.image_file image_file, p.name p_name, ";
-        $sql_str .= "pv.views views, pv.purchases purchases, ";
-        $sql_str .= "pv.status status, pv.position position ";
-        $sql_str .= "FROM ".$wpdb->base_prefix."cellable_phone_versions pv ";
-        $sql_str .= "left join ".$wpdb->base_prefix."cellable_phones p on pv.phone_id = p.id ";
+        $sql_str = "SELECT t.id id, t.comment comment, t.rating rating, ";
+        $sql_str .= "t.created_date created_date, t.published published, ";
+        $sql_str .= "u.user_login user_login ";
+        $sql_str .= "FROM ".$wpdb->base_prefix."cellable_testimonials t ";
+        $sql_str .= "left join ".$wpdb->base_prefix."users u on t.user_id = u.id ";
                 
         if($search_str) {
-            $sql_str .= "where (pv.name like %s or p.name like %s or views like %s or purchases like %s";
-            $sql_str .= "or position like %s) ";
-
-            if ($status != "-1") {
-                $sql_str .= "and pv.status = " .$status;
-            } 
+            $sql_str .= "where t.comment like %s or t.rating like %s or t.created_date like %s, t.published like %s ";
+            $sql_str .= "or u.user_login like %s or position like %s "; 
 
             $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',            
+            '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
             
         }
-        else {          
-            if ($status != "-1") {
-                $sql_str .= " where pv.status = " .$status;
-            }   
+        else {            
             $data = $wpdb->get_results($sql_str,ARRAY_A);
         }
         
@@ -487,36 +474,23 @@ class Cellable_Version_List_Table extends WP_List_Table {
  * so we've instead called those methods explicitly. It keeps things flexible, and
  * it's the way the list tables are used in the WordPress core.
  */
-function render_version_list(){
-
-    if(isset($_GET['action']) && $_GET['action'] == 'edit')
-    {
-        $id = $_GET['item'];        
-        render_edit_version_page($id);
-        return;
-    }
-
-    if(isset($_GET['action']) && $_GET['action'] == 'new')
-    {        
-        render_new_version_page();
-        return;
-    }
+function render_testimonial_list(){
 
     //Create an instance of our package class...
-    $list_table = new Cellable_Version_List_Table();
+    $list_table = new Cellable_Testimonial_List_Table();
     //Fetch, prepare, sort, and filter our data...
     $search_str = isset($_REQUEST['s']) ? $_REQUEST['s']: "";    
     $list_table->prepare_items($search_str);?>
     <div class="wrap">
         
         <div id="icon-users" class="icon32"><br/></div>        
-        <h2>Phone Versions <a href="admin.php?page=version_pages&action=new" class="page-title-action">Add New</a></h2>
+        <h2>Testimonials</h2>
         <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
-        <form id="versions-filter" method="get">
+        <form id="testimonials-filter" method="get">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo $_REQUEST['page']?>" />
             <!-- Now we can render the completed list table -->
-            <?php $list_table->search_box('Search','version_id');?>
+            <?php $list_table->search_box('Search','testimonial_id');?>
             <?php $list_table->display()?>
             <input type="hidden" name="_wp_http_referer" value="">
         </form>
@@ -525,252 +499,20 @@ function render_version_list(){
     <?php
 }
 
-function delete_version($id){
+function delete_testimonial($id){
     global $wpdb;
-    $wpdb->delete($wpdb->base_prefix.'cellable_phone_versions', array('id' => $id));
+    $wpdb->delete($wpdb->base_prefix.'callable_testimonials', array('id' => $id));
 }
 
-
-function render_edit_version_page($id){
+function publish_testimonial($id, $status){
     global $wpdb;
-
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_phone_versions where id = %d ";
-    $info = $wpdb->get_row($wpdb->prepare($sql_str, $id));
-
-    if (!$info->image_file) {
-        $info->image_file = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS8GikQJ4SjNowi37yU_TNhBxAamP_afG0hFaHXL7-m_64d4kQe";
-    }
     
-    $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
-    
-    $sql_str = "SELECT c.id id, c.name name, vc.value value ";
-    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_carriers c ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_version_carriers vc on c.id = vc.carrier_id and vc.phone_version_id = " .$id;
-    $sql_str .= " order by c.id";    
-    $version_carriers = $wpdb->get_results($sql_str, ARRAY_A);
-
-    $sql_str = "SELECT sc.id id, sc.capacity capacity, sc.description descr, vc.value value ";
-    $sql_str .= "FROM ".$wpdb->base_prefix."cellable_storage_capacities sc ";
-    $sql_str .= "left join ".$wpdb->base_prefix."cellable_version_capacities vc on sc.id = vc.storage_capacity_id and vc.phone_version_id = " .$id;
-    $sql_str .= " order by sc.capacity";    
-    $version_capacities = $wpdb->get_results($sql_str, ARRAY_A);
-
-    ?>
-    <div class="wrap edit-page">
-        <h2>Phone Version</h2>
-        <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">
-            <input name="id" hidden type="text" value="<?php echo $id?>">
-            <table class="form-table" role="presentation">
-                <tbody>
-                    <tr class="form-field">
-                        <td colspan="2">
-                            <img width="150" src="<?=$info->image_file?>" alt="">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="name">Name</label>
-                        </th>
-                        <td>
-                            <input name="name" type="text" value="<?=$info->name;?>" required>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="phone_id">Brand</label>
-                        </th>
-                        <td>
-                            <select name="phone_id" id="phone_id" required>
-                            <?php foreach ($phone_brands as $phone): ?>
-                                <option value="<?= $phone['id'] ?>" <?= ($info->phone_id == $phone['id']) ? "selected" : "" ?>><?= $phone['name'] ?></option>
-                            <?php endforeach; ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th colspan="2">Carriers (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($version_carriers as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cr<?= $ele['id']?>"><?= $ele['name'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cr<?= $ele['id'] ?>" id="cr<?= $ele['id']?>" type="number" step="0.01" min="0" value="<?=$ele['value'];?>">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2">Capacities (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($version_capacities as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cp<?= $ele['id']?>"><?= $ele['descr'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cp<?= $ele['id'] ?>" id="cp<?= $ele['id']?>" type="number" step="0.01" min="0" value="<?=$ele['value'];?>">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2"><hr></td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="views">Views</label>
-                        </th>
-                        <td>
-                            <input name="views" type="number" min="0" value="<?=$info->views;?>">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="purchases">Purchases</label>
-                        </th>
-                        <td>
-                            <input name="purchases" type="number" min="0" value="<?=$info->purchases;?>">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="position">Position</label>
-                        </th>
-                        <td>
-                            <input name="position" type="number" step="0.01" min="0" value="<?=$info->position;?>">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="status">Status</label>
-                        </th>
-                        <td>
-                            <select name="status" id="status" required>
-                                <option value="1" <?= ($info->status == 1) ? "selected" : "" ?>>Active</option>
-                                <option value="0" <?= ($info->status == 0) ? "selected" : "" ?>>Inactive</option>
-                            </select>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <p class="submit">
-                <input type="submit" name="CELLABLE_VERSION_UPDATE" class="button button-primary" value="Save Changes">
-            </p>
-        </form>
-    </div>
-
-<?php
+    $r = $wpdb->query(
+        $wpdb->prepare(
+            "UPDATE ". $wpdb->base_prefix. "callable_testimonials SET published=%d where id = %d;",
+            $status, $_POST['id']
+        ) 
+    );
 }
 
-function render_new_version_page(){
-    global $wpdb;
-
-    $phone_brands = $wpdb->get_results("SELECT * FROM ".$wpdb->base_prefix."cellable_phones", ARRAY_A);
-    
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix. "cellable_carriers order by id";    
-    $carriers = $wpdb->get_results($sql_str, ARRAY_A);
-
-    $sql_str = "SELECT * FROM ".$wpdb->base_prefix."cellable_storage_capacities order by capacity";    
-    $storage_capacities = $wpdb->get_results($sql_str, ARRAY_A);
-
-?>
-    <div class="wrap edit-page">
-        <h2>Phone Version</h2>
-        <form method="post" class="validate" action="<?php echo plugins_url( 'actions.php', __FILE__);?>">            
-            <table class="form-table" role="presentation">
-                <tbody>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="name">Name</label>
-                        </th>
-                        <td>
-                            <input name="name" type="text" value="" required>
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="phone_id">Brand</label>
-                        </th>
-                        <td>
-                            <select name="phone_id" id="phone_id" required>
-                            <?php foreach ($phone_brands as $phone): ?>
-                                <option value="<?= $phone['id'] ?>"><?= $phone['name'] ?></option>
-                            <?php endforeach; ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th colspan="2">Carriers (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($carriers as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cr<?= $ele['id']?>"><?= $ele['name'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cr<?= $ele['id'] ?>" id="cr<?= $ele['id']?>" type="number" step="0.01" min="0" value="">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2">Capacities (Basecost)<hr></td>
-                    </tr>
-                    <?php foreach ($storage_capacities as $ele): ?>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="cp<?= $ele['id']?>"><?= $ele['description'] ?></label>
-                        </th>
-                        <td>
-                            <input name="cp<?= $ele['id'] ?>" id="cp<?= $ele['id']?>" type="number" step="0.01" min="0" value="">
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <th colspan="2"><hr></td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="views">Views</label>
-                        </th>
-                        <td>
-                            <input name="views" type="number" min="0" value="">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="purchases">Purchases</label>
-                        </th>
-                        <td>
-                            <input name="purchases" type="number" min="0" value="">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="position">Position</label>
-                        </th>
-                        <td>
-                            <input name="position" type="number" step="0.01" min="0" value="">
-                        </td>
-                    </tr>
-                    <tr class="form-field">
-                        <th scope="row">
-                            <label for="status">Status</label>
-                        </th>
-                        <td>
-                            <select name="status" id="status" required>
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <p class="submit">
-                <input type="submit" name="CELLABLE_VERSION_NEW" class="button button-primary" value="Create">
-            </p>
-        </form>
-    </div>
-
-<?php
-}
 

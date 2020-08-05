@@ -16,6 +16,7 @@ require_once('views/settings.php');
 require_once('views/capacities.php');
 require_once('views/defect_groups.php');
 require_once('views/possible_defects.php');
+require_once('views/testimonials.php');
 require_once('views/orders.php');
 
 /**
@@ -81,6 +82,12 @@ if ( ! function_exists( 'capacity_pages' ) ) {
     }
 }
 
+if ( !function_exists( 'testimonial_pages' ) ) {
+    function testimonial_pages(){
+        render_testimonial_list();
+    }
+}
+
 /**
  * Add SuperAdmin & SubAdmin Menus
  */
@@ -99,6 +106,7 @@ if ( ! function_exists( 'admin_add_pages' ) ) {
             add_submenu_page('cellable','Possible Defects', 'Possible Defects', 'manage_options', 'possible_defect_pages','possible_defect_pages');
             add_submenu_page('cellable','Storage Capacities', 'Storage Capacities', 'manage_options', 'capacity_pages','capacity_pages');
             add_submenu_page('cellable','Orders', 'Orders', 'manage_options', 'order_pages','order_pages');
+            add_submenu_page('cellable','Testimonials', 'Testimonials', 'manage_options', 'testimonial_pages','testimonial_pages');
             add_submenu_page('cellable','Settings', 'System Settings', 'manage_options', 'setting_pages','setting_pages');
             remove_submenu_page('cellable', 'cellable');
         }
