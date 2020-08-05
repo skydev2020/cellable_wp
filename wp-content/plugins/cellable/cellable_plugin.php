@@ -379,3 +379,40 @@ function extra_user_profile_fields($user) {
     </table>
 <?php }
 
+// Custom Dashboard
+add_action('wp_dashboard_setup', 'cellable_new_orders_dashboard_widgets');
+  
+function cellable_new_orders_dashboard_widgets() {
+    global $wp_meta_boxes;
+    
+    wp_add_dashboard_widget('cellable_new_orders_widget', 'New Orders', 'new_orders_widget_section');
+}
+ 
+function new_orders_widget_section() {
+    global $wpdb;
+    
+    $sql_str = "select o.*, pt.name pay_name FROM ".$wpdb->base_prefix . "cellable_orders o ";
+    $sql_str .= "left join ".$wpdb->base_prefix."cellable_payment_types pt on o.payment_type_id = pt.id ";
+    $sql_str .= "where o.order_status_id=1 ";
+
+    $data = $wpdb->get_results($sql_str,ARRAY_A);
+    
+    $str ="<table style='width:100%;'>";
+    foreach ($data as $ele):
+        $created_date="";
+        if ($ele['created_date']) {
+            $date = new DateTime($ele['created_date']);
+            $created_date = $date->format('m/d/Y h:i:s A');            
+        }
+        
+        $str .= "<tr>";
+        $str .= "<td style='width: 30%;'>$". $ele["amount"]. "</td>";
+        $str .= "<td style='width: 45%;'>". $created_date. "</td>";
+        $str .= "<td class='alignleft'>". $ele["pay_name"]. "</td>";
+        $str .= "</tr>";
+    endforeach;
+    $str .="</table>";
+
+    echo $str;
+}
+

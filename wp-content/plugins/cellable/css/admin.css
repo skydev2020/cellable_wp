@@ -32,3 +32,7 @@
 .fa-star.checked {
   color: orange;
 }
+
+#dashboard-widgets .postbox-container {
+  width: 50%;
+}

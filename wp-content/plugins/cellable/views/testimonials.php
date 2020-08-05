@@ -410,7 +410,7 @@ class Cellable_Testimonial_List_Table extends WP_List_Table {
                 $sql_str .= "and t.published = " .$status;
             }
 
-            $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',            
+            $data = $wpdb->get_results($wpdb->prepare($sql_str, '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%',
             '%'.$wpdb->esc_like($search_str).'%'),ARRAY_A);
