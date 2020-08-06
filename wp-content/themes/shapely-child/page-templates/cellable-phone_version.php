@@ -24,7 +24,7 @@ get_header();
 			$phone_versions = $wpdb->get_results($wpdb->prepare(
 				"SELECT pv.id id, pv.phone_id phone_id, pv.name name, pv.image_file image_file FROM ". $wpdb->base_prefix. "cellable_phone_versions pv, "
 				.$wpdb->base_prefix."cellable_version_carriers vc "
-				."where pv.status = true  and vc.phone_version_id=pv.id and vc.carrier_id=". $carrier_id." and pv.name like %s order by position desc", 
+				."where pv.status = true  and vc.phone_version_id=pv.id and vc.carrier_id=". $carrier_id." and pv.name like %s order by position desc, name desc", 
 			'%'.$wpdb->esc_like($search_str).'%'), ARRAY_A);
 		}
 		else {
@@ -32,7 +32,7 @@ get_header();
 			$phone_versions = $wpdb->get_results($wpdb->prepare(
 				"SELECT pv.id id, pv.phone_id phone_id, pv.name name, pv.image_file image_file FROM ". $wpdb->base_prefix. "cellable_phone_versions pv, "
 				.$wpdb->base_prefix."cellable_version_carriers vc "
-				."where pv.status = true and vc.phone_version_id=pv.id and vc.carrier_id=". $carrier_id." and pv.phone_id = %d ", 
+				."where pv.status = true and vc.phone_version_id=pv.id and vc.carrier_id=". $carrier_id." and pv.phone_id = %d order by pv.position desc, pv.name desc", 
 			$wpdb->esc_like($brand_id)), ARRAY_A);
 		}
 		?>
