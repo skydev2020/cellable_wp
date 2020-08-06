@@ -65,7 +65,7 @@ get_header();
 							<br />
 							<?= $phone_version['name'] ?>
 							<br />
-							<img src="<?= $PHONE_IMAGE_LOCATION ?>/<?= $phone_version['image_file'] ?>" style="height:250px; width:130px;" />
+							<img src="<?= $phone_version['image_file'] ?>" style="height:250px; width:130px;" />
 							<br />
 							Please Note: We do not pay for devices that have been reported lost or stolen.
 							<p>

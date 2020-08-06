@@ -31,7 +31,7 @@ get_header();
 					<?php if (!$phone_version_id): ?>
 					<a href="<?=get_home_url() ?>/phone-versions/?brand_id=<?=$brand_id?>&carrier_id=<?=$carrier['id']?>" class="btn btn-default">
 						<?php if ($carrier['image_file']): ?>						
-						<img src="<?= get_stylesheet_directory_uri()?>/assets/images/<?= $carrier['image_file'] ?>" alt="<?= $carrier['name'] ?>">
+						<img src="<?= $carrier['image_file'] ?>" alt="<?= $carrier['name'] ?>">
 						<?php else: ?>							
 						<div style="height:30px;"></div>
 						<?=$carrier['name']?>
