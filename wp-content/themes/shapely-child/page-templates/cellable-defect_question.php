@@ -85,17 +85,17 @@ get_header();
 												Storage Capacity
 											</p>
 										</div>
-										<div class="inline-block" style="width:30px;"></div>
-										<?php 
-										foreach ($phone_version_capacities as $phone_version_capacity): 
-											$capacity = $wpdb->get_row("SELECT * FROM " .$wpdb->base_prefix ."cellable_storage_capacities WHERE id=" . $phone_version_capacity['storage_capacity_id'], ARRAY_A);
-										?>
+										<div style="padding-left: 30px;">
+											<?php 
+											foreach ($phone_version_capacities as $phone_version_capacity): 
+												$capacity = $wpdb->get_row("SELECT * FROM " .$wpdb->base_prefix ."cellable_storage_capacities WHERE id=" . $phone_version_capacity['storage_capacity_id'], ARRAY_A);
+											?>
 											<label>
 												<input type="radio" name="capacity_id" value="<?= $capacity['id'] ?>" autocomplete="off" required/>&nbsp;
 												<?= $capacity['description'] ?>
 											</label>&nbsp;&nbsp;
-										<?php endforeach; ?>
-										
+											<?php endforeach; ?>
+										</div>
 										<br />
 										<div class="inline-block" style="width:30px;"></div><div id="CapacityValidationMessage" name="CapacityValidationMessage" style="display:inline-block" class="text-danger"></div>
 										<input type="hidden" name="hdnCapacity" id="hdnCapacity" />

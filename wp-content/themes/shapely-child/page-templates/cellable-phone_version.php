@@ -37,6 +37,9 @@ get_header();
 		}
 		?>
 		<div class="text-center">
+			<?php if (count($phone_versions) == 0) : ?>
+			There is no available phone versions for this carrier. <a href="<?= get_home_url() ?>">HomePage</a>		
+			<?php endif; ?>
 			<?php foreach ($phone_versions as $ele): ?>
 			<div class="col-sm-3 text-center phone-version">
 				<a class="btn btn-default" href="<?=get_home_url() ?>/defect-questions/?phone_version_id=<?=$ele['id']?>&carrier_id=<?= $carrier_id?>">

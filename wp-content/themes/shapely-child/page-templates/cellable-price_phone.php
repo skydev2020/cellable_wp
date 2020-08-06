@@ -28,9 +28,6 @@ get_header();
 			$phone_version_carrier = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix . "cellable_version_carriers 
 				WHERE phone_version_id=" . $phone_version_id." and carrier_id =" . $carrier_id, ARRAY_A);
 			
-			var_dump($phone_version_id); echo("<br/>");
-			var_dump($carrier_id); echo("<br/>");
-			var_dump($phone_version_carrier); echo("<br/>");
 			if (!$phone_version || !$carrier_id || !$capacity || !$phone_version_capacity || !$phone_version_carrier || !$defect_ids || !is_array($defect_ids)) {
 			?>
 			<p>There are some incorrect variables.</p>
@@ -75,7 +72,7 @@ get_header();
 						<br/> 
 						<?= $phone_version['name'] ?> (<?= $capacity['description'] ?>)
 						<br/>
-						<img src="<?= $PHONE_IMAGE_LOCATION ?>/<?= $phone_version['image_file'] ?>" style="height:250px; width:130px;" />
+						<img src="<?= $phone_version['image_file'] ?>" style="height:250px; width:130px;" />
 						<br/>
 						Please Note: We do not pay for devices that have been reported lost or stolen.
 					</td>
