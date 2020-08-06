@@ -81,13 +81,11 @@ get_header();
 				// begin DB transaction
 				// $wpdb->query('START TRANSACTION');
 							
-				// Save User Phone
+				// Save Order Detail
 				$r = $wpdb->insert($wpdb->base_prefix ."cellable_order_details", array(
-					'user_id' => $user->ID,
 					'phone_id' => $phone_brand['id'],
 					'carrier_id' => $carrier['id'],
-					'phone_version_id' => $phone_version['id'],
-					'created_date' => date_create()->format('Y-m-d H:i:s')
+					'phone_version_id' => $phone_version['id'],					
 				));
 
 				if ($r == false) {

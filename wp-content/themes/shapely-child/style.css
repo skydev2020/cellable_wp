@@ -231,10 +231,6 @@ footer.bg-dark a:hover {
     padding-top: 15px;
 }
 
-.content-area {
-    min-height: calc(100% - 150px);
-}
-
 ul.menu li.active {
     background-color: initial;
 }
@@ -258,3 +254,24 @@ ul.menu li.active a {
 .margin-right-auto {
     margin-right: auto;
 }
+
+
+html {
+    height: 100%;
+  }
+body {
+    min-height: 100%;
+}
+
+.page-template-cellable-phone_version, .page-template-cellable-phone_version #page, .page-template-cellable-carrier, .page-template-cellable-carrier #page {
+    height: 100%;
+}
+
+.page-template-cellable-phone_version .main-container, .page-template-cellable-carrier .main-container {
+    height: calc(100% - 90px);
+}
+
+.page-template-cellable-phone_version .content-area, .page-template-cellable-carrier .content-area {
+    min-height: calc(100% - 30px);
+}
+ 
