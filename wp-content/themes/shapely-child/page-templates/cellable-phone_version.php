@@ -21,12 +21,18 @@ get_header();
 
 		if ($search_str) {
 			// Get filtered Phone Versions list
-			$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix. "cellable_phone_versions where name like %s order by position desc", 
+			$phone_versions = $wpdb->get_results($wpdb->prepare(
+				"SELECT pv.id id, pv.phone_id phone_id, pv.name name, pv.image_file image_file FROM ". $wpdb->base_prefix. "cellable_phone_versions pv, "
+				.$wpdb->base_prefix."cellable_version_carriers vc "
+				."where pv.status = true  and vc.phone_version_id=pv.id and vc.carrier_id=". $carrier_id." and pv.name like %s order by position desc", 
 			'%'.$wpdb->esc_like($search_str).'%'), ARRAY_A);
 		}
 		else {
 			// Get entire list of Phone Versions to pass to the view
-			$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix. "cellable_phone_versions where status = true and phone_id = %d order by position desc", 
+			$phone_versions = $wpdb->get_results($wpdb->prepare(
+				"SELECT pv.id id, pv.phone_id phone_id, pv.name name, pv.image_file image_file FROM ". $wpdb->base_prefix. "cellable_phone_versions pv, "
+				.$wpdb->base_prefix."cellable_version_carriers vc "
+				."where pv.status = true and vc.phone_version_id=pv.id and vc.carrier_id=". $carrier_id." and pv.phone_id = %d ", 
 			$wpdb->esc_like($brand_id)), ARRAY_A);
 		}
 		?>
