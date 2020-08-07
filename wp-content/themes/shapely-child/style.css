@@ -263,15 +263,21 @@ body {
     min-height: 100%;
 }
 
-.page-template-cellable-phone_version, .page-template-cellable-phone_version #page, .page-template-cellable-carrier, .page-template-cellable-carrier #page {
+.page-template-cellable-phone_version, .page-template-cellable-phone_version #page, 
+.page-template-cellable-carrier, .page-template-cellable-carrier #page,
+.page-template-cellable-user-register, .page-template-cellable-user-register #page {
     height: 100%;
 }
 
-.page-template-cellable-phone_version .main-container, .page-template-cellable-carrier .main-container {
+.page-template-cellable-phone_version .main-container, 
+.page-template-cellable-carrier .main-container,
+.page-template-cellable-user-register .main-container {
     height: calc(100% - 90px);
 }
 
-.page-template-cellable-phone_version .content-area, .page-template-cellable-carrier .content-area {
+.page-template-cellable-phone_version .content-area, 
+.page-template-cellable-carrier .content-area,
+.page-template-cellable-user-register .content-area {
     min-height: calc(100% - 30px);
 }
  

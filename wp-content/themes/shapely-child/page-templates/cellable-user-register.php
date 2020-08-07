@@ -79,7 +79,7 @@ get_header();
 
 			try {
 				// begin DB transaction
-				// $wpdb->query('START TRANSACTION');
+				$wpdb->query('START TRANSACTION');
 							
 				// Save Order Detail
 				$r = $wpdb->insert($wpdb->base_prefix ."cellable_order_details", array(
@@ -141,8 +141,8 @@ get_header();
 				exit();
 			} catch (Exception $e) {
 				$wpdb->query('ROLLBACK');
-				error_log($e->getMessage());
-				
+				echo "<p style='color:red'> Error: ".$e->getMessage()."</p>";
+				error_log($e->getMessage());				
 			}
 
 			?>			
