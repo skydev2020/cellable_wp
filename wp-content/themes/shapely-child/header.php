@@ -22,8 +22,8 @@
 
 <?php
 	
- 	$rating_avg = $wpdb->get_var("SELECT avg(rating) FROM " .$wpdb->base_prefix. "cellable_testimonials");
-	$rating_count = $wpdb->get_var("SELECT count(rating) FROM " .$wpdb->base_prefix. "cellable_testimonials");
+ 	$rating_avg = $wpdb->get_var("SELECT avg(rating) FROM " .$wpdb->base_prefix. "cellable_testimonials where published=1");
+	$rating_count = $wpdb->get_var("SELECT count(rating) FROM " .$wpdb->base_prefix. "cellable_testimonials where published=1");
 ?>
 
 <body <?php body_class(); ?>>
