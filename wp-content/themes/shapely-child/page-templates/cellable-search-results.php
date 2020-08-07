@@ -19,15 +19,15 @@ get_header();
 		endwhile; // End of the loop.
 		
 		$s = isset($_GET['q']) ? $_GET['q'] : "";
-		$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_phone_versions WHERE active=true		
-					and name like %s", "%".$wpdb->esc_like($s)."%"), ARRAY_A);
+		$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_phone_versions WHERE status=true		
+					and name like %s order by phone_id, position desc, name", "%".$wpdb->esc_like($s)."%"), ARRAY_A);
 		
 		?>
 		<div class="text-center">
 			<?php foreach ($phone_versions as $ele): ?>
 			<div class="col-sm-3 text-center phone-version">
 				<a class="btn btn-default" href="<?=get_home_url() ?>/carriers/?phone_id=<?=$ele['phone_id']?>&phone_version_id=<?=$ele['id']?>">
-					<img src="<?= $PHONE_IMAGE_LOCATION ?>/<?= $ele['image_file'] ?>" alt="<?= $ele['name'] ?>">
+					<img src="<?= $ele['image_file'] ?>" alt="<?= $ele['name'] ?>">
 				</a>
 				<br />
 				<?php

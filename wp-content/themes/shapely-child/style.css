@@ -265,19 +265,25 @@ body {
 
 .page-template-cellable-phone_version, .page-template-cellable-phone_version #page, 
 .page-template-cellable-carrier, .page-template-cellable-carrier #page,
-.page-template-cellable-user-register, .page-template-cellable-user-register #page {
+.page-template-cellable-user-register, .page-template-cellable-user-register #page,
+.page-template-cellable-track-orders, .page-template-cellable-track-orders #page,
+.page-template-cellable-search-results, .page-template-cellable-search-results #page {
     height: 100%;
 }
 
 .page-template-cellable-phone_version .main-container, 
 .page-template-cellable-carrier .main-container,
-.page-template-cellable-user-register .main-container {
+.page-template-cellable-user-register .main-container,
+.page-template-cellable-track-orders .main-container,
+.page-template-cellable-search-results .main-container {
     height: calc(100% - 90px);
 }
 
 .page-template-cellable-phone_version .content-area, 
 .page-template-cellable-carrier .content-area,
-.page-template-cellable-user-register .content-area {
+.page-template-cellable-user-register .content-area,
+.page-template-cellable-track-orders .content-area,
+.page-template-cellable-search-results .content-area {
     min-height: calc(100% - 30px);
 }
  

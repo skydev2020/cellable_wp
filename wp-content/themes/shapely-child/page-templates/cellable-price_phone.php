@@ -27,7 +27,7 @@ get_header();
 				WHERE phone_version_id=" . $phone_version_id." and storage_capacity_id =" . $capacity_id, ARRAY_A);
 			$phone_version_carrier = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix . "cellable_version_carriers 
 				WHERE phone_version_id=" . $phone_version_id." and carrier_id =" . $carrier_id, ARRAY_A);
-			
+
 			if (!$phone_version || !$carrier_id || !$capacity || !$phone_version_capacity || !$phone_version_carrier || !$defect_ids || !is_array($defect_ids)) {
 			?>
 			<p>There are some incorrect variables.</p>

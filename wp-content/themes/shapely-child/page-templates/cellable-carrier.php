@@ -37,10 +37,17 @@ get_header();
 						<?=$carrier['name']?>
 						<?php endif; ?>
 					</a>
-					<?php else: ?>
+					<?php 
+						else: 
+							$phone_version_carrier = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix . "cellable_version_carriers 
+				WHERE phone_version_id=" . $phone_version_id." and carrier_id =" . $carrier['id'], ARRAY_A);
+							if (!$phone_version_carrier) {
+								continue;
+							}
+					?>
 					<a href="<?=get_home_url() ?>/defect-questions/?phone_version_id=<?=$phone_version_id?>&carrier_id=<?=$carrier['id']?>" class="btn btn-default">						
 						<?php if ($carrier['image_file']): ?>
-						<img src="<?= get_stylesheet_directory_uri()?>/assets/images/<?= $carrier['image_file'] ?>" alt="<?= $carrier['name'] ?>">
+						<img src="<?= $carrier['image_file'] ?>" alt="<?= $carrier['name'] ?>">
 						<?php else: ?>
 						<div style="height:30px;"></div>
 						<?=$carrier['name']?>
