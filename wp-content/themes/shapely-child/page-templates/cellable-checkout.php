@@ -216,9 +216,9 @@ get_header();
 											</td>
 											<td class="text-right" style="width:25px; color:forestgreen;">
 												<?php if ($promo['discount']>0):?>
-													+<?= $promo['discount'] ?>%
+													<?= $promo['discount'] ?>%
 												<?php else: ?>
-													+$<?= $promo['dollar_value'] ?>
+													$<?= $promo['dollar_value'] ?>
 												<?php endif;?>
 											</td>
 										</tr>

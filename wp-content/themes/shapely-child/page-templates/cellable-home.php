@@ -15,7 +15,7 @@ get_header();
 			the_content();
 		endwhile; // End of the loop.
 		$phones = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix."cellable_phones", ARRAY_A);
-		$testimonials = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix."cellable_testimonials", ARRAY_A);
+		$testimonials = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix."cellable_testimonials where published=1", ARRAY_A);
 		?>
 		<div class="text-center full-width inline-block">
 			<?php foreach ($phones as $phone): ?>
@@ -44,7 +44,7 @@ get_header();
 			<?php endforeach; ?>
 			</div>
 		</div>
-		<div class="text-center" style="padding-top: 5px;">
+		<div class="text-center" style="padding-top: 5px; <?= (count($testimonials) == 0) ? 'display: none;' : '' ?>">
 			<div class="dot-container">
 			<?php for ($i=0; $i<count($testimonials); $i++): ?>
 				<span class='dot' onclick='currentSlide(<?= $i+1 ?>)'></span>
@@ -77,11 +77,16 @@ get_header();
         for (i = 0; i < slides.length; i++) {
             slides[i].style.display = "none";
         }
-        for (i = 0; i < dots.length; i++) {
+        
+		for (i = 0; i < dots.length; i++) {
             dots[i].className = dots[i].className.replace(" active", "");
         }
-        slides[slideIndex - 1].style.display = "block";
-        dots[slideIndex - 1].className += " active";
+
+		if (slides.length > 0) {
+			slides[slideIndex - 1].style.display = "block";
+        	dots[slideIndex - 1].className += " active";
+		}
+        
     }
 </script>
 <?php
