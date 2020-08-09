@@ -32,8 +32,10 @@ get_header();
 			$capacity = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix."cellable_storage_capacities WHERE id=" . $capacity_id, ARRAY_A);
 			$phone_version_capacity = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix."cellable_version_capacities 
 				WHERE phone_version_id=" . $phone_version_id." and storage_capacity_id =" . $capacity_id, ARRAY_A);
+			$phone_version_carrier = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix . "cellable_version_carriers 
+				WHERE phone_version_id=" . $phone_version_id." and carrier_id =" . $carrier_id, ARRAY_A);
 			
-			if (!$phone_version || !$carrier_id || !$capacity || !$phone_version_capacity || !$defect_ids || !is_array($defect_ids)) {
+			if (!$phone_version || !$carrier_id || !$capacity || !$phone_version_capacity || !$phone_version_carrier || !$defect_ids || !is_array($defect_ids)) {
 			?>
 			<p>There are some incorrect variables.</p>
 			<a href="<?=get_home_url() ?>">Go To Homepage</a>
@@ -42,6 +44,7 @@ get_header();
 			}
 
 			$price = $phone_version_capacity['value'];
+			$price -= $phone_version_carrier['value'];
 			$original_price = $price;
 			$defect_ids_str = implode(', ', $defect_ids);
 			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM ".$wpdb->base_prefix
@@ -140,7 +143,8 @@ get_header();
 							<input name="UserExists" type="hidden" value="True">
 							<input name="phone_version_id" type="hidden" value="<?= $phone_version_id ?>">
 							<input name="carrier_id" type="hidden" value="<?= $carrier_id ?>">
-							<input name="capacity_id" type="hidden" value="<?= $capacity_id ?>">							
+							<input name="capacity_id" type="hidden" value="<?= $capacity_id ?>">
+							<input name="promo_code" type="hidden" value="<?=$promo_code?>" />
 							<?php foreach ($defect_ids as $defect_id): ?>
 								<input name="defect_ids[]" type="hidden" value="<?=$defect_id?>"/>
 							<?php endforeach; ?>
@@ -149,7 +153,7 @@ get_header();
                                     <td class="text-left" style="width:100%; padding:10px;">
                                         <i class="text-danger">*</i>&nbsp;Payment Method:
                                         <br/>
-										<select class="form-control" name="payment_type_id" onchange="validate_form()" required>
+										<select class="form-control" name="payment_type_id" required>
 											<option value="">-- How You Get Paid --</option>
 											<?php foreach ($payment_types as $ele):  ?>
 											<option value="<?= $ele['id'] ?>"><?= $ele['name'] ?></option>
@@ -243,42 +247,6 @@ get_header();
                 </tr>
 			</table>
 		</div><!-- #primary -->
-	</div>
-	<script>
-		function validate_form() {
-			var paymentType = document.getElementById("PaymentTypes").value;
-			var paymentUserName = document.getElementById("PaymentUserName").value;
-			var userNameDisplay = document.getElementById("PayUserName");
-
-			if (paymentType != "1") {
-				userNameDisplay.innerHTML = "<i class='text-danger'>*</i>&nbsp;Email Address for Payment Method:";
-			}
-			else {
-				userNameDisplay.innerHTML = "<i class='text-danger'>*</i>&nbsp;User Name / Email for Payment Method:";
-			}
-
-			// Custom "Forced" Validation For Password
-			if (paymentType == "") {
-				document.getElementById("PaymentValidationMessage").innerHTML = "Payment Type is required";
-				valid = false;
-			}
-			else {
-				document.getElementById("PaymentValidationMessage").innerHTML = "";
-				valid = true;
-			}
-
-			// Custom "Forced" Validation For Confirm Password
-			if (paymentUserName == "") {
-				document.getElementById("PaymentUserNameValidationMessage").innerHTML = "Payment User Name is required";
-				valid = false;
-			}
-			else {
-				document.getElementById("PaymentUserNameValidationMessage").innerHTML = "";
-				valid = true;
-			}
-
-			return valid;
-		}
-	</script>
+	</div>	
 <?php
 get_footer();

@@ -39,6 +39,7 @@ get_header();
 			$price = $phone_version_capacity['value'];
 			// It should include code: Carrier baseCost -= decimal.Parse(versionCarrier.Value.ToString());
 			$price -= $phone_version_carrier['value'];
+			
 			$original_price = $price;
 			$defect_ids_str = implode(', ', $defect_ids);
 			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM ".$wpdb->base_prefix

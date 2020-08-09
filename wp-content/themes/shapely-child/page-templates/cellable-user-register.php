@@ -36,8 +36,10 @@ get_header();
 			$capacity = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_storage_capacities WHERE id=" . $capacity_id, ARRAY_A);
 			$phone_version_capacity = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_version_capacities 
 				WHERE phone_version_id=" . $phone_version_id." and storage_capacity_id =" . $capacity_id, ARRAY_A);
+			$phone_version_carrier = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix . "cellable_version_carriers 
+				WHERE phone_version_id=" . $phone_version_id." and carrier_id =" . $carrier_id, ARRAY_A);
 									
-			if (!$phone_version || !$carrier || !$capacity || !$phone_version_capacity || !$payment_type_id || !$payment_username || !$defect_ids || !is_array($defect_ids)) {
+			if (!$phone_version || !$carrier || !$capacity || !$phone_version_capacity || !$phone_version_carrier || !$payment_type_id || !$payment_username || !$defect_ids || !is_array($defect_ids)) {
 			?>
 			<p>There are some incorrect variables.</p>
 			<a href="<?=get_home_url() ?>">Go To Homepage</a>
@@ -46,6 +48,7 @@ get_header();
 			}
 			
 			$price = $phone_version_capacity['value'];
+			$price -= $phone_version_carrier['value'];
 			$original_price = $price;
 			$defect_ids_str = implode(', ', $defect_ids);
 			
