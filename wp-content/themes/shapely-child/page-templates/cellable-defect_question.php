@@ -50,7 +50,7 @@ get_header();
 		
 		$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
 		$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix."cellable_version_capacities 
-			where phone_version_id = %d order by storage_capacity_id", $phone_version['id']), ARRAY_A);
+			where value>0 and phone_version_id = %d order by storage_capacity_id", $phone_version['id']), ARRAY_A);
 
 		?>
 		<form action="<?=get_home_url() ?>/price-phone/?phone_version_id=<?= $phone_version_id ?>" method="post">
