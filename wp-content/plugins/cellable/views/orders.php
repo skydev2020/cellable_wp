@@ -133,7 +133,7 @@ class Cellable_Order_List_Table extends WP_List_Table {
         global $wpdb;
         //Build row actions
         $actions = array(
-            'edit'      => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id'])            
+            'edit'  => sprintf('<a href="?page=%s&action=%s&item=%s">Edit</a>',$_REQUEST['page'],'edit',$item['id'])            
         );
         
         //Return the title contents
@@ -222,7 +222,7 @@ class Cellable_Order_List_Table extends WP_List_Table {
             'p_name' => "Payment Type",
             'p_username' => "Payment User Name",
             'usps_tracking_id' => "USPS Tracking",
-            'created_date' => "Created Date",
+            'created_date' => "Ordered Date",
             'action' => "Action",
         );
         return $columns;
@@ -421,7 +421,7 @@ class Cellable_Order_List_Table extends WP_List_Table {
          */
         function usort_reorder($a,$b){
             $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'id'; //If no sort, default to title
-            $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
+            $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'desc'; //If no order, default to asc
             if ($orderby == "id" || $orderby == "amount" || $orderby == "discount") {
                 if ($a[$orderby] > $b[$orderby]) {
                     $result = 1;
@@ -583,6 +583,8 @@ function render_edit_order_page($id){
 
     $order_statuses = $wpdb->get_results("select * from ".$wpdb->base_prefix."cellable_order_statuses", ARRAY_A);
     
+    $sql_str = "select * FROM ".$wpdb->base_prefix . "cellable_order_qas where order_id = %d ";
+    $qas = $wpdb->get_results($wpdb->prepare($sql_str, $id), ARRAY_A);
     ?>
     <div class="wrap">
         <h2>Order</h2>
@@ -644,7 +646,7 @@ function render_edit_order_page($id){
                             <label>Amount</label>
                         </th>
                         <td>
-                            <?= $info->amount;?>
+                            $<?= $info->amount;?>
                         </td>
                     </tr>
                     <tr class="form-field">
@@ -697,12 +699,27 @@ function render_edit_order_page($id){
                     </tr>
                     <tr class="form-field">
                         <th scope="row">
-                            <label>Created Date</label>
+                            <label>Ordered Date</label>
                         </th>
                         <td>
                             <?= $created_date;?>
                         </td>
                     </tr>
+                    <tr class="form-field">
+                        <th scope="row" colspan="2">
+                            <label><strong>Order Question and Answers</strong></label>
+                        </th>
+                    </tr>
+                    <?php foreach($qas as $qa): ?>
+                    <tr class="form-field">
+                        <th scope="row">
+                            <label><i><?= $qa['question'];?></i></label>
+                        </th>
+                        <td>
+                            <?= $qa['answer'];?> : <?= $qa['cost'] >= 0 ? "$".$qa['cost'] : "-$". abs($qa['cost'])?>
+                        </td>
+                    </tr
+                    <?php endforeach; ?>
                     <tr class="form-field form-required">
                         <th scope="row">
                             <label for="value">Status</label>
