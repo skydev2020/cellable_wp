@@ -138,7 +138,7 @@ get_header();
                 </tr>
 				<tr>
                     <td class="v-top" style="border-right:solid; border-right-color:lightgrey; border-right-width:1px;">
-						<form action="<?=get_home_url() ?>/user-register" method="post">
+						<form action="<?=get_home_url() ?>/process-order" method="post">
 							<input name="userEmail" type="hidden" value="<?= $user->user_email ?>">
 							<input name="UserExists" type="hidden" value="True">
 							<input name="phone_version_id" type="hidden" value="<?= $phone_version_id ?>">

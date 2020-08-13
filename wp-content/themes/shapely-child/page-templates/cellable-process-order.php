@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: Cellable User Register
+Template Name: Cellable Process Order
 Template Post Type: page
 */
 ob_start(); // this line is for the issue: header already sent
@@ -115,20 +115,21 @@ get_header();
 				}
 				$order_id = $wpdb->insert_id;
 				
-				$view_count = 0;
-				if ($phone_version['views'] == null ) {
-					$view_count = 1;
+				$purchase_count = 0;
+				if ($phone_version['purchases'] == null ) {
+					$purchase_count = 1;
 				}
 				else {
-					$view_count = 1+ $phone_version['views'];
+					$purchase_count = 1+ $phone_version['purchases'];
 				}
 				
 				$wpdb->update($wpdb->base_prefix ."cellable_phone_versions", array(            
-					'views' => $phone_version['views']
+					'purchases' => $purchase_count
 				), array(
 					'id' => $phone_version_id,
 				));
-				// $wpdb->query('COMMIT');
+				
+				
 
 				// Get/Save Shipping Label
 				$shipping_mail = new CellableShipping;				
