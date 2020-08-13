@@ -67,11 +67,7 @@ get_header();
 				$price += $promo['dollar_value'];
 			endif;
 			
-			$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
-			$capacities = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix."cellable_storage_capacities", ARRAY_A);
-			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_version_capacities 
-				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
-
+			$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);			
 			?>			
 
 			<table style="width:100%; margin-left:auto; margin-right:auto;">

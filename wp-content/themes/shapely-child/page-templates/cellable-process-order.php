@@ -52,10 +52,18 @@ get_header();
 			$original_price = $price;
 			$defect_ids_str = implode(', ', $defect_ids);
 			
-			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM ".$wpdb->base_prefix
-				."cellable_possible_defects WHERE id in (%s)", $defect_ids_str) );
-			
+			$total_defect_value = $wpdb->get_var("SELECT sum(cost) FROM ".$wpdb->base_prefix
+				."cellable_possible_defects WHERE id in (" .$defect_ids_str.")");
+				
 			$price = $price-$total_defect_value;
+
+			// Get Defect Group Name along with answer
+
+			$sql_str = "select pd.*, dg.name dg_name FROM ".$wpdb->base_prefix . "cellable_possible_defects pd ";
+			$sql_str .= "left join ".$wpdb->base_prefix."cellable_defect_groups dg on pd.defect_group_id = dg.id ";
+			$sql_str .= "where pd.id in (" .$defect_ids_str.")";
+	
+			$defects = $wpdb->get_results($sql_str, ARRAY_A);			
 			
 			// Promotion Code
 			$promo_code = isset($_REQUEST['promo_code']) ? $_REQUEST['promo_code'] : null;
@@ -75,11 +83,7 @@ get_header();
 			endif;
 			
 			$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
-						
-			$capacities = $wpdb->get_results("SELECT * FROM ". $wpdb->base_prefix ."cellable_storage_capacities", ARRAY_A);
-			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix ."cellable_version_capacities 
-				where phone_version_id = %d", $phone_version['id']), ARRAY_A);
-
+			
 			try {
 				// begin DB transaction
 				$wpdb->query('START TRANSACTION');
@@ -115,6 +119,7 @@ get_header();
 				}
 				$order_id = $wpdb->insert_id;
 				
+				// Update Phone Version Purchases Count
 				$purchase_count = 0;
 				if ($phone_version['purchases'] == null ) {
 					$purchase_count = 1;
@@ -129,7 +134,23 @@ get_header();
 					'id' => $phone_version_id,
 				));
 				
-				
+
+				// Create OrderQuestion and Store it to DB
+				$r = $wpdb->insert($wpdb->base_prefix ."cellable_order_qas", array(
+					'order_id' => $order_id,
+					'question' => "Storage Capacity",
+					'answer' => $capacity['description'],
+					'cost' => $phone_version_capacity['value']
+				));
+
+				foreach ($defects as $defect):
+					$r = $wpdb->insert($wpdb->base_prefix ."cellable_order_qas", array(
+						'order_id' => $order_id,
+						'question' => $defect['dg_name'],
+						'answer' => $defect['name'],
+						'cost' => (0.0 - $defect['value'])
+					));
+				endforeach;
 
 				// Get/Save Shipping Label
 				$shipping_mail = new CellableShipping;				
