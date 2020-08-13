@@ -148,7 +148,7 @@ get_header();
 						'order_id' => $order_id,
 						'question' => $defect['dg_name'],
 						'answer' => $defect['name'],
-						'cost' => (0.0 - $defect['value'])
+						'cost' => (0.0 - $defect['cost'])
 					));
 				endforeach;
 

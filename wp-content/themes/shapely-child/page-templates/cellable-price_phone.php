@@ -42,11 +42,12 @@ get_header();
 			
 			$original_price = $price;
 			$defect_ids_str = implode(', ', $defect_ids);
-			$total_defect_value = $wpdb->get_var($wpdb->prepare("SELECT sum(cost) FROM ".$wpdb->base_prefix
-				."cellable_possible_defects WHERE id in (%s)", $defect_ids_str) );
+
+			$total_defect_value = $wpdb->get_var("SELECT sum(cost) FROM ".$wpdb->base_prefix
+			."cellable_possible_defects WHERE id in (" .$defect_ids_str.")");
 			
 			$price = $price-$total_defect_value;
-			
+
 			// Promotion Code
 			$promo_code = isset($_REQUEST['promo_code']) ? $_REQUEST['promo_code'] : null;
 			$promo = null;
