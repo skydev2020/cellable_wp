@@ -18,6 +18,11 @@
 	<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
 
 	<?php wp_head(); ?>
+
+<!-- Google Fonts -->	
+	<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,900;1,300;1,400;1,900&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
 </head>
 
 <?php
@@ -37,10 +42,11 @@
 					<div class="row">
 						<div class="module left site-title-container">
 							<?php shapely_get_header_logo(); ?>
-							<?php for ($i=1; $i<=$rating_avg; $i++): ?>
+							<!-- 
+							<//?php for ($i=1; $i<=$rating_avg; $i++): ?>
 							<span class='fa fa-star checked'></span>
-							<?php endfor; ?>
-							<span class="rating-score">(ratings: <?= $rating_count ?>)</span>
+							<//?php endfor; ?>
+							<span class="rating-score">(ratings: <?= $rating_count ?>)</span> -->
 						</div>
 						<div class="module widget-handle mobile-toggle right visible-sm visible-xs">
 							<i class="fa fa-bars"></i>

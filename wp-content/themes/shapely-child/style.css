@@ -1,289 +1,500 @@
-/*
- Template:       shapely
- Theme Name:     Shapely Child Theme
- Theme URI:      https://colorlib.com/wp/themes/shapely
- Description:    Shapely Child Theme
- Author:         SkyDev
- Template:       Shapely
- Version:        1.1.2
-*/
-@import url("../shapely/style.css");
-.homepage .phone a{
-    font-size: 50px; 
-    height: 350px; 
-    width: 250px; 
-    padding: 10px; 
-    border-radius: 5px; 
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); 
-    margin-top: 50px; 
-    border-width: 0;
+/*
+ Template:       shapely
+ Theme Name:     Shapely Child Theme
+ Theme URI:      https://colorlib.com/wp/themes/shapely
+ Description:    Shapely Child Theme
+ Author:         SkyDev
+ Template:       Shapely
+ Version:        1.1.2
+*/
+@import url("../shapely/style.css");
+
+.bg-dark {background-color: #fff;}
+
+section.content-area {
+    padding-top: 0;
+}
+
+
+@media screen and (max-width: 480px) {
+
+#homepage_hero {
+    background-position: center;
+	background-repeat: no-repeat;
+	background-size: auto !important;
+	background-color: #C55600;
+}
+
+#homepage_hero h2 {
+    margin-top: 0;
+}
+	
+p.homepage_callout {
+    margin: 7% 0;
+}
+	
+a.cellable_button {
+    padding: 8% 6%;
+    margin-top: 7%;
+}
+
+#footer_logo {
+    max-width: 100px;
+	margin-bottom: 2%;
+	text-align: center;
+}
+
+a.NavLink {
+    font-size: 1.5em;
+}
+	
+	#address {font-size: 1em;
+    margin-bottom: 5%;
+}
+
+.module.widget-handle i {
+	font-size: 28px;
+	color: #666666;}
+	
+	h2#phone_name {
+    font-size: 2em !important;
+    margin-top: 3% !important;
+}
+	
+input#PromoCode {
+    max-width: 220px;
+}
+
+button#promo_code {
+    padding: 3% 7%;
+}	
+	
+h2#final_price {
+    font-size: 4em !important;
+}
+	
+input.btn.sell_phone {
+    font-size: 1.1em;
+}	
+	
+#summary_header	{font-size: 2em !important;}
+	
+div#defect_questions > p {
+    font-size: 1em !important;
+    margin-bottom: 1% !important;
+}	
+	
+}/*****************END MOBILE*********************/
+
+input#PromoCode {
+    max-width: 86%;
+}
+
+button#promo_code {
+    padding: 1% 4%;
+}
+
+#homepage_hero {
+    background-image: url(https://www.cellable.net/wp-content/uploads/2020/09/cellable-hero.jpg);
+    background-color: orangered;
+    color: #fff;
+    padding: 13% 8%;
+    background-size: cover;
+    max-height: 488px;
+    background-repeat: no-repeat;
+}
+#homepage_hero h2 {color: #fff; font-size: 2.5em; line-height: 1.5em;}
+
+.cellable_button {
+  font-family: Roboto;
+  font-weight: 300;
+	background-color: #57805f;
+  border: none;
+  color: white;
+  color: white;
+  padding: 2% 4%;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1.4em;	
+}
+
+.cellable_button:hover {
+	background: linear-gradient(#57805f, #3c6544);
+    color: #fff;
+}
+
+.cellable_button:visited {
+	color: #fff;
+}
+
+#primary > div.text-center {
+    margin-top: 4%;
+}
+
+p.homepage_callout {
+    font-size: 1.4em;
+	margin-bottom: 3%;
+}
+
+.homepage .phone a{
+    font-size: 50px; 
+    height: 350px; 
+    width: 250px; 
+    padding: 10px; 
+    border-width: 0;
+}
+
+.homepage .phone a:hover {
+    background-color: #e6e6e6;
+}
+
+.homepage .phone .phone-image {
+    width: 185px; 
+    height: 224px; 
+    margin-top: 27px; 
+    padding-top: 10px;
+}
+
+.homepage .phone .title {
+    padding-top: 50px; 
+    font-size: 25px; 
+    width: 249px; 
+    height: 70px; 
+    color: #000; 
+    margin-right: 50px;
+    text-transform: initial;
+}
+
+.phone-page .carrier a {
+    width: 200px;
+    height: 100px;
+    padding: .375rem .75rem;
+    border-width: 0px;
+    color: black;
+}
+
+.col-sm-3.text-center.phone-version {
+    margin-bottom: 4%;
+}
+
+p.phone_type {
+    margin-top: 0;
+}
+
+p.fine_print {
+    font-size: 0.9em;
+	margin-bottom: 5%;
+}
+.phone-page .carrier a:hover {
+    background-color: initial;
+    color: initial;
+}
+
+.phone-version a {
+    border-width: 0px;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    background-color: transparent;
+    padding-top: 10px;
+}
+
+.phone-version a:hover {
+    background-color: initial;
+}
+
+.phone-version a img {
+    height: 250px;
+    width: 130px;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.inline-block {
+    display: inline-block;
+}
+.fa-star.checked {
+    color: orange;
+}
+
+.bg-black {
+    background-color: black;
+}
+
+.bg-lightgrey {
+    background-color:lightgrey;
+}
+
+.lawngreen {
+    color:lawngreen;
+}
+
+
+.slideshow-container {
+    position: relative;
+    background: #EBEFF6;
+}
+
+/* Slides */
+.mySlides {
+    display: none;
+    padding: 80px;
+    text-align: center;
+}
+
+/* Next & previous buttons */
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    margin-top: -30px;
+    padding: 16px;
+    color: #888;
+    font-weight: bold;
+    font-size: 20px;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+}
+
+div#defect_questions > button {
+    border-radius: 5px;
+    border: 1px solid #747474;
+    padding: 1% 3%;
+    margin-right: 1%;
+    font-size: 0.9em;
+    background: #fff;
+}
+
+div#defect_questions > p {
+    font-size: 1.2em;
+    margin-bottom: 2%;
+}
+
+#final_price {font-size: 4.8em !important;}
+
+div#defect_questions > button:hover, div#defect_questions > button:focus {
+    background-color: #5d9691;
+    color: #fff;
+    font-weight: bold;
+	border: 1px solid #dcdcdc;
+}
+
+/* Position the "previous button" to the left */
+.prev {
+    position: absolute;
+    left: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+/* Position the "next button" to the right */
+.next {
+    position: absolute;
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+    /* On hover, add a black background color with a little bit see-through */
+    .prev:hover, .next:hover {
+        background-color: rgba(0,0,0,0.8);
+        color: white;
+    }
+
+/* The dot/bullet/indicator container */
+.dot-container {
+    text-align: center;
+    padding: 20px;
+    background: #ddd;
+}
+
+/* The dots/bullets/indicators */
+.dot {
+    cursor: pointer;
+    height: 15px;
+    width: 15px;
+    margin: 0 2px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.6s ease;
+}
+
+/* Add a background color to the active dot/circle */
+.active, .dot:hover {
+    background-color: #717171;
+}
+
+footer {
+    padding: 10px 0;
+}
+
+.back-to-top {
+    margin-bottom: 3px;
+}
+#colophon .site-info {
+    margin-top: 0px;
+}
+
+.site-title-container {
+    line-height: 0px;
+    color: #49c97d;
+    font-size: 16px;
+    padding-bottom: 5px;
+}
+
+.site-title-container .rating-score {
+    color: #49c97d;
+}
+
+.footer .footer-credits {
+    color: #fff;
+}
+
+#colophon {
+    font-size: 18px;
+	background-color: #442f50;
+	padding: 4% 0;
+}
+
+.site-title-container .site-title {
+    color: #49c97d;
+    font-size: 30px;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    color: rgb(33,37,41);
+    font-size: 16px;
+}
+
+.main-navigation .menu li a {
+    font-size: 24px;
+    text-transform: initial;
+    color: #131313;
+    font-weight: 300;
+}
+
+.search .fa.fa-search {
+    font-size: 18px;
+    color: #49c97d;
+}
+
+footer.bg-dark a {font-weight: normal;}
+
+footer.bg-dark a:hover {
+    color: #49c97d;
+}
+
+.main-navigation {
+    padding: 0px 0px;
+}
+
+#site-navigation .menu-container{
+    padding-top: 15px;
+}
+
+ul.menu li.active {
+    background-color: initial;
+}
+
+ul.menu li.active a {
+    color: #49c97d;
+}
+
+.v-middle {
+    vertical-align: middle;
+}
+
+.v-top {
+    vertical-align: top;
+}
+
+.margin-left-auto {
+    margin-left: auto;
+}
+
+.margin-right-auto {
+    margin-right: auto;
+}
+
+
+html {
+    height: 100%;
+  }
+body {
+    min-height: 100%;
+}
+
+.page-template-cellable-phone_version, .page-template-cellable-phone_version #page, 
+.page-template-cellable-carrier, .page-template-cellable-carrier #page,
+.page-template-cellable-user-register, .page-template-cellable-user-register #page,
+.page-template-cellable-track-orders, .page-template-cellable-track-orders #page,
+.page-template-cellable-search-results, .page-template-cellable-search-results #page {
+    height: 100%;
+}
+
+.page-template-cellable-phone_version .main-container, 
+.page-template-cellable-carrier .main-container,
+.page-template-cellable-user-register .main-container,
+.page-template-cellable-track-orders .main-container,
+.page-template-cellable-search-results .main-container {
+    height: calc(100% - 90px);
+}
+
+.page-template-cellable-phone_version .content-area, 
+.page-template-cellable-carrier .content-area,
+.page-template-cellable-user-register .content-area,
+.page-template-cellable-track-orders .content-area,
+.page-template-cellable-search-results .content-area {
+    min-height: calc(100% - 30px);
+}
+
+
+label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: 500;
+    border: 1px solid #dcdcdc;
+    padding: 1% 2%;
+    border-radius: 5px;
+	font-size: 0.8em;
+}
+
+#CapacityValidationMessage {
+	float: right;
+	width: 300px;
+	border: 1px #dcdcdc;
+	border-radius: 5px;
+}
+
+
+ibutton#promo_code {
+    padding: 1% 3%;
+}
+
+.big_header {
+	font-size: 2em;
+	line-height: 1.4em;
+	margin: 0;
+	color: #666666;
+}
+
+.sell_phone {
+	margin: 0 0 2% 0;
+}
+input.btn.sell_phone {
+    font-size: 2em;
+    margin-bottom: 4%;
+}
+
+div.phone > a.btn.btn-default {
+    background: none;
+}
+
+div.phone > a.btn.btn-default:hover {
+    /* box-shadow: 0 0 black; */
+    border: 1px #dcdcdc solid;
+    max-height: 315px;
 }
-
-.homepage .phone a:hover {
-    background-color: #e6e6e6;
-}
-
-.homepage .phone .phone-image {
-    width: 185px; 
-    height: 224px; 
-    margin-top: 27px; 
-    padding-top: 10px;
-}
-
-.homepage .phone .title {
-    font-family: 'HP Simplified'; 
-    padding-top: 50px; 
-    font-size: 25px; 
-    width: 249px; 
-    height: 70px; 
-    color: #000; 
-    margin-right: 50px;
-    text-transform: initial;
-}
-
-.phone-page .carrier a {
-    width: 200px;
-    height: 100px;
-    padding: .375rem .75rem;
-    border-width: 0px;
-    box-shadow: 0 14px 18px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
-    color: black;
-}
-
-.phone-page .carrier a:hover {
-    background-color: initial;
-    color: initial;
-}
-
-.phone-version a {
-    border-width: 0px;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-    background-color: transparent;
-    padding-top: 10px;
-}
-
-.phone-version a:hover {
-    background-color: initial;
-}
-
-.phone-version a img {
-    height: 250px;
-    width: 130px;
-}
-
-.pointer {
-    cursor: pointer;
-}
-
-.inline-block {
-    display: inline-block;
-}
-.fa-star.checked {
-    color: orange;
-}
-
-.bg-black {
-    background-color: black;
-}
-
-.bg-lightgrey {
-    background-color:lightgrey;
-}
-
-.lawngreen {
-    color:lawngreen;
-}
-
-
-.slideshow-container {
-    position: relative;
-    background: #EBEFF6;
-}
-
-/* Slides */
-.mySlides {
-    display: none;
-    padding: 80px;
-    text-align: center;
-}
-
-/* Next & previous buttons */
-.prev, .next {
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    width: auto;
-    margin-top: -30px;
-    padding: 16px;
-    color: #888;
-    font-weight: bold;
-    font-size: 20px;
-    border-radius: 0 3px 3px 0;
-    user-select: none;
-}
-
-/* Position the "previous button" to the left */
-.prev {
-    position: absolute;
-    left: 0;
-    border-radius: 3px 0 0 3px;
-}
-
-/* Position the "next button" to the right */
-.next {
-    position: absolute;
-    right: 0;
-    border-radius: 3px 0 0 3px;
-}
-
-    /* On hover, add a black background color with a little bit see-through */
-    .prev:hover, .next:hover {
-        background-color: rgba(0,0,0,0.8);
-        color: white;
-    }
-
-/* The dot/bullet/indicator container */
-.dot-container {
-    text-align: center;
-    padding: 20px;
-    background: #ddd;
-}
-
-/* The dots/bullets/indicators */
-.dot {
-    cursor: pointer;
-    height: 15px;
-    width: 15px;
-    margin: 0 2px;
-    background-color: #bbb;
-    border-radius: 50%;
-    display: inline-block;
-    transition: background-color 0.6s ease;
-}
-
-/* Add a background color to the active dot/circle */
-.active, .dot:hover {
-    background-color: #717171;
-}
-
-footer {
-    padding: 10px 0;
-}
-
-.back-to-top {
-    margin-bottom: 3px;
-}
-#colophon .site-info {
-    margin-top: 0px;
-}
-
-.site-title-container {
-    line-height: 0px;
-    color: lawngreen;
-    font-size: 16px;
-    padding-bottom: 5px;
-}
-
-.site-title-container .rating-score {
-    color: lawngreen;
-}
-
-.footer .footer-credits {
-    color: lawngreen;
-}
-
-#colophon {
-    font-size: 18px;
-}
-
-.site-title-container .site-title {
-    color: lawngreen;
-    font-family: 'Manrope', sans-serif;
-    font-size: 30px;
-}
-
-body {
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-    color: rgb(33,37,41);
-    font-size: 16px;
-}
-
-.main-navigation .menu li a {
-    font-size: 18px;
-    text-transform: initial;
-    color: white;
-    font-weight: normal;
-}
-
-.search .fa.fa-search {
-    font-size: 18px;
-    color: lawngreen;
-}
-footer.bg-dark a:hover {
-    color: lawngreen;
-}
-
-.main-navigation {
-    padding: 0px 0px;
-}
-
-#site-navigation .menu-container{
-    padding-top: 15px;
-}
-
-ul.menu li.active {
-    background-color: initial;
-}
-
-ul.menu li.active a {
-    color: lawngreen;
-}
-
-.v-middle {
-    vertical-align: middle;
-}
-
-.v-top {
-    vertical-align: top;
-}
-
-.margin-left-auto {
-    margin-left: auto;
-}
-
-.margin-right-auto {
-    margin-right: auto;
-}
-
-
-html {
-    height: 100%;
-  }
-body {
-    min-height: 100%;
-}
-
-.page-template-cellable-phone_version, .page-template-cellable-phone_version #page, 
-.page-template-cellable-carrier, .page-template-cellable-carrier #page,
-.page-template-cellable-user-register, .page-template-cellable-user-register #page,
-.page-template-cellable-track-orders, .page-template-cellable-track-orders #page,
-.page-template-cellable-search-results, .page-template-cellable-search-results #page {
-    height: 100%;
-}
-
-.page-template-cellable-phone_version .main-container, 
-.page-template-cellable-carrier .main-container,
-.page-template-cellable-user-register .main-container,
-.page-template-cellable-track-orders .main-container,
-.page-template-cellable-search-results .main-container {
-    height: calc(100% - 90px);
-}
-
-.page-template-cellable-phone_version .content-area, 
-.page-template-cellable-carrier .content-area,
-.page-template-cellable-user-register .content-area,
-.page-template-cellable-track-orders .content-area,
-.page-template-cellable-search-results .content-area {
-    min-height: calc(100% - 30px);
-}
- 
