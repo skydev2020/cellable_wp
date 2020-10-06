@@ -6,6 +6,25 @@ Template Post Type: page
 */
 
 require_once(ABSPATH . 'wp-content/plugins/cellable/cellable_global.php');
+
+$user = wp_get_current_user(); // ID->0: if user is not logged in
+if ($user->ID==0):
+	/**
+	 * Push the necessary variables into Session Variable
+	 * These values will be reused after user successfully logins or register
+	 *  
+	 * */
+	$url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+	
+	$obj = [];
+		
+	$obj["phone_version_id"] = isset($_REQUEST['phone_version_id']) ? $_REQUEST['phone_version_id'] : null; 
+	$obj["carrier_id"] = isset($_REQUEST['carrier_id']) ? $_REQUEST['carrier_id'] : null; 
+	$obj["url"] = $url;
+
+	$_SESSION['cellable_obj'] = $obj;
+endif;
+
 get_header(); 
 ?>
 
@@ -19,11 +38,32 @@ get_header();
 				the_content();
 			endwhile; // End of the loop.
 
-			$phone_version_id = $_GET['phone_version_id'];
-			$carrier_id = $_REQUEST['carrier_id'];
+			$phone_version_id = null;
+			$carrier_id = null;
 
-			// Get filtered Phone Versions list
-			$phone_version = $wpdb->get_row("SELECT * FROM " . $wpdb->base_prefix ."cellable_phone_versions WHERE id=" . $phone_version_id, ARRAY_A);
+			if (isset($_REQUEST['call_back']) && $_REQUEST['call_back'] == "1") {
+				$obj = $_SESSION['cellable_obj'];
+				
+				if (!$obj || is_array($obj) !== true) {
+					// Stored session variable is expired, go to first page.
+				?>
+					<p>Session is expired.Please start from homepage again.</p>
+					<a href="<?=get_home_url() ?>">Go To Homepage</a>
+				<?php
+					return;
+				}
+				$carrier_id = $obj['carrier_id'];
+				$phone_version_id = $obj['phone_version_id'];				
+			}
+			else {
+				$phone_version_id = isset($_REQUEST['phone_version_id']) ? $_REQUEST['phone_version_id'] : null; 
+				$carrier_id = isset($_REQUEST['carrier_id']) ? $_REQUEST['carrier_id'] : null; 
+			}
+
+			// Get filtered Phone Versions list			
+			$phone_version = $wpdb->get_row($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix . "cellable_phone_versions 
+				where id = %d", $phone_version_id), ARRAY_A);
+
 			if (!$phone_version || !$carrier_id) {
 			?>
 			<p>Proper Phone Version can't be found.</p>
@@ -48,8 +88,10 @@ get_header();
 			), array(
 				'id' => $phone_version_id,
 			));
+			
+			$phone_brand = $wpdb->get_row($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix . "cellable_phones 
+				where id = %d", $phone_version['phone_id']), ARRAY_A);
 
-			$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
 			$phone_version_capacities = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix."cellable_version_capacities 
 				where value>0 and phone_version_id = %d order by storage_capacity_id", $phone_version['id']), ARRAY_A);
 			?>
@@ -73,8 +115,9 @@ get_header();
 						<p>Storage Capacity</p>
 						<p>
 							<?php 
-							foreach ($phone_version_capacities as $phone_version_capacity): 
-								$capacity = $wpdb->get_row("SELECT * FROM " .$wpdb->base_prefix ."cellable_storage_capacities WHERE id=" . $phone_version_capacity['storage_capacity_id'], ARRAY_A);
+							foreach ($phone_version_capacities as $phone_version_capacity): 								
+								$capacity = $wpdb->get_row($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix . "cellable_storage_capacities 
+									where id = %d", $phone_version_capacity['storage_capacity_id']), ARRAY_A);
 							?>
 							<label>
 								<input type="radio" name="capacity_id" value="<?= $capacity['id'] ?>" autocomplete="off" required/>&nbsp;
@@ -88,7 +131,9 @@ get_header();
 
 						<?php
 						foreach ($possible_defect_groups as $possible_defect_group):
-							$defect_group = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix. "cellable_defect_groups WHERE id=" . $possible_defect_group['id'], ARRAY_A);
+							$defect_group = $wpdb->get_row($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix . "cellable_defect_groups 
+									where id = %d", $possible_defect_group['id']), ARRAY_A);
+
 							$possible_defects = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix . "cellable_possible_defects 
 								where phone_version_id = %d and defect_group_id = %d", 
 								$phone_version_id, $possible_defect_group['id']), ARRAY_A);

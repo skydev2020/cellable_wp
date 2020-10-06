@@ -7,7 +7,6 @@ Template Post Type: page
 require_once(ABSPATH . 'wp-content/plugins/cellable/cellable_global.php');
 
 $user = wp_get_current_user(); // ID->0: if user is not logged in
-
 if ($user->ID==0):
 	/**
 	 * Push the necessary variables into Session Variable
@@ -19,8 +18,8 @@ if ($user->ID==0):
 	$obj = [];
 	
 	$obj["q"] = isset($_GET['q']) ? $_GET['q'] : "";
-	$obj["brand_id"] = isset($_GET['brand_id']) ? $_GET['brand_id'] : ""; 
-	$obj["carrier_id"] = isset($_REQUEST['carrier_id']) ? $_REQUEST['carrier_id'] : ""; 
+	$obj["brand_id"] = isset($_GET['brand_id']) ? $_GET['brand_id'] : null; 
+	$obj["carrier_id"] = isset($_REQUEST['carrier_id']) ? $_REQUEST['carrier_id'] : null; 
 	$obj["url"] = $url;
 
 	$_SESSION['cellable_obj'] = $obj;
