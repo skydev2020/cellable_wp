@@ -305,7 +305,15 @@ function crf_user_register( $user_id ) {
     wp_set_password($password, $user_id);
     wp_set_current_user($user_id);
     wp_set_auth_cookie($user_id);
-    wp_redirect( home_url() ); // You can change home_url() to the specific URL,such as "wp_redirect( 'http://www.wpcoke.com' )";
+
+    // Check whether it comes from middle of selling
+    $obj = $_SESSION['cellable_obj'];
+    
+    $rtr_url = get_home_url();
+    if ($obj && is_array($obj) === true) {
+        $rtr_url = $obj['url']."&call_back=1";
+    }
+    wp_redirect($rtr_url); // You can change home_url() to the specific URL,such as "wp_redirect( 'http://www.wpcoke.com' )";
     exit();
 
 }
