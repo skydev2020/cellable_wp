@@ -6,7 +6,6 @@ Template Post Type: page
 */
 
 require_once(ABSPATH . 'wp-content/plugins/cellable/cellable_global.php');
-
 $user = wp_get_current_user(); // ID->0: if user is not logged in
 if ($user->ID==0):
 	/**

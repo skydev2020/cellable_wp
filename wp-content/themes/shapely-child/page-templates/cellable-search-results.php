@@ -6,6 +6,24 @@ Template Post Type: page
 
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_shipping.class.php');
 require_once(ABSPATH . 'wp-content/themes/shapely-child/cellable_email.class.php');
+
+$user = wp_get_current_user(); // ID->0: if user is not logged in
+if ($user->ID==0):
+	/**
+	 * Push the necessary variables into Session Variable
+	 * These values will be reused after user successfully logins or register
+	 *  
+	 * */
+	$url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+	
+	$obj = [];
+		
+	$obj["q"] = isset($_REQUEST['q']) ? $_REQUEST['q'] : null; 	
+	$obj["url"] = $url;
+
+	$_SESSION['cellable_obj'] = $obj;
+endif;
+
 get_header(); 
 ?>
 
@@ -17,10 +35,28 @@ get_header();
 		while ( have_posts() ) : the_post();				
 			the_content();
 		endwhile; // End of the loop.
+
+		$s = null;
+
+		if (isset($_REQUEST['call_back']) && $_REQUEST['call_back'] == "1") {
+			$obj = $_SESSION['cellable_obj'];
+			
+			if (!$obj || is_array($obj) !== true) {
+				// Stored session variable is expired, go to first page.
+			?>
+				<p>Session is expired.Please start from homepage again.</p>
+				<a href="<?=get_home_url() ?>">Go To Homepage</a>
+			<?php
+				return;
+			}
+			$s = $obj['q'];
+		}
+		else {
+			$s = isset($_GET['q']) ? $_GET['q'] : "";
+		}
 		
-		$s = isset($_GET['q']) ? $_GET['q'] : "";
 		$phone_versions = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_phone_versions WHERE status=true		
-					and name like %s order by phone_id, position desc, name", "%".$wpdb->esc_like($s)."%"), ARRAY_A);
+			and name like %s order by phone_id, position desc, name", "%".$wpdb->esc_like($s)."%"), ARRAY_A);
 		
 		?>
 		<div class="text-center">
@@ -31,7 +67,8 @@ get_header();
 				</a>
 				<br />
 				<?php
-				$phone = $wpdb->get_row("SELECT name FROM ". $wpdb->base_prefix. "cellable_phones WHERE id=" . $ele['phone_id']);					
+				$phone = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_phones WHERE id=%d", 
+					$ele['phone_id']));
 				?>
 				<?= $phone->name?>
 				<br />

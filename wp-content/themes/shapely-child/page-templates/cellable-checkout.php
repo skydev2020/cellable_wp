@@ -50,7 +50,7 @@ get_header();
 			$promo_code = null;
 
 			// if this variable is called back from Login or Register, pull the variable from session variable
-			if ($_REQUEST['call_back'] == "1") {
+			if (isset($_REQUEST['call_back']) && $_REQUEST['call_back'] == "1") {
 				$obj = $_SESSION['cellable_obj'];
 				
 				if (!$obj || is_array($obj) !== true) {
