@@ -111,36 +111,12 @@ if ( ! function_exists( 'admin_add_pages' ) ) {
             remove_submenu_page('cellable', 'cellable');
         }
         else{
-            // add_menu_page("Spark Ignite", "Spark Ignite", "edit_posts", "spark","page_super_spark_users","dashicons-networking", 4);
-            // add_submenu_page('spark','Ignite Templates', 'Ignite Templates', 'edit_posts', 'admin_spark_pages','page_admin_spark_pages');
-            // add_submenu_page('spark','My Landing Pages', 'My Landing Pages', 'edit_posts', 'my_landing_pages','page_my_landing_pages');
-            // add_submenu_page('spark','Spark Fields', 'Spark Fields', 'edit_posts', 'spark_fields','page_admin_spark_fields');
+          
         }
 
         
     }
 }
-
-
-/**
- * Show Spark Fields to deal with shortcode
- */
-function shortcode_spark_fields($atts, $content = null) {
-	global $wpdb;
-	// $short_code = shortcode_atts( array (
-	// 	'id' => '',
-	// ), $atts);
-    // $site_id = get_current_blog_id();
-    // $content = $wpdb->get_var("SELECT " .  esc_attr($short_code['id'])  . " FROM wp_spark_fields WHERE status='Activated' and site_id=" . $site_id);
-    
-    // if ($short_code['id']=="logo") {
-    //     // return $content;
-    //     return '<img src="'.$content.'" class="sparkLogo" />';
-    // }
-    
-	return $content;
-}
-
 
 function get_cellable_setting($name) {
     global $wpdb;
@@ -179,16 +155,29 @@ add_action( 'personal_options_update', 'save_extra_user_profile_fields' );
 add_action( 'edit_user_profile_update', 'save_extra_user_profile_fields' );
 
 // Login & Logout Redirect
-add_filter('login_redirect', 'admin_default_page' ,10, 3);
-add_filter('logout_redirect', 'admin_default_page',10, 3);
+add_filter('login_redirect', 'user_default_redirect_page' ,10, 3);
+add_filter('logout_redirect', 'home_page',10, 3);
 
-function admin_default_page( $url, $request, $user) {
-   
+function user_default_redirect_page($url, $request, $user) {       
     if (isset($user->ID) && ($user->ID>0)) {
+        // When login success
         $str = date_create()->format('Y-m-d H:i:s');
         update_user_meta($user->ID, 'last_login', $str);
-        return get_home_url();
+                
+        $obj = $_SESSION['cellable_obj'];
+				
+		if (!$obj || is_array($obj) !== true) {
+            return get_home_url();
+        }
+    
+        $rtr_url = $obj['url']."&call_back=1";
+        return $rtr_url;
     }
+}
+
+function home_page($url, $request, $user) {
+    // clear the session variable
+    $_SESSION['cellable_obj'] = null;
     return get_home_url();
 }
 
