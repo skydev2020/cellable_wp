@@ -91,7 +91,6 @@ get_header();
 						$phone_version_carrier = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_version_carriers 
 							WHERE phone_version_id= %d and carrier_id = %d", $phone_version_id, $carrier['id']), ARRAY_A);
 						
-						
 						// $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix . "cellable_version_carriers 
 						// 	WHERE phone_version_id=" . $phone_version_id." and carrier_id =" . $carrier['id'], ARRAY_A);
 
