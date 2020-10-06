@@ -40,8 +40,6 @@ get_header();
 				return;
 			}
 
-
-
 			$price = $phone_version_capacity['value'];
 			// It should include code: Carrier baseCost -= decimal.Parse(versionCarrier.Value.ToString());
 
@@ -50,276 +48,115 @@ get_header();
 			$defect_ids_str = implode(', ', $defect_ids);
 			$total_defect_value = $wpdb->get_var("SELECT sum(cost) FROM ".$wpdb->base_prefix
 				."cellable_possible_defects WHERE id in (" .$defect_ids_str.")");
-
 			$price = $price-$total_defect_value;
 			
 			// Promotion Code
 			$promo = null;
-
-
-
 			if ($promo_code) {
-
 				$promo = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_promos WHERE code= %s
-
 					and start_date <= CURDATE() and end_date >= CURDATE()", $wpdb->esc_like($promo_code)), ARRAY_A);
-
 			}
 
-
-
 			if ($promo && $promo['discount']>0):
-
 				$price += $price * $promo['discount'] / 100;	
-
 			elseif ($promo && $promo['dollar_value']>0):
-
 				$price += $promo['dollar_value'];
-
 			endif;
-
-						
-
+					
 			$phone_brand = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix ."cellable_phones WHERE id=" . $phone_version['phone_id'], ARRAY_A);
-
 			?>
 
-			
-
 			<div class="col-md-12 mb-xs-24">
-
-				
-
 				<div class="col-md-3 col-xs-12">
-
-							
-
-						<center><img src="<?= $phone_version['image_file'] ?>" style="max-width: 250px;" class="text-center" /></center>
-
-						
-
+					<div class="text-center">
+						<img src="<?= $phone_version['image_file'] ?>" style="max-width: 250px;" class="text-center" />
+					</div>
 					<p class="fine_print"><strong>Please Note:</strong> We do not pay for devices that have been reported lost or stolen.</p>
-
-					
-
 					<p class="fine_print"><strong><?= get_cellable_setting('DefectsFooter') ?></strong></p>
-
-					
-
-					</div>			
-
-				
-
+				</div>
 				<div class="col-sm-2 col-xs-12"></div>
-
-				
-
 				<div class="col-sm-7 col-xs-12" id="defect_questions">
-
-					
-
-						<h3 class="big_header"><?= $phone_brand['name'] ?> <?= $phone_version['name'] ?> (<?= $capacity['description'] ?>)</h3>
-
-					
-
-						<h2 id="final_price">
-
-							$<?= number_format((float)$price, 2, '.', '')  ?>
-
-						</h2>
-
-					
-
-					
+					<h3 class="big_header"><?= $phone_brand['name'] ?> <?= $phone_version['name'] ?> (<?= $capacity['description'] ?>)</h3>
+					<h2 id="final_price">
+						$<?= number_format((float)$price, 2, '.', '')  ?>
+					</h2>
 
 					<!--PROMO CODE -->
-
-
-
-						<?php if ($price>0):?>
-
-							<?php if (isset($promo)):?>
-
-								Promo Code Applied<br/>
-
-								Promo Code: <?= $promo['code'] ?><br/>
-
-								<?php if ($promo['discount']>0):?>
-
-									+<?= $promo['discount'] ?>%
-
-								<?php else: ?>
-
-									+$<?= $promo['dollar_value'] ?>
-
-								<?php endif;?>
-
-							<?php else:?>
-
-								<form action="<?=get_home_url() ?>/price-phone/?phone_version_id=<?= $phone_version_id ?>" method="post">
-
-									<input name="capacity_id" type="hidden" value="<?=$capacity_id?>"/>
-
-									<input name="carrier_id" type="hidden" value="<?=$carrier_id?>"/>
-
-									<input id="PromoCode" name="promo_code" type="text" placeholder="Promo Code?" autofocus />
-
-
-
-									<?php foreach ($defect_ids as $defect_id): ?>
-
-									<input name="defect_ids[]" type="hidden" value="<?=$defect_id?>"/>
-
-									<?php endforeach; ?>
-
-									<button type="submit" name="submit" id="promo_code" class="PromoCode">
-
-										<i class="fa fa-caret-right"></i>
-
-									</button>
-
-									
-
-								</form>
-
+					<?php if ($price>0):?>
+						<?php if (isset($promo)):?>
+							Promo Code Applied<br/>
+							Promo Code: <?= $promo['code'] ?><br/>
+							<?php if ($promo['discount']>0):?>
+								+<?= $promo['discount'] ?>%
+							<?php else: ?>
+								+$<?= $promo['dollar_value'] ?>
 							<?php endif;?>
-
-					
-
-					
-
-							<form action="<?=get_home_url() ?>/checkout/?phone_version_id=<?= $phone_version_id ?>" method="post">
-
+						<?php else:?>
+							<form action="<?=get_home_url() ?>/price-phone/?phone_version_id=<?= $phone_version_id ?>" method="post">
 								<input name="capacity_id" type="hidden" value="<?=$capacity_id?>"/>
-
-								<input name="promo_code" type="hidden" value="<?=$promo_code?>" />
-
 								<input name="carrier_id" type="hidden" value="<?=$carrier_id?>"/>
-
-
+								<input id="PromoCode" name="promo_code" type="text" placeholder="Promo Code?" autofocus />
 
 								<?php foreach ($defect_ids as $defect_id): ?>
-
 								<input name="defect_ids[]" type="hidden" value="<?=$defect_id?>"/>
-
 								<?php endforeach; ?>
 
-								<p>
-
-									<input type="submit" value="Sell Your Phone" class="btn sell_phone" />
-
-								</p>
-
+								<button type="submit" name="submit" id="promo_code" class="PromoCode">
+									<i class="fa fa-caret-right"></i>
+								</button>
 							</form>
-
-						
-
-					
-
-						<?php else:?>
-
-							<div class='text-danger'>Unfortunately, we cannot purchase your phone.</div>
-
 						<?php endif;?>
 
-					
+						<form action="<?=get_home_url() ?>/checkout/?phone_version_id=<?= $phone_version_id ?>" method="post">
+							<input name="capacity_id" type="hidden" value="<?=$capacity_id?>"/>
+							<input name="promo_code" type="hidden" value="<?=$promo_code?>" />
+							<input name="carrier_id" type="hidden" value="<?=$carrier_id?>"/>
 
-					
-
-					
+							<?php foreach ($defect_ids as $defect_id): ?>
+							<input name="defect_ids[]" type="hidden" value="<?=$defect_id?>"/>
+							<?php endforeach; ?>
+							<p>
+								<input type="submit" value="Sell Your Phone" class="btn sell_phone" />
+							</p>
+						</form>
+					<?php else:?>
+						<div class='text-danger'>Unfortunately, we cannot purchase your phone.</div>
+					<?php endif;?>
 
 					<!--SUMMARY -->
-
+					<h2 id="summary_header">Summary</h2>
+					<p><strong>Phone's Base Value:</strong> $<?= number_format((float)$original_price, 2, '.', '')?></p>
+					<p><strong>Storage Capacity:</strong> <?= $capacity['description'] ?></p>
 					
+					<?php 
+					foreach ($defect_ids as $defect_id): 
+					$defect = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix. "cellable_possible_defects WHERE id=" . $defect_id, ARRAY_A);
+					if (!$defect) {
+						continue;
+					}	
 
-					
-
-									<h2 id="summary_header">Summary</h2>
-
-					
-
-									<p><strong>Phone's Base Value:</strong> $<?= number_format((float)$original_price, 2, '.', '')?></p>
-
-								
-
-									<p><strong>Storage Capacity:</strong> <?= $capacity['description'] ?></p>
-
-								
-
-					
-
-							<?php 
-
-							foreach ($defect_ids as $defect_id): 
-
-								$defect = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix. "cellable_possible_defects WHERE id=" . $defect_id, ARRAY_A);
-
-								if (!$defect) {
-
-									continue;
-
-								}	
-
-								$defect_group = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix. "cellable_defect_groups WHERE id=" . $defect['defect_group_id'], ARRAY_A);
-
-								if (!$defect_group) {
-
-									continue;
-
-								}
-
-							?>
-
-							
-
+					$defect_group = $wpdb->get_row("SELECT * FROM ". $wpdb->base_prefix. "cellable_defect_groups WHERE id=" . $defect['defect_group_id'], ARRAY_A);
+					if (!$defect_group) {
+						continue;
+					}
+					?>
 					<p><strong><?= $defect_group['name'] ?></strong> <?= $defect['name'] ?></p>
-
-
-
 					<?php endforeach; ?>
 
+					<?php if ($promo):?>		
+						<h3>Promo Code Applied:</h3>								
+						<?php if ($promo['discount']>0):?>
+							<?= $promo['discount'] ?>%
+						<?php else:?>
+							$<?= $promo['dollar_value'] ?>
+						<?php endif;?>
+					<?php endif; ?>                            
 
-
-							<?php if ($promo):?>
-
-					
-
-					<h3>Promo Code Applied:</h3>
-
-								
-
-								<?php if ($promo['discount']>0):?>
-
-									<?= $promo['discount'] ?>%
-
-								<?php else:?>
-
-									$<?= $promo['dollar_value'] ?>
-
-								<?php endif;?>
-
-									
-
-									
-
-							<?php endif; ?>                            
-
-									<!--<p><strong>Phone Value:</strong> $<?= number_format((float)$price, 2, '.', '')?></p>-->
-
-						
-
-									
-
-		</div>				
-
+					<!--<p><strong>Phone Value:</strong> $<?= number_format((float)$price, 2, '.', '')?></p>-->
+				</div>				
 			</div><!-- #content -->		
-
-								
-
 		</div><!-- #primary -->
-
 	</div>
-
 <?php
 
 get_footer();
