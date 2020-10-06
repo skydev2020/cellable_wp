@@ -191,7 +191,8 @@ function crf_registration_form() {
     $city = !empty( $_POST['city'] ) ? $_POST['city']  : '';
     $state = !empty( $_POST['state'] ) ? $_POST['state']  : '';
     $zip = !empty( $_POST['zip'] ) ? $_POST['zip']  : '';
-    
+    $password = !empty( $_POST['password'] ) ? $_POST['password']  : '';
+    $cpassword = !empty( $_POST['cpassword'] ) ? $_POST['cpassword']  : '';
 ?>
 	<p>
 		<label for="first_name">First Name<br/>
@@ -230,6 +231,14 @@ function crf_registration_form() {
 			<input type="text" id="zip" name="zip" value="<?php echo esc_attr( $zip ); ?>"
 			       class="input"/>
 		</label>
+        <label for="password">Password<br/>
+			<input type="password" id="password" name="password" value="<?php echo esc_attr( $password ); ?>"
+			       class="input"/>
+		</label>
+        <label for="cpassword">Confirm Password<br/>
+			<input type="password" id="cpassword" name="cpassword" value="<?php echo esc_attr( $cpassword ); ?>"
+			       class="input"/>
+		</label>
 	</p>
 <?php
 }
@@ -257,6 +266,12 @@ function crf_registration_errors( $errors, $sanitized_user_login, $user_email ) 
     if ( empty( $_POST['zip'] ) ) {
 		$errors->add( 'zip_error', __( '<strong>Error</strong>: Please enter Zip.', 'crf' ) );
     }
+    if ( empty( $_POST['password'] ) ) {
+		$errors->add( 'password_error', __( '<strong>Error</strong>: Please enter Password.', 'crf' ) );
+    }
+    if ($_POST['password'] !== $_POST['cpassword']) {
+		$errors->add( 'cpassword_error', __( '<strong>Error</strong>: Please confirm Password.', 'crf' ) );
+    }
 
 	return $errors;
 }
@@ -282,7 +297,17 @@ function crf_user_register( $user_id ) {
     } 
     if ( !empty( $_POST['zip'] ) ) {
 		update_user_meta( $user_id, 'zip', $_POST['zip'] ) ;
-	}
+    }
+    
+    // setup the password
+    $password = $_POST['password'];
+
+    wp_set_password($password, $user_id);
+    wp_set_current_user($user_id);
+    wp_set_auth_cookie($user_id);
+    wp_redirect( home_url() ); // You can change home_url() to the specific URL,such as "wp_redirect( 'http://www.wpcoke.com' )";
+    exit();
+
 }
 
 function save_extra_user_profile_fields( $user_id ) {
