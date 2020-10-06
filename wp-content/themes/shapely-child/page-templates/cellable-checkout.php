@@ -69,10 +69,10 @@ get_header();
 				$promo_code = $obj['promo_code'];
 			}
 			else {
-				$phone_version_id = $_REQUEST['phone_version_id'];
-				$capacity_id = $_REQUEST['capacity_id'];
-				$carrier_id = $_REQUEST['carrier_id'];
-				$defect_ids = $_REQUEST['defect_ids'];
+				$phone_version_id = isset($_REQUEST['phone_version_id']) ? $_REQUEST['phone_version_id'] : null;
+				$capacity_id = isset($_REQUEST['capacity_id']) ? $_REQUEST['capacity_id'] : null;
+				$carrier_id = isset($_REQUEST['carrier_id']) ? $_REQUEST['carrier_id'] : null; 
+				$defect_ids = isset($_REQUEST['defect_ids']) ? $_REQUEST['defect_ids'] : null; 
 				$promo_code = isset($_REQUEST['promo_code']) ? $_REQUEST['promo_code'] : null;
 			}
 			
