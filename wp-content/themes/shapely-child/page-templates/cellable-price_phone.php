@@ -4,6 +4,27 @@ Template Name: Cellable Price Phone
 Template Post Type: page
 */
 require_once(ABSPATH . 'wp-content/plugins/cellable/cellable_global.php');
+$user = wp_get_current_user(); // ID->0: if user is not logged in
+if ($user->ID==0):
+	/**
+	 * Push the necessary variables into Session Variable
+	 * These values will be reused after user successfully logins or register
+	 *  
+	 * */
+	$url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+	
+	$obj = [];
+		
+	$obj["phone_version_id"] = isset($_REQUEST['phone_version_id']) ? $_REQUEST['phone_version_id'] : null; 
+	$obj["capacity_id"] = isset($_REQUEST['capacity_id']) ? $_REQUEST['capacity_id'] : null; 
+	$obj["carrier_id"] = isset($_REQUEST['carrier_id']) ? $_REQUEST['carrier_id'] : null; 
+	$obj["defect_ids"] = isset($_REQUEST['defect_ids']) ? $_REQUEST['defect_ids'] : null; 
+	$obj["promo_code"] = isset($_REQUEST['promo_code']) ? $_REQUEST['promo_code'] : null; 
+	$obj["url"] = $url;
+
+	$_SESSION['cellable_obj'] = $obj;
+endif;
+
 get_header(); 
 ?>
 
@@ -15,13 +36,39 @@ get_header();
 			while ( have_posts() ) : the_post();				
 				the_content();
 			endwhile; // End of the loop.
+			
+			$phone_version_id = null;
+			$capacity_id = null;
+			$defect_ids = null;
+			$carrier_id = null;
+			$promo_code = null;
 
-			$phone_version_id = isset($_REQUEST['phone_version_id']) ? $_REQUEST['phone_version_id'] : null;
-			$capacity_id = isset($_REQUEST['capacity_id']) ? $_REQUEST['capacity_id'] : null;
-			$defect_ids = isset($_REQUEST['defect_ids']) ? $_REQUEST['defect_ids'] : null;
-			$carrier_id = isset($_REQUEST['carrier_id']) ? $_REQUEST['carrier_id'] : null;
-			$promo_code = isset($_REQUEST['promo_code']) ? $_REQUEST['promo_code'] : null;
+			if (isset($_REQUEST['call_back']) && $_REQUEST['call_back'] == "1") {
+				$obj = $_SESSION['cellable_obj'];
+				
+				if (!$obj || is_array($obj) !== true) {
+					// Stored session variable is expired, go to first page.
+				?>
+					<p>Session is expired.Please start from homepage again.</p>
+					<a href="<?=get_home_url() ?>">Go To Homepage</a>
+				<?php
+					return;
+				}
 
+				$carrier_id = $obj['carrier_id'];
+				$phone_version_id = $obj['phone_version_id'];
+				$capacity_id = $obj['capacity_id'];
+				$defect_ids = $obj['defect_ids'];
+				$promo_code = $obj['promo_code'];
+			}
+			else {
+				$phone_version_id = isset($_REQUEST['phone_version_id']) ? $_REQUEST['phone_version_id'] : null;
+				$capacity_id = isset($_REQUEST['capacity_id']) ? $_REQUEST['capacity_id'] : null;
+				$defect_ids = isset($_REQUEST['defect_ids']) ? $_REQUEST['defect_ids'] : null;
+				$carrier_id = isset($_REQUEST['carrier_id']) ? $_REQUEST['carrier_id'] : null;
+				$promo_code = isset($_REQUEST['promo_code']) ? $_REQUEST['promo_code'] : null;
+			}
+			
 			$phone_version = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_phone_versions WHERE id= %d", 
 				$phone_version_id), ARRAY_A);
 			$capacity = $wpdb->get_row($wpdb->prepare("SELECT * FROM ". $wpdb->base_prefix."cellable_storage_capacities WHERE id= %d", 
