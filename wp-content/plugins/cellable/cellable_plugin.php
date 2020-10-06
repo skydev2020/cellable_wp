@@ -169,8 +169,11 @@ function user_default_redirect_page($url, $request, $user) {
 		if (!$obj || is_array($obj) !== true) {
             return get_home_url();
         }
-    
+
         $rtr_url = $obj['url']."&call_back=1";
+        if (strpos($obj['url'], "phones/") !==false) {
+            $rtr_url = $obj['url']."?call_back=1";    
+        }
         return $rtr_url;
     }
 }
@@ -310,8 +313,13 @@ function crf_user_register( $user_id ) {
     $obj = $_SESSION['cellable_obj'];
     
     $rtr_url = get_home_url();
-    if ($obj && is_array($obj) === true) {
-        $rtr_url = $obj['url']."&call_back=1";
+    if ($obj && is_array($obj) === true) {        
+        if (strpos($obj['url'], "phones/") !==false) {
+            $rtr_url = $obj['url']."?call_back=1";    
+        }
+        else {
+            $rtr_url = $obj['url']."&call_back=1";
+        }
     }
     wp_redirect($rtr_url); // You can change home_url() to the specific URL,such as "wp_redirect( 'http://www.wpcoke.com' )";
     exit();
