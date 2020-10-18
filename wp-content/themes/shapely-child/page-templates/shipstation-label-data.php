@@ -15,7 +15,7 @@ if (!$order) {
 
 $data = base64_decode($order['label_data']);
 
-$file_name = $order_id."_label_data.pdf";
+$file_name = "files/". $order_id."_label_data.pdf";
 file_put_contents($file_name, $data);
 
 header('Cache-control: private');

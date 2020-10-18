@@ -171,9 +171,10 @@ class CellableShipping
             "insuranceOptions"=> null,
             "internationalOptions"=> null,
             "advancedOptions"=> null,
-            "testLabel"=> false
+            "testLabel"=> true
         );
-
+        error_log(json_encode($post_data));
+        
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://ssapi.shipstation.com/shipments/createlabel",
             CURLOPT_RETURNTRANSFER => true,
@@ -196,7 +197,7 @@ class CellableShipping
         curl_close($curl);
         error_log($response);
 
-        if (isset($response['shipmentId'])){
+        if (isset($res['shipmentId'])){
             $order = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_orders WHERE id=" . $order_id, ARRAY_A);
             $r = $wpdb->query(
                 $wpdb->prepare(

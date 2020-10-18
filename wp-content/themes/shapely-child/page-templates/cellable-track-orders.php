@@ -115,7 +115,7 @@ get_header();
 						<?= $order['payment_username'] ?>
 					</td>
 					<td>
-						<?php if ($order['mailing_label']): ?>
+						<?php if ($order['label_data']): ?>
 							<div onclick="popupLabelWindow('<?= $order['id'] ?>', window, 800, 600)" class="pointer" style="color:blue;">Print Label</div>
 						<?php endif; ?>
 					</td>
