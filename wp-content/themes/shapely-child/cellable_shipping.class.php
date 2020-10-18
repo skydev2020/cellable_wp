@@ -110,16 +110,108 @@ class CellableShipping
     }
 
         
-    public function GetShipStationLabel($orderId, $userId) {
-        // var client = new RestClient("https://ssapi.shipstation.com/orders/createlabelfororder");
-        // client.Timeout = -1;
-        // var request = new RestRequest(Method.POST);
-        // request.AddHeader("Host", "ssapi.shipstation.com");
-        // request.AddHeader("Authorization", "__YOUR_AUTH_HERE__");
-        // request.AddHeader("Content-Type", "application/json");
-        // request.AddParameter("application/json", "{\n  \"orderId\": " + orderId + ",\n  \"carrierCode\": \"fedex\",\n  \"serviceCode\": \"fedex_2day\",\n  \"packageCode\": \"package\",\n  \"confirmation\": null,\n  \"shipDate\": \"2014-04-03\",\n  \"weight\": {\n    \"value\": 2,\n    \"units\": \"pounds\"\n  },\n  \"dimensions\": null,\n  \"insuranceOptions\": null,\n  \"internationalOptions\": null,\n  \"advancedOptions\": null,\n  \"testLabel\": false\n}", ParameterType.RequestBody);
-        // IRestResponse response = client.Execute(request);
-        // Console.WriteLine(response.Content);
+    public function GetShipStationLabel($user_id, $order_id) {
+        global $SHIPSTATION_API_KEY;
+        global $SHIPSTATION_API_SECRET;
+        global $CONTACT_US_PHONE;
+        global $wpdb;
+
+        $curl = curl_init();
+        $post_fields = "";
+        $auth = "Basic ". base64_encode($SHIPSTATION_API_KEY.":". $SHIPSTATION_API_SECRET);
+
+        $user =get_userdata($user_id);
+        $address_setting = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_settings WHERE name='LocationAddress'", ARRAY_A);
+        $city_setting = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_settings WHERE name='LocationCity'", ARRAY_A);
+        $state_setting = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_settings WHERE name='LocationState'", ARRAY_A);
+        $zip_setting = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_settings WHERE name='LocationZip'", ARRAY_A);
+        $phone_setting = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_settings WHERE name='Phone'", ARRAY_A);
+        
+        $post_data = array(
+            "carrierCode" => "stamps_com",
+            "serviceCode" => "usps_first_class_mail",
+            "packageCode"=> "package",
+            "confirmation"=> "delivery",
+            "shipDate"=> date('Y-m-d'),
+            "weight"=> array(
+              "value"=> 2,
+              "units"=> "ounces"
+            ),
+            "dimensions"=> array(
+              "units"=> "inches",
+              "length"=> 6,
+              "width"=> 4,
+              "height"=> 2
+            ),
+            "shipFrom"=> array(
+              "name"=> $user->first_name . " " . $user->last_name,
+              "company"=> "Individual",
+              "street1"=> get_the_author_meta('address1', $user_id),
+              "street2"=> get_the_author_meta('address2', $user_id),
+              "street3"=> null,
+              "city"=> get_the_author_meta('city', $user_id),
+              "state"=> get_the_author_meta('state', $user_id),
+              "postalCode"=> get_the_author_meta('zip', $user_id),
+              "country"=> "US",
+              "phone"=> get_the_author_meta('phone_number', $user_id),
+              "residential"=> false
+            ),
+            "shipTo"=> array(
+              "name"=> "Cellable Receiving",
+              "company"=> "Cellable",
+              "street1"=> $address_setting['value'],
+              "street2"=> null,
+              "street3"=> null,
+              "city"=> $city_setting['value'],
+              "state"=> $state_setting['value'],
+              "postalCode"=> $zip_setting['value'],
+              "country"=> "US",
+              "phone"=> '+1 '.$CONTACT_US_PHONE
+            ),
+            "insuranceOptions"=> null,
+            "internationalOptions"=> null,
+            "advancedOptions"=> null,
+            "testLabel"=> false
+        );
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://ssapi.shipstation.com/shipments/createlabel",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => json_encode($post_data),
+            CURLOPT_HTTPHEADER => array(
+                "Host: ssapi.shipstation.com",
+                "Authorization: ".$auth,
+                "Content-Type: application/json"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $res = json_decode($response, true);
+        curl_close($curl);
+        error_log($response);
+
+        if (isset($response['shipmentId'])){
+            $order = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_orders WHERE id=" . $order_id, ARRAY_A);
+            $r = $wpdb->query(
+                $wpdb->prepare(
+                    "UPDATE ". $wpdb->base_prefix. "cellable_orders SET label_data = %s, usps_tracking_id = %s where id = %d;",
+                    $res['labelData'], $res['trackingNumber'], $order_id
+                ) // $wpdb->prepare
+            ); // $wpdb->query
+          
+        } 
+        else {
+            error_log("Creating Shipping Label Failed:");    
+            error_log($response);        
+        }
+
+        
     }
 
         //public ShipStationCreateOrderRequest GetShipStationCreateOrderRequestByExternalRef(long external_ref)

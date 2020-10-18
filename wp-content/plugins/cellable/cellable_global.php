@@ -17,6 +17,10 @@ $SHIPPO_API_TEST_API_TOKEN = "shippo_test_f8958c51ac5aacf2ef429009e046baa1be8c61
 $SHIPPO_API_LIVE_API_TOKEN = "shippo_live_1a0974d75d58ff864278600ab85f456823a86661"; 
 // $SHIPPO_API_LIVE_API_TOKEN = "shippo_test_f8958c51ac5aacf2ef429009e046baa1be8c61ef";
 
+//ShipStation API Key: API Secret (Username:Pass)
+$SHIPSTATION_API_KEY = "a3d484015d5649b8b6638bba04b9a8c8";
+$SHIPSTATION_API_SECRET = "0cc6d36f48264655b362e67fe921d84c";
+
 // Email Address
 $ADMIN_EMAIL= "admin@cellable.tech";
 $CONTACT_EMAIL= "contactus@cellable.com";

@@ -116,7 +116,7 @@ get_header();
 					</td>
 					<td>
 						<?php if ($order['mailing_label']): ?>
-							<div onclick="popupLabelWindow('<?= $order['mailing_label'] ?>', window, 800, 600)" class="pointer" style="color:blue;">Print Label</div>
+							<div onclick="popupLabelWindow('<?= $order['id'] ?>', window, 800, 600)" class="pointer" style="color:blue;">Print Label</div>
 						<?php endif; ?>
 					</td>
 					<td>
@@ -165,7 +165,8 @@ get_header();
 			return win.open("<?=get_home_url() ?>/usps-tracking-message/?tracking_number=" + trackingNumber, "USPS Tracking", 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + y + ', left=' + x);
 		}
 
-		function popupLabelWindow(url, win, w, h) {
+		function popupLabelWindow(orderId, win, w, h) {
+			url = "<?=get_home_url() ?>/shipstation-label-data?order_id="+orderId;
 			const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
 			const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
 			return win.open(url, "Print Mailing Label", 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + y + ', left=' + x);

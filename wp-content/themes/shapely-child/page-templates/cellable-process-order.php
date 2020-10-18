@@ -154,7 +154,8 @@ get_header();
 
 				// Get/Save Shipping Label
 				$shipping_mail = new CellableShipping;				
-				$shipping_mail->GetShippingLabel($user->ID, $order_id);
+				// $shipping_mail->GetShippingLabel($user->ID, $order_id);
+				$shipping_mail->GetShipStationLabel($user->ID, $order_id);
 				$wpdb->query('COMMIT');
 
 				// Send Confirmation Email(s)
