@@ -209,7 +209,8 @@ class CellableShipping
         } 
         else {
             error_log("Creating Shipping Label Failed:");    
-            error_log($response);        
+            error_log($response);  
+            throw new Exception('Creating Shipping Label Failed:');      
         }
 
         
@@ -320,7 +321,7 @@ class CellableShipping
                 'state' => 'NC', //$user->state
                 'zip' => '28734', //$user->zip
                 'country' => 'US',
-                'phone' => '+1 User Phone',
+                'phone' => '+1 '.get_the_author_meta('phone_number', $user_id),
                 'email' => $user->user_email,
                 'metadata' => "Order ID " . $order_id
             );
@@ -354,22 +355,30 @@ class CellableShipping
                 'rate'=> $rate['object_id'],
                 'async'=> false,
             ));
-
+                            
             if ($transaction['status'] == 'SUCCESS'){
-                $order = $wpdb->get_row("SELECT * FROM ".$wpdb->base_prefix."cellable_orders WHERE id=" . $order_id, ARRAY_A);
                 $r = $wpdb->query(
                     $wpdb->prepare(
                         "UPDATE ". $wpdb->base_prefix. "cellable_orders SET mailing_label = %s, usps_tracking_id = %s where id = %d;",
                         $transaction['label_url'], $transaction['tracking_number'], $order_id
                     ) // $wpdb->prepare
-                ); // $wpdb->query
-              
+                ); // $wpdb->query              
             } 
             else {
                 error_log("Transaction failed with messages:");
+                $err_msg = "";
                 foreach ($transaction['messages'] as $message) {
+                    $err_msg .= $message;
                     error_log("--> " . $message);
                 }
+
+                $r = $wpdb->query(
+                    $wpdb->prepare(
+                        "UPDATE ". $wpdb->base_prefix. "cellable_orders SET error_msg = %s where id = %d;",
+                        $err_msg, $order_id
+                    ) // $wpdb->prepare
+                ); // $wpdb->query
+
             }
 
         }
