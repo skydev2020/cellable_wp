@@ -349,12 +349,14 @@ class CellableShipping
 
             // select desired shipping rate according to your business logic
             // we simply select the first rate in this example
-            $rate = $shipment['rates'][0];
-            
+            $rate = $shipment['rates'][3];            
+
             $transaction = Shippo_Transaction::create(array(
                 'rate'=> $rate['object_id'],
                 'async'=> false,
             ));
+
+           
                             
             if ($transaction['status'] == 'SUCCESS'){
                 $r = $wpdb->query(
